@@ -14,9 +14,9 @@ import { Delete, ExpandCircleDown, ExpandCircleUp, ExpandMore, ExpandLess, } fro
 import { Grid, MenuItem, Select, TextField } from '@mui/material';
 import { exercisesList } from '../exercisesAPI';
 
-function AddExerciseListItem({ exercises, onAddExercise }) {
-    const [open, setOpen] = useState(false);
-    const [exercise, setExercise] = useState(exercises[0].name);
+function AddExerciseListItem({ onAddExercise }) {
+    const [open, setOpen] = useState(true);
+    const [exercise, setExercise] = useState(exercisesList[0].name);
     const [totalWeeklySets, setTotalWeeklySets] = useState(5);
     const handleChange = (event) => {
         setExercise(event.target.value);

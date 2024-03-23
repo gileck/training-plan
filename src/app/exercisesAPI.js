@@ -30,7 +30,7 @@ export function useExercisesAPI() {
 
     function calcWeelklyTarget(weeklyTarget, week) {
         const progressiveOverload = 0.05; // 5% increase per week
-        return Math.round(initialSets * Math.pow(1 + progressiveOverload, weekNumber - 1));
+        return Math.round(weeklyTarget * Math.pow(1 + progressiveOverload, Number(week) - 1));
     }
 
     const weeks = _.range(1, 8).map(week => {
@@ -47,27 +47,24 @@ export function useExercisesAPI() {
     const allExercises = weeks.flat();
     const localExercises = getData() || allExercises;
     console.log({ localExercises });
-    const [exercises, setExercises] = useState(allExercises);
+    const [exercises, setExercises] = useState(localExercises);
 
 
     function addExercise(exercise) {
-        const byWeek = _.groupBy(exercises, 'week');
-        const byWeekIncludingNewExercise = _.mapValues(byWeek, (weeklyExercises, week) => {
-            return [
-                ...weeklyExercises,
-                {
-                    id: `${week}-${weeklyExercises.length}`,
-                    week: Number(week),
-                    name: exercise.name,
-                    totalSets: 0,
-                    totalWeeklySets: 0,
-                    weeklyTarget: exercise.weeklyTarget,
-                }
-            ]
+        const newExerciseByWeek = _.range(1, 8).map(week => {
+            return {
+                id: `${week}-${exercises.length}`,
+                week: Number(week),
+                name: exercise.name,
+                totalSets: 0,
+                totalWeeklySets: 0,
+                weeklyTarget: calcWeelklyTarget(exercise.weeklyTarget, week),
+            }
         })
-        const all = Object.values(byWeekIncludingNewExercise).flat()
-        setExercises(all)
-        saveData(all)
+
+        const newExerciseList = [...exercises, ...newExerciseByWeek]
+        setExercises(newExerciseList);
+        saveData(newExerciseList)
     }
     const deleteExercise = (exercise) => {
         const newExercises = exercises.filter(e => e.name !== exercise.name);
