@@ -13,7 +13,6 @@ import { AddExercise } from "./components/addExercise";
 import { Add } from "@mui/icons-material";
 import dynamic from 'next/dynamic'
 import { TrainingPlan } from "./components/TrainingPlan";
-import { allExercises } from "./components/exercises";
 import _ from 'lodash'
 import { localStorageAPI } from "./localStorageAPI";
 
@@ -21,18 +20,12 @@ const { getData, saveData, removeData } = localStorageAPI();
 
 export default function Home() {
   const ClientTabs = dynamic(() => Promise.resolve(AppTabs), { ssr: false })
-  // const localExercises = getData();
-  // console.log({ localExercises });
-  const [exercises, setExercises] = React.useState(getData() || allExercises);
-  console.log('exercises', exercises);
-
-  
 
   return (
     <main className={styles.main}>
       <ClientTabs
-        List1={<TrainingPlan/>}
-        List2={<EditPlan/>}
+        List1={<TrainingPlan />}
+        List2={<EditPlan />}
       />
 
     </main>

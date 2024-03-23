@@ -28,6 +28,11 @@ export function useExercisesAPI() {
 
     const { getData, saveData, removeData } = localStorageAPI();
 
+    function calcWeelklyTarget(weeklyTarget, week) {
+        const progressiveOverload = 0.05; // 5% increase per week
+        return Math.round(initialSets * Math.pow(1 + progressiveOverload, weekNumber - 1));
+    }
+
     const weeks = _.range(1, 8).map(week => {
         return SmallexercisesList.map((exercise, index) => ({
             id: `${week}-${index}`,
@@ -35,14 +40,14 @@ export function useExercisesAPI() {
             name: exercise.name,
             totalSets: 0,
             totalWeeklySets: 0,
-            weeklyTarget: exercise.weeklyTarget,
+            weeklyTarget: calcWeelklyTarget(exercise.weeklyTarget, week),
         }));
     })
 
     const allExercises = weeks.flat();
     const localExercises = getData() || allExercises;
     console.log({ localExercises });
-    const [exercises, setExercises] = useState(localExercises);
+    const [exercises, setExercises] = useState(allExercises);
 
 
     function addExercise(exercise) {
