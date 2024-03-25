@@ -13,7 +13,7 @@ import AddIcon from '@mui/icons-material/Add';
 import IconButton from '@mui/material/IconButton';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { Delete, RemoveCircle } from "@mui/icons-material";
+import { Delete, EditLocation, EditLocationAlt, EditNotifications, RemoveCircle } from "@mui/icons-material";
 import { AddExercise } from "./addExercise";
 import { localStorageAPI } from "../localStorageAPI";
 import AddExerciseListItem from "./AddExerciseListItem";
@@ -23,7 +23,6 @@ export function EditPlan() {
 
     const { addExercise, updateExercise, exercises, deleteExercise } = useExercisesAPI()
 
-    console.log({ exercises });
 
     const exerciseToShow = _.groupBy(exercises, 'week')[1] || []
     const [open, setOpen] = React.useState(false);
@@ -40,6 +39,9 @@ export function EditPlan() {
 
     const onRemoveButtonClicked = (exercise) => {
         updateExercise(exercise, { weeklyTarget: Number(exercise.weeklyTarget) - 1 });
+    }
+
+    const EditButtonClicked = (exercises) => {
 
     }
 
@@ -57,12 +59,13 @@ export function EditPlan() {
                         .map((exercise) => (
                             <ListItem disablePadding>
                                 <ListItemButton>
-                                    <ListItemText primary={exercise.name} secondary={`Weekly Target: ${exercise.weeklyTarget}`} />
-                                    <IconButton onClick={() => onAddButtonClicked(exercise)}>
-                                        <AddCircleIcon />
-                                    </IconButton>
-                                    <IconButton onClick={() => onRemoveButtonClicked(exercise)}>
-                                        <RemoveCircle />
+                                    <ListItemText primary={exercise.name}
+                                        secondary={`
+                                        Weekly Sets: ${exercise.weeklyTarget} (${exercise.numberOfReps}x${exercise.weight}kg)
+                                    `} />
+
+                                    <IconButton onClick={() => EditButtonClicked(exercise)}>
+                                        <EditLocationAlt />
                                     </IconButton>
                                     <IconButton onClick={() => onDeleteButtonClicked(exercise)}>
                                         <Delete />
@@ -72,7 +75,6 @@ export function EditPlan() {
                         ))}
 
                     <AddExerciseListItem
-                        selectedValue={''}
                         exercises={exercises}
                         onAddExercise={onAddExercise}
                     />

@@ -36,7 +36,7 @@ export function SelectExercise({ exercise, exercises, setExercises, numberOfSets
     };
 
     return (
-        <Box sx={{ minWidth: 120 }}>
+        <Box sx={{}}>
             <FormControl fullWidth>
                 <InputLabel>Exercise</InputLabel>
                 <Select

@@ -11,13 +11,22 @@ import { allExercises } from "./exercises";
 import { localStorageAPI } from "../localStorageAPI";
 import { ExpandLess, ExpandMore, RemoveCircle } from "@mui/icons-material";
 import _ from 'lodash'
-import { Collapse } from "@mui/material";
+import { Button, Collapse } from "@mui/material";
 import { useExercisesAPI } from "../exercisesAPI";
+import AddExerciseListItem from "./AddExerciseListItem";
 const { getData, saveData } = localStorageAPI();
 
 export function TrainingPlan() {
 
-    const { updateExercise, exercises: weeklyExercises } = useExercisesAPI()
+    const { cleanData, updateExercise, exercises: weeklyExercises, addExercise } = useExercisesAPI()
+    console.log(' weeklyExercises', weeklyExercises);
+
+
+    function onAddExercise(newExercise, week) {
+        if (newExercise) {
+            addExercise(newExercise, week);
+        }
+    }
 
 
     console.log({ weeklyExercises });
@@ -54,6 +63,7 @@ export function TrainingPlan() {
 
                             >
                                 <ExercisesWeekly
+                                    onAddExercise={e => onAddExercise(e, week)}
                                     updateExercise={updateExercise}
                                     exercises={groupByWeek[week]} />
 
@@ -62,10 +72,11 @@ export function TrainingPlan() {
                     ))}
                 </List>
             </div>
+            <Button onClick={() => cleanData()}>Clear</Button>
         </Box>
     );
 }
-export function ExercisesWeekly({ exercises, updateExercise }) {
+export function ExercisesWeekly({ exercises, updateExercise, onAddExercise }) {
     function onSetComplete(exercise, sets) {
         updateExercise(exercise, { totalWeeklySets: Number(exercise.totalWeeklySets || 0) + Number(sets) });
     }
@@ -82,6 +93,7 @@ export function ExercisesWeekly({ exercises, updateExercise }) {
                     />
                 ))}
 
+
         </List>
     );
 }
@@ -92,7 +104,11 @@ function Exercise({ exercise, onRemoveSetComplete, onAddSetComplete }) {
             <ListItemText
                 style={{ textDecoration: weeklyTargetReached ? 'line-through' : '' }}
                 primary={exercise.name}
-                secondary={`Sets: ${exercise.totalWeeklySets || 0} / ${exercise.weeklyTarget}`} />
+                secondary={`
+                Sets: ${exercise.totalWeeklySets || 0} / ${exercise.weeklyTarget}
+                (${exercise.numberOfReps}x${exercise.weight}kg)
+                `} />
+
 
             <IconButton onClick={() => onAddSetComplete()}>
                 <AddCircleIcon />

@@ -7,8 +7,9 @@ export function localStorageAPI() {
         saveData: (data) => {
             localStorage.setItem('data', JSON.stringify(data));
         },
-        removeData: (key = 'data') => {
+        cleanData: (key = 'data') => {
             localStorage.removeItem(key);
+            console.log('cleaned');
         }
     };
 }

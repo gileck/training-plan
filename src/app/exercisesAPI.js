@@ -26,10 +26,10 @@ const SmallexercisesList = [
 
 export function useExercisesAPI() {
 
-    const { getData, saveData, removeData } = localStorageAPI();
+    const { getData, saveData, cleanData } = localStorageAPI();
 
-    function calcWeelklyTarget(weeklyTarget, week) {
-        const progressiveOverload = 0.05; // 5% increase per week
+    function calcWeelklyTarget(weeklyTarget, week, overloadValue) {
+        const progressiveOverload = overloadValue || 0.05; // 5% increase per week
         return Math.round(weeklyTarget * Math.pow(1 + progressiveOverload, Number(week) - 1));
     }
 
@@ -50,15 +50,28 @@ export function useExercisesAPI() {
     const [exercises, setExercises] = useState(localExercises);
 
 
-    function addExercise(exercise) {
+    function addExercise({ overloadValue, overloadType, name, numberOfReps, weight, weeklyTarget }) {
+
+        console.log({
+            overloadType, name, numberOfReps, weight, weeklyTarget
+        });
+
+
         const newExerciseByWeek = _.range(1, 8).map(week => {
+            const calcFn = type => overloadType === type ? calcWeelklyTarget : v => v
+
             return {
                 id: `${week}-${exercises.length}`,
                 week: Number(week),
-                name: exercise.name,
+                name,
                 totalSets: 0,
                 totalWeeklySets: 0,
-                weeklyTarget: calcWeelklyTarget(exercise.weeklyTarget, week),
+                weeklyTarget: calcFn('sets')(weeklyTarget, week, overloadValue),
+                numberOfReps: calcFn('reps')(numberOfReps || 8, week, overloadValue),
+                weight: calcFn('weight')(weight || 12, week, overloadValue),
+                overloadType,
+                overloadValue
+
             }
         })
 
@@ -87,6 +100,7 @@ export function useExercisesAPI() {
         exercises,
         addExercise,
         deleteExercise,
-        updateExercise
+        updateExercise,
+        cleanData
     }
 }
