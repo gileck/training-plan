@@ -41,7 +41,7 @@ export function TrainingPlan() {
     }
 
     return (
-        <Box sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+        <Box sx={{ width: '100%', maxWidth: 360, }}>
             <div>
                 <List component="nav" aria-labelledby="nested-list-subheader">
                     {Object.keys(groupByWeek).map((week) => (

@@ -52,7 +52,9 @@ export function AppTabs({ List1, List2 }) {
                     <Tab label="Edit Plan" {...a11yProps(1)} />
                 </Tabs>
             </Box>
-            <CustomTabPanel value={value} index={0}>
+            <CustomTabPanel
+
+                value={value} index={0}>
                 {List1}
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
