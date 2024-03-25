@@ -1,6 +1,6 @@
 "use client"
 import React from "react";
-import { Card, } from "@mui/material";
+import { Card, Collapse, } from "@mui/material";
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -16,17 +16,22 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Delete, EditLocation, EditLocationAlt, EditNotifications, RemoveCircle } from "@mui/icons-material";
 import { AddExercise } from "./addExercise";
 import { localStorageAPI } from "../localStorageAPI";
-import AddExerciseListItem from "./AddExerciseListItem";
+import AddExerciseListItem, { EditExerciseForm } from "./AddExerciseListItem";
 import _ from 'lodash'
 import { useExercisesAPI } from "../exercisesAPI";
 export function EditPlan() {
 
-    const { addExercise, updateExercise, exercises, deleteExercise } = useExercisesAPI()
+    const { editExercide, addExercise, updateExercise, exercises, deleteExercise } = useExercisesAPI()
 
 
     const exerciseToShow = _.groupBy(exercises, 'week')[1] || []
     const [open, setOpen] = React.useState(false);
+    const [editExerciseOpened, setEditExercise] = React.useState({});
+    console.log({ editExerciseOpened });
 
+    function handleEditExerciseClicked(id) {
+        setEditExercise({ ...editExerciseOpened, [id]: !editExerciseOpened[id] });
+    }
     function onAddExercise(newExercise) {
         if (newExercise) {
             addExercise(newExercise);
@@ -41,8 +46,9 @@ export function EditPlan() {
         updateExercise(exercise, { weeklyTarget: Number(exercise.weeklyTarget) - 1 });
     }
 
-    const EditButtonClicked = (exercises) => {
-
+    const editExerciseInternal = (exercise) => {
+        addExercise(exercise);
+        setEditExercise({ ...editExerciseOpened, [exercise.id]: false });
     }
 
     const onDeleteButtonClicked = (exercise) => {
@@ -57,21 +63,31 @@ export function EditPlan() {
                 <List>
                     {exerciseToShow
                         .map((exercise) => (
-                            <ListItem disablePadding>
-                                <ListItemButton>
-                                    <ListItemText primary={exercise.name}
-                                        secondary={`
+                            <React.Fragment key={exercise.id}>
+
+
+                                <ListItem disablePadding>
+                                    <ListItemButton>
+                                        <ListItemText primary={exercise.name}
+                                            secondary={`
                                         Weekly Sets: ${exercise.weeklyTarget} (${exercise.numberOfReps}x${exercise.weight}kg)
                                     `} />
 
-                                    <IconButton onClick={() => EditButtonClicked(exercise)}>
-                                        <EditLocationAlt />
-                                    </IconButton>
-                                    <IconButton onClick={() => onDeleteButtonClicked(exercise)}>
-                                        <Delete />
-                                    </IconButton>
-                                </ListItemButton>
-                            </ListItem>
+                                        <IconButton onClick={() => handleEditExerciseClicked(exercise.id)}>
+                                            <EditLocationAlt />
+                                        </IconButton>
+                                        <IconButton onClick={() => onDeleteButtonClicked(exercise)}>
+                                            <Delete />
+                                        </IconButton>
+                                    </ListItemButton>
+                                </ListItem>
+                                <Collapse in={editExerciseOpened[exercise.id]}>
+                                    <EditExerciseForm
+                                        onAddExercise={editExerciseInternal}
+                                        exerciseToEdit={exercise}
+                                    />
+                                </Collapse>
+                            </React.Fragment>
                         ))}
 
                     <AddExerciseListItem
