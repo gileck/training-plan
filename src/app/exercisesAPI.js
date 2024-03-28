@@ -2,24 +2,46 @@ import { useState } from 'react';
 import _ from 'lodash';
 import { localStorageAPI } from "./localStorageAPI";
 
-
 export const exercisesList = [
-    { name: "Squats", weeklyTarget: 10 },
-    { name: "ATG Split squats", weeklyTarget: 10 },
-    { name: "Shoulder Press", weeklyTarget: 15 },
-    { name: "Bicep Curls", weeklyTarget: 15 },
-    { name: "Tricep Extensions", weeklyTarget: 10 },
-    { name: "Pull Ups", weeklyTarget: 15 },
-    { name: "Push Ups", weeklyTarget: 15 },
-    { name: "Deeps", weeklyTarget: 10 },
-    { name: "Core", weeklyTarget: 10 },
-    { name: "Farmer Carry", weeklyTarget: 15 },
-    { name: "Lunges", weeklyTarget: 10 },
-    { name: "Kettlebell Swings", weeklyTarget: 10 },
-    { name: "Snatch", weeklyTarget: 10 },
-    { name: "Shoulder side raises", weeklyTarget: 10 },
-    { name: "HIIT", weeklyTarget: 2 },
-]
+    { name: "Push-ups", bodyParts: ["Chest", "Triceps", "Shoulders"], pullPush: "Push", bodyWeight: true, category: "Upper body" },
+    { name: "Squats", bodyParts: ["Quadriceps", "Hamstrings", "Glutes"], pullPush: "Push", bodyWeight: true, category: "Legs" },
+    { name: "Lunges", bodyParts: ["Quadriceps", "Hamstrings", "Glutes"], pullPush: "Push", bodyWeight: true, category: "Legs" },
+    { name: "Plank", bodyParts: ["Core"], pullPush: null, bodyWeight: true, category: "Core" },
+    { name: "Deadlifts", bodyParts: ["Back", "Glutes", "Hamstrings"], pullPush: "Pull", bodyWeight: false, category: "Legs" },
+    { name: "Bench Press", bodyParts: ["Chest", "Triceps", "Shoulders"], pullPush: "Push", bodyWeight: false, category: "Upper body" },
+    { name: "Pull-ups", bodyParts: ["Back", "Biceps"], pullPush: "Pull", bodyWeight: true, category: "Upper body" },
+    { name: "Sit-ups", bodyParts: ["Core"], pullPush: null, bodyWeight: true, category: "Core" },
+    { name: "Burpees", bodyParts: ["Full Body"], pullPush: null, bodyWeight: true, category: "Core" },
+    { name: "Mountain Climbers", bodyParts: ["Core", "Shoulders"], pullPush: null, bodyWeight: true, category: "Core" },
+    { name: "Bicep Curls", bodyParts: ["Biceps"], pullPush: "Pull", bodyWeight: false, category: "Upper body" },
+    { name: "Tricep Dips", bodyParts: ["Triceps"], pullPush: "Push", bodyWeight: true, category: "Upper body" },
+    { name: "Jump Rope", bodyParts: ["Calves", "Cardiovascular System"], pullPush: null, bodyWeight: true, category: "Legs" },
+    { name: "Leg Raises", bodyParts: ["Core"], pullPush: null, bodyWeight: true, category: "Core" },
+    { name: "Russian Twists", bodyParts: ["Core"], pullPush: null, bodyWeight: true, category: "Core" },
+    { name: "Jump Squats", bodyParts: ["Quadriceps", "Hamstrings", "Glutes"], pullPush: "Push", bodyWeight: true, category: "Legs" },
+    { name: "Kettlebell Swings", bodyParts: ["Glutes", "Hamstrings", "Back"], pullPush: "Pull", bodyWeight: false, category: "Legs" },
+    { name: "Box Jumps", bodyParts: ["Legs"], pullPush: "Push", bodyWeight: true, category: "Legs" },
+    { name: "Bicycle Crunches", bodyParts: ["Core"], pullPush: null, bodyWeight: true, category: "Core" },
+    { name: "Wall Sit", bodyParts: ["Quadriceps", "Glutes"], pullPush: null, bodyWeight: true, category: "Legs" }
+];
+
+// export const exercisesList = [
+//     { name: "Squats", weeklyTarget: 10 },
+//     { name: "ATG Split squats", weeklyTarget: 10 },
+//     { name: "Shoulder Press", weeklyTarget: 15 },
+//     { name: "Bicep Curls", weeklyTarget: 15 },
+//     { name: "Tricep Extensions", weeklyTarget: 10 },
+//     { name: "Pull Ups", weeklyTarget: 15 },
+//     { name: "Push Ups", weeklyTarget: 15 },
+//     { name: "Deeps", weeklyTarget: 10 },
+//     { name: "Core", weeklyTarget: 10 },
+//     { name: "Farmer Carry", weeklyTarget: 15 },
+//     { name: "Lunges", weeklyTarget: 10 },
+//     { name: "Kettlebell Swings", weeklyTarget: 10 },
+//     { name: "Snatch", weeklyTarget: 10 },
+//     { name: "Shoulder side raises", weeklyTarget: 10 },
+//     { name: "HIIT", weeklyTarget: 2 },
+// ]
 const SmallexercisesList = [
     { name: "Squats", weeklyTarget: 10 },
 ]

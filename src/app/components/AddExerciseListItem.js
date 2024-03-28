@@ -11,7 +11,7 @@ import AddIcon from '@mui/icons-material/Add';
 import IconButton from '@mui/material/IconButton';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { Delete, ExpandCircleDown, ExpandCircleUp, ExpandMore, ExpandLess, } from "@mui/icons-material";
-import { Button, Grid, MenuItem, Select, TextField } from '@mui/material';
+import {Autocomplete, Button, Grid, MenuItem, Select, TextField} from '@mui/material';
 import { exercisesList } from '../exercisesAPI';
 
 function AddExerciseListItem({ onAddExercise }) {
@@ -75,15 +75,19 @@ export function EditExerciseForm({ onAddExercise, exerciseToEdit }) {
     return (
         <List component="div" disablePadding>
             <ListItem>
-                <Select
-                    sx={{ width: '140px' }}
+                <Autocomplete
+                    disablePortal
+                    aria-label={"Exercise"}
+                    label={"Exercise"}
                     value={exerciseName}
-                    onChange={handleChange}>   {
-                        exercisesList.map((exercise, index) => (
-                            <MenuItem key={index} value={exercise.name}>{exercise.name}</MenuItem>
-                        ))
-                    }
-                </Select>
+                    options={exercisesList.map((option) => ({label: option.name, value: option.name}))}
+                    sx={{ width: 300 }}
+                    renderInput={(params) => <TextField {...params} label={params.name} />}
+                    onChange={(event, newValue) => {
+                        setExerciseName(newValue.value)
+                    }}
+                />
+
             </ListItem>
             <ListItem>
 

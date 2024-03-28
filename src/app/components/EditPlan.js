@@ -5,23 +5,15 @@ import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import Divider from '@mui/material/Divider';
-import InboxIcon from '@mui/icons-material/Inbox';
-import AddIcon from '@mui/icons-material/Add';
 import IconButton from '@mui/material/IconButton';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { Delete, EditLocation, EditLocationAlt, EditNotifications, RemoveCircle } from "@mui/icons-material";
-import { AddExercise } from "./addExercise";
-import { localStorageAPI } from "../localStorageAPI";
+import { Delete, EditLocationAlt, EditNotifications, RemoveCircle } from "@mui/icons-material";
 import AddExerciseListItem, { EditExerciseForm } from "./AddExerciseListItem";
 import _ from 'lodash'
 import { useExercisesAPI } from "../exercisesAPI";
 export function EditPlan() {
 
-    const { editExercide, addExercise, updateExercise, exercises, deleteExercise } = useExercisesAPI()
+    const { addExercise, updateExercise, exercises, deleteExercise } = useExercisesAPI()
 
 
     const exerciseToShow = _.groupBy(exercises, 'week')[1] || []
@@ -69,8 +61,12 @@ export function EditPlan() {
                                 <ListItem disablePadding>
                                     <ListItemButton>
                                         <ListItemText primary={exercise.name}
+
                                             secondary={`
-                                        Weekly Sets: ${exercise.weeklyTarget} (${exercise.numberOfReps}x${exercise.weight}kg)
+                                        Weekly Sets: ${exercise.weeklyTarget}
+                                        ${exercise.numberOfReps && exercise.weight ?
+                                                "(" + exercise.numberOfReps + 'x' + exercise.weight + 'kg' + ")" : ''} 
+                                            
                                     `} />
 
                                         <IconButton onClick={() => handleEditExerciseClicked(exercise.id)}>
