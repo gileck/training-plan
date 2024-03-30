@@ -74,11 +74,11 @@ export function ExercisesWeekly({ exercises, updateExercise, week }) {
 
     return (
         <List component="div" disablePadding sx={{ ml: '20px' }}>
+            <Divider />
             {_.take(exercises, 3)
                 // .sort((a, b) => (a.totalWeeklySets - a.weeklyTarget) - (b.totalWeeklySets - b.weeklyTarget))
                 .map((exercise) => (
                     <React.Fragment key={exercise.id}>
-                        <Divider />
 
                         <Exercise key={exercise.id}
                             exercise={exercise}

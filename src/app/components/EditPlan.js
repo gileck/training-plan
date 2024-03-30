@@ -1,6 +1,6 @@
 "use client"
 import React from "react";
-import { Card, Collapse, } from "@mui/material";
+import { Card, Collapse, Divider, } from "@mui/material";
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -17,11 +17,9 @@ export function EditPlan() {
 
 
     const exerciseToShow = exercises.map(e => ({ ...e, ...e.weeks[0] }))
-    console.log({ exerciseToShow });
 
     const [open, setOpen] = React.useState(false);
     const [editExerciseOpened, setEditExercise] = React.useState({});
-    console.log({ editExerciseOpened });
 
     function handleEditExerciseClicked(id) {
         setEditExercise({ ...editExerciseOpened, [id]: !editExerciseOpened[id] });
@@ -75,9 +73,9 @@ export function EditPlan() {
 
                                         secondary={printSets(exercise)} />
 
-                                    <IconButton onClick={() => handleEditExerciseClicked(exercise.id)}>
+                                    {/* <IconButton onClick={() => handleEditExerciseClicked(exercise.id)}>
                                         <EditLocationAlt />
-                                    </IconButton>
+                                    </IconButton> */}
                                     <IconButton onClick={() => onDeleteButtonClicked(exercise)}>
                                         <Delete />
                                     </IconButton>
@@ -87,9 +85,14 @@ export function EditPlan() {
                                 <EditExerciseForm
                                     onAddExercise={editExerciseInternal}
                                     exerciseToEdit={exercise}
+                                    exercises={exercises}
+
                                 />
                             </Collapse>
+                            <Divider />
+
                         </React.Fragment>
+
                     ))}
 
                 <AddExerciseListItem

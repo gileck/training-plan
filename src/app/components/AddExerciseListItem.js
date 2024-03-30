@@ -11,10 +11,10 @@ import AddIcon from '@mui/icons-material/Add';
 import IconButton from '@mui/material/IconButton';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { Delete, ExpandCircleDown, ExpandCircleUp, ExpandMore, ExpandLess, } from "@mui/icons-material";
-import { Autocomplete, Button, Grid, MenuItem, Select, TextField } from '@mui/material';
+import { Autocomplete, Button, Chip, Grid, MenuItem, Select, TextField } from '@mui/material';
 import { exercisesList } from '../exercisesAPI';
 
-function AddExerciseListItem({ onAddExercise }) {
+function AddExerciseListItem({ onAddExercise, exercises }) {
     const [open, setOpen] = useState(false);
 
     function onAddExerciseInternal(exercise) {
@@ -32,12 +32,13 @@ function AddExerciseListItem({ onAddExercise }) {
         <List>
             <ListItem onClick={handleClick}>
                 <ListItemIcon>
-                    {open ? <ExpandLess /> : <ExpandMore />}
+                    <Chip icon={open ? <ExpandLess /> : <AddCircleIcon />} label="Add Exercise" />
                 </ListItemIcon>
                 <ListItemText primary="" />
             </ListItem>
             <Collapse in={open} timeout="auto" unmountOnExit>
                 <EditExerciseForm
+                    exercises={exercises}
                     onAddExercise={onAddExerciseInternal}
                 />
             </Collapse>
@@ -45,15 +46,17 @@ function AddExerciseListItem({ onAddExercise }) {
     );
 }
 
-export function EditExerciseForm({ onAddExercise, exerciseToEdit }) {
+export function EditExerciseForm({ onAddExercise, exerciseToEdit, exercises }) {
 
-    const [exercise, setExercise] = useState(exerciseToEdit || exercisesList[0]);
-    const [exerciseName, setExerciseName] = useState(exerciseToEdit?.name || exercisesList[0].name);
+    console.log({ exerciseToEdit });
+    const exerciseOptions = exercisesList.filter(e => !exercises.find(ex => ex.name === e.name))
+    const [exercise, setExercise] = useState(exerciseToEdit || exerciseOptions[0]);
     const [totalWeeklySets, setTotalWeeklySets] = useState(exerciseToEdit?.weeklySets || 5);
     const [reps, setReps] = useState(exerciseToEdit?.numberOfReps || 8);
     const [weight, setWeight] = useState(exerciseToEdit?.weight || 12);
     const [overloadType, setOverloadType] = useState(exerciseToEdit?.overloadType || 'sets');
     const [overloadValue, setOverloadValue] = useState(exerciseToEdit?.overloadValue || 5);
+    console.log({ exercise });
 
     const onAddButtonClicked = () => {
         onAddExercise(Object.assign(exerciseToEdit || {}, {
@@ -68,23 +71,28 @@ export function EditExerciseForm({ onAddExercise, exerciseToEdit }) {
         }))
     }
 
-    const handleChange = (event) => {
-        setExerciseName(event.target.value);
-    }
     const handleOverloadTypeChange = (event) => {
         setOverloadType(event.target.value);
     }
 
+
     return (
-        <List component="div" disablePadding>
+        <List
+            sx={{
+                background: '#f2f2f2',
+                borderRadius: '10px',
+                borderColor: 'grey',
+                padding: '10px',
+
+            }} component="div" disablePadding>
             <ListItem>
                 <Autocomplete
                     isOptionEqualToValue={(option, value) => option.name === value.name}
                     disablePortal
                     aria-label={"Exercise"}
                     label={"Exercise"}
-                    value={exercise.name}
-                    options={exercisesList.map((option) => ({ label: option.name, value: option }))}
+                    value={exerciseOptions[0].name}
+                    options={exerciseOptions.map((option) => ({ label: option.name, value: option }))}
                     sx={{ width: 300 }}
                     renderInput={(params) => <TextField {...params} label={params.name} />}
                     onChange={(event, newValue) => {
@@ -144,8 +152,12 @@ export function EditExerciseForm({ onAddExercise, exerciseToEdit }) {
             <Divider />
 
             <ListItem>
-                <ListItemButton onClick={onAddButtonClicked}>Add</ListItemButton>
-                <ListItemButton>Clean</ListItemButton>
+                <Button
+                    onClick={onAddButtonClicked}
+                    variant="contained"
+                    color="primary"
+                >Add</Button>
+                {/* <ListItemButton>Clean</ListItemButton> */}
 
             </ListItem>
         </List>
