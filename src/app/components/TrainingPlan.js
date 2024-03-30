@@ -36,7 +36,7 @@ export function TrainingPlan() {
                     <React.Fragment key={week.id}>
                         <ListItem key={week} onClick={() => handleCollapseClick(week)}>
                             <ListItemText
-                                primary={`Week ${week}`}
+                                primary={`Week ${Number(week) + 1}`}
                                 secondary={`Total Sets: 
                                         ${groupByWeek[week].reduce((acc, exercise) => acc + (Number(exercise.totalWeeklySets) || 0), 0)} 
                                         / 
@@ -73,7 +73,7 @@ export function ExercisesWeekly({ exercises, updateExercise, week }) {
     }
 
     return (
-        <List component="div" disablePadding sx={{ ml: '20px' }}>
+        <List component="div" disablePadding sx={{ ml: '15px' }}>
             <Divider />
             {_.take(exercises, 3)
                 // .sort((a, b) => (a.totalWeeklySets - a.weeklyTarget) - (b.totalWeeklySets - b.weeklyTarget))
