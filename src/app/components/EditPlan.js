@@ -16,7 +16,9 @@ export function EditPlan() {
     const { addExercise, updateExercise, exercises, deleteExercise } = useExercisesAPI()
 
 
-    const exerciseToShow = _.groupBy(exercises, 'week')[1] || []
+    const exerciseToShow = exercises.map(e => ({ ...e, ...e.weeks[0] }))
+    console.log({ exerciseToShow });
+
     const [open, setOpen] = React.useState(false);
     const [editExerciseOpened, setEditExercise] = React.useState({});
     console.log({ editExerciseOpened });
@@ -47,53 +49,56 @@ export function EditPlan() {
         deleteExercise(exercise);
     }
 
+    function printSets(exercise) {
+        return `
+        Weekly Sets: ${exercise.weeklyTarget}
+        ${exercise.bodyWeight && exercise.numberOfReps ? exercise.numberOfReps : ""}
+
+        ${!exercise.bodyWeight && exercise.numberOfReps && exercise.weight ?
+                "(" + exercise.numberOfReps + 'x' + exercise.weight + 'kg' + ")" : ''} 
+            
+    `
+    }
 
 
     return (
-        <Box sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-            <div>
-                <List>
-                    {exerciseToShow
-                        .map((exercise) => (
-                            <React.Fragment key={exercise.id}>
+        <div>
+            <List>
+                {exerciseToShow
+                    .map((exercise) => (
+                        <React.Fragment key={exercise.id}>
 
 
-                                <ListItem disablePadding>
-                                    <ListItemButton>
-                                        <ListItemText primary={exercise.name}
+                            <ListItem disablePadding>
+                                <ListItemButton>
+                                    <ListItemText primary={exercise.name}
 
-                                            secondary={`
-                                        Weekly Sets: ${exercise.weeklyTarget}
-                                        ${exercise.numberOfReps && exercise.weight ?
-                                                "(" + exercise.numberOfReps + 'x' + exercise.weight + 'kg' + ")" : ''} 
-                                            
-                                    `} />
+                                        secondary={printSets(exercise)} />
 
-                                        <IconButton onClick={() => handleEditExerciseClicked(exercise.id)}>
-                                            <EditLocationAlt />
-                                        </IconButton>
-                                        <IconButton onClick={() => onDeleteButtonClicked(exercise)}>
-                                            <Delete />
-                                        </IconButton>
-                                    </ListItemButton>
-                                </ListItem>
-                                <Collapse in={editExerciseOpened[exercise.id]}>
-                                    <EditExerciseForm
-                                        onAddExercise={editExerciseInternal}
-                                        exerciseToEdit={exercise}
-                                    />
-                                </Collapse>
-                            </React.Fragment>
-                        ))}
+                                    <IconButton onClick={() => handleEditExerciseClicked(exercise.id)}>
+                                        <EditLocationAlt />
+                                    </IconButton>
+                                    <IconButton onClick={() => onDeleteButtonClicked(exercise)}>
+                                        <Delete />
+                                    </IconButton>
+                                </ListItemButton>
+                            </ListItem>
+                            <Collapse in={editExerciseOpened[exercise.id]}>
+                                <EditExerciseForm
+                                    onAddExercise={editExerciseInternal}
+                                    exerciseToEdit={exercise}
+                                />
+                            </Collapse>
+                        </React.Fragment>
+                    ))}
 
-                    <AddExerciseListItem
-                        exercises={exercises}
-                        onAddExercise={onAddExercise}
-                    />
-                </List>
+                <AddExerciseListItem
+                    exercises={exercises}
+                    onAddExercise={onAddExercise}
+                />
+            </List>
 
-            </div>
-        </Box>
+        </div>
     )
 
 }

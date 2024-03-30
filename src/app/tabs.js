@@ -38,7 +38,7 @@ function a11yProps(index) {
     };
 }
 
-export function AppTabs({ List1, List2 }) {
+export function AppTabs({ Comps }) {
     const [value, setValue] = React.useState(0);
 
     const handleChange = (event, newValue) => {
@@ -48,18 +48,23 @@ export function AppTabs({ List1, List2 }) {
         <Box sx={{ width: '100%' }}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-                    <Tab label="Training Plan" {...a11yProps(0)} />
-                    <Tab label="Edit Plan" {...a11yProps(1)} />
+                    {
+                        Comps.map(({ label }, index) => (
+                            <Tab label={label} {...a11yProps(index)} />
+                        ))
+                    }
                 </Tabs>
             </Box>
-            <CustomTabPanel
+            {
+                Comps.map(({ Comp }, index) => (
+                    <CustomTabPanel value={value} index={index}>
+                        <Box sx={{ width: '100%', maxWidth: 360, }}>
+                            {Comp}
+                        </Box>
 
-                value={value} index={0}>
-                {List1}
-            </CustomTabPanel>
-            <CustomTabPanel value={value} index={1}>
-                {List2}
-            </CustomTabPanel>
+                    </CustomTabPanel>
+                ))
+            }
         </Box>
     );
 }

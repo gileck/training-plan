@@ -1,13 +1,13 @@
 export function localStorageAPI() {
 
     return {
-        getData: () => {
-            return JSON.parse(localStorage.getItem('data') || null);
+        getData: (key) => {
+            return JSON.parse(localStorage.getItem(key) || null);
         },
-        saveData: (data) => {
-            localStorage.setItem('data', JSON.stringify(data));
+        saveData: (key, data) => {
+            localStorage.setItem(key, JSON.stringify(data));
         },
-        cleanData: (key = 'data') => {
+        cleanData: (key) => {
             localStorage.removeItem(key);
             console.log('cleaned');
         }

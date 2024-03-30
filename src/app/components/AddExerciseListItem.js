@@ -11,7 +11,7 @@ import AddIcon from '@mui/icons-material/Add';
 import IconButton from '@mui/material/IconButton';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { Delete, ExpandCircleDown, ExpandCircleUp, ExpandMore, ExpandLess, } from "@mui/icons-material";
-import {Autocomplete, Button, Grid, MenuItem, Select, TextField} from '@mui/material';
+import { Autocomplete, Button, Grid, MenuItem, Select, TextField } from '@mui/material';
 import { exercisesList } from '../exercisesAPI';
 
 function AddExerciseListItem({ onAddExercise }) {
@@ -47,8 +47,9 @@ function AddExerciseListItem({ onAddExercise }) {
 
 export function EditExerciseForm({ onAddExercise, exerciseToEdit }) {
 
+    const [exercise, setExercise] = useState(exerciseToEdit || exercisesList[0]);
     const [exerciseName, setExerciseName] = useState(exerciseToEdit?.name || exercisesList[0].name);
-    const [totalWeeklySets, setTotalWeeklySets] = useState(exerciseToEdit?.weeklyTarget || 5);
+    const [totalWeeklySets, setTotalWeeklySets] = useState(exerciseToEdit?.weeklySets || 5);
     const [reps, setReps] = useState(exerciseToEdit?.numberOfReps || 8);
     const [weight, setWeight] = useState(exerciseToEdit?.weight || 12);
     const [overloadType, setOverloadType] = useState(exerciseToEdit?.overloadType || 'sets');
@@ -56,12 +57,14 @@ export function EditExerciseForm({ onAddExercise, exerciseToEdit }) {
 
     const onAddButtonClicked = () => {
         onAddExercise(Object.assign(exerciseToEdit || {}, {
-            name: exerciseName,
-            weeklyTarget: Number(totalWeeklySets),
+            ...exercise,
+            name: exercise.name,
+            weeklySets: Number(totalWeeklySets),
             numberOfReps: Number(reps),
-            weight: Number(weight),
+            weight: exercise.bodyWeight ? null : Number(weight),
             overloadType,
             overloadValue: Number(overloadValue),
+
         }))
     }
 
@@ -76,15 +79,16 @@ export function EditExerciseForm({ onAddExercise, exerciseToEdit }) {
         <List component="div" disablePadding>
             <ListItem>
                 <Autocomplete
+                    isOptionEqualToValue={(option, value) => option.name === value.name}
                     disablePortal
                     aria-label={"Exercise"}
                     label={"Exercise"}
-                    value={exerciseName}
-                    options={exercisesList.map((option) => ({label: option.name, value: option.name}))}
+                    value={exercise.name}
+                    options={exercisesList.map((option) => ({ label: option.name, value: option }))}
                     sx={{ width: 300 }}
                     renderInput={(params) => <TextField {...params} label={params.name} />}
                     onChange={(event, newValue) => {
-                        setExerciseName(newValue.value)
+                        setExercise(newValue.value)
                     }}
                 />
 
@@ -106,8 +110,10 @@ export function EditExerciseForm({ onAddExercise, exerciseToEdit }) {
             </ListItem>
             <ListItem>
                 <TextField
+                    // disabled={true}
+                    disabled={exercise.bodyWeight}
                     label="Weight (kg)"
-                    value={weight}
+                    value={exercise.bodyWeight ? 0 : weight}
                     onChange={(e) => setWeight(e.target.value)}
                     type="number" />
             </ListItem>

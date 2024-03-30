@@ -17,68 +17,58 @@ import AddExerciseListItem from "./AddExerciseListItem";
 const { getData, saveData } = localStorageAPI();
 
 export function TrainingPlan() {
-
-    const { cleanData, updateExercise, exercises: weeklyExercises, addExercise } = useExercisesAPI()
-    console.log(' weeklyExercises', weeklyExercises);
-
-
+    const [open, setOpen] = React.useState({});
+    const { getExercisesByWeeks, cleanData, updateExercise, addExercise } = useExercisesAPI()
+    const groupByWeek = getExercisesByWeeks();
+    console.log(' groupByWeek', groupByWeek);
+    function handleCollapseClick(week) {
+        setOpen({ ...open, [week]: !open[week] });
+    }
     function onAddExercise(newExercise, week) {
         if (newExercise) {
             addExercise(newExercise, week);
         }
     }
-
-
-    console.log({ weeklyExercises });
-
-    const [open, setOpen] = React.useState({});
-
-    const groupByWeek = _.groupBy(weeklyExercises, 'week');
-    console.log({ groupByWeek, open });
-
-    function handleCollapseClick(week) {
-        setOpen({ ...open, [week]: !open[week] });
-    }
-
     return (
-        <Box sx={{ width: '100%', maxWidth: 360, }}>
-            <div>
-                <List component="nav" aria-labelledby="nested-list-subheader">
-                    {Object.keys(groupByWeek).map((week) => (
-                        <React.Fragment key={week.id}>
-                            <ListItem key={week} onClick={() => handleCollapseClick(week)}>
-                                <ListItemText
-                                    primary={`Week ${week}`}
-                                    secondary={`Total Sets: 
+        <div>
+            <List component="nav" aria-labelledby="nested-list-subheader">
+                {Object.keys(groupByWeek).map((week) => (
+                    <React.Fragment key={week.id}>
+                        <ListItem key={week} onClick={() => handleCollapseClick(week)}>
+                            <ListItemText
+                                primary={`Week ${week}`}
+                                secondary={`Total Sets: 
                                         ${groupByWeek[week].reduce((acc, exercise) => acc + (Number(exercise.totalWeeklySets) || 0), 0)} 
                                         / 
                                         ${groupByWeek[week].reduce((acc, exercise) => acc + Number(exercise.weeklyTarget), 0)}`}
-                                />
-                                {open[week.id] ? <ExpandLess /> : <ExpandMore />}
-                            </ListItem>
-                            <Collapse
-                                in={open[week]}
-                                timeout="auto"
-                                unmountOnExit
+                            />
+                            {open[week.id] ? <ExpandLess /> : <ExpandMore />}
+                        </ListItem>
+                        <Collapse
+                            in={open[week]}
+                            timeout="auto"
+                            unmountOnExit
 
-                            >
-                                <ExercisesWeekly
-                                    onAddExercise={e => onAddExercise(e, week)}
-                                    updateExercise={updateExercise}
-                                    exercises={groupByWeek[week]} />
+                        >
+                            <ExercisesWeekly
+                                week={week}
+                                onAddExercise={e => onAddExercise(e, week)}
+                                updateExercise={updateExercise}
+                                exercises={groupByWeek[week]} />
 
-                            </Collapse>
-                        </React.Fragment>
-                    ))}
-                </List>
-            </div>
-            <Button onClick={() => cleanData()}>Clear</Button>
-        </Box>
+                        </Collapse>
+                    </React.Fragment>
+                ))}
+            </List>
+        </div>
+
     );
 }
-export function ExercisesWeekly({ exercises, updateExercise, onAddExercise }) {
+export function ExercisesWeekly({ exercises, updateExercise, week }) {
     function onSetComplete(exercise, sets) {
-        updateExercise(exercise, { totalWeeklySets: Number(exercise.totalWeeklySets || 0) + Number(sets) });
+        updateExercise(exercise.id, week, {
+            totalWeeklySets: Number(exercise.totalWeeklySets || 0) + Number(sets)
+        });
     }
 
     return (

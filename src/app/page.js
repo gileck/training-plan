@@ -15,6 +15,7 @@ import dynamic from 'next/dynamic'
 import { TrainingPlan } from "./components/TrainingPlan";
 import _ from 'lodash'
 import { localStorageAPI } from "./localStorageAPI";
+import { Settings } from "./components/Settings";
 
 const { getData, saveData, removeData } = localStorageAPI();
 
@@ -24,8 +25,12 @@ export default function Home() {
   return (
     <main className={styles.main}>
       <ClientTabs
-        List1={<TrainingPlan />}
-        List2={<EditPlan />}
+        Comps={
+          [
+            { label: "Training Plan", Comp: <TrainingPlan /> },
+            { label: "Edit Plan", Comp: <EditPlan /> },
+            { label: "Settings", Comp: <Settings /> },
+          ]}
       />
 
     </main>
