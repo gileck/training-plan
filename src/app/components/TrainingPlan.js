@@ -11,8 +11,8 @@ import { allExercises } from "./exercises";
 import { localStorageAPI } from "../localStorageAPI";
 import { ExpandLess, ExpandMore, RemoveCircle } from "@mui/icons-material";
 import _ from 'lodash'
-import { Button, Collapse } from "@mui/material";
-import { useExercisesAPI } from "../exercisesAPI";
+import { Button, Chip, Collapse, Divider, Typography } from "@mui/material";
+import { useExercisesAPI, getBodyParts, getCategory } from "../exercisesAPI";
 import AddExerciseListItem from "./AddExerciseListItem";
 const { getData, saveData } = localStorageAPI();
 
@@ -56,6 +56,7 @@ export function TrainingPlan() {
                                 updateExercise={updateExercise}
                                 exercises={groupByWeek[week]} />
 
+
                         </Collapse>
                     </React.Fragment>
                 ))}
@@ -72,15 +73,21 @@ export function ExercisesWeekly({ exercises, updateExercise, week }) {
     }
 
     return (
-        <List component="div" disablePadding>
+        <List component="div" disablePadding sx={{ ml: '20px' }}>
             {_.take(exercises, 3)
                 // .sort((a, b) => (a.totalWeeklySets - a.weeklyTarget) - (b.totalWeeklySets - b.weeklyTarget))
                 .map((exercise) => (
-                    <Exercise key={exercise.id}
-                        exercise={exercise}
-                        onRemoveSetComplete={() => onSetComplete(exercise, -1)}
-                        onAddSetComplete={() => onSetComplete(exercise, 1)}
-                    />
+                    <React.Fragment key={exercise.id}>
+                        <Divider />
+
+                        <Exercise key={exercise.id}
+                            exercise={exercise}
+                            onRemoveSetComplete={() => onSetComplete(exercise, -1)}
+                            onAddSetComplete={() => onSetComplete(exercise, 1)}
+                        />
+                        <Divider />
+                    </React.Fragment>
+
                 ))}
 
 
@@ -90,22 +97,71 @@ export function ExercisesWeekly({ exercises, updateExercise, week }) {
 function Exercise({ exercise, onRemoveSetComplete, onAddSetComplete }) {
     const weeklyTargetReached = exercise.totalWeeklySets >= exercise.weeklyTarget;
     return (
-        <ListItem sx={{ pl: 4 }}>
-            <ListItemText
-                style={{ textDecoration: weeklyTargetReached ? 'line-through' : '' }}
-                primary={exercise.name}
-                secondary={`
-                Sets: ${exercise.totalWeeklySets || 0} / ${exercise.weeklyTarget}
-                (${exercise.numberOfReps}x${exercise.weight}kg)
-                `} />
+        <ListItem
 
 
-            <IconButton onClick={() => onAddSetComplete()}>
-                <AddCircleIcon />
-            </IconButton>
-            <IconButton onClick={() => onRemoveSetComplete()}>
-                <RemoveCircle />
-            </IconButton>
-        </ListItem>
+            sx={{ flexDirection: 'column', alignItems: 'flex-start' }}
+        >
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    width: '100%'
+                }}>
+
+                <ListItemText
+                    style={{ textDecoration: weeklyTargetReached ? 'line-through' : '' }}
+                    primary={exercise.name}
+                    secondary={
+                        <React.Fragment>
+                            <Typography
+                                component="span"
+                                variant="body2"
+                                color="text.secondary"
+                            >
+                                Sets: {exercise.totalWeeklySets || 0} / {exercise.weeklyTarget}
+
+
+                            </Typography>
+                            <Typography
+                                sx={{ ml: '10px' }}
+                                component="span"
+                                variant="body2"
+                                color="text.secondary"
+                            >
+                                ({exercise.numberOfReps}x{exercise.weight}kg)
+                            </Typography>
+                        </React.Fragment>
+                    } />
+
+
+
+                <IconButton onClick={() => onAddSetComplete()}>
+                    <AddCircleIcon />
+                </IconButton>
+                <IconButton onClick={() => onRemoveSetComplete()}>
+                    <RemoveCircle />
+                </IconButton>
+            </Box>
+            <Box sx={{ pt: 1 }}> {/* This Box is optional and provides padding top */}
+
+                <Chip
+                    sx={{ mr: 1 }}
+                    key={getCategory(exercise.name)}
+                    label={getCategory(exercise.name)}
+                    size="small"
+                />
+
+                {getBodyParts(exercise.name).map((bodyPart) => (
+                    <Chip
+                        sx={{ mr: 1 }}
+                        key={bodyPart}
+                        label={bodyPart}
+                        size="small"
+                        variant="outlined"
+                    />
+                ))}
+            </Box>
+        </ListItem >
     );
 }

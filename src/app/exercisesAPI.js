@@ -43,6 +43,15 @@ const SmallexercisesList = [
     { name: "Squats", weeklyTarget: 10 },
 ]
 
+export function getBodyParts(name) {
+    return exercisesList.find(e => e.name === name).bodyParts;
+}
+
+export function getCategory(name) {
+    return exercisesList.find(e => e.name === name).category;
+}
+
+
 export function useExercisesAPI() {
 
     const { getData, saveData, cleanData } = localStorageAPI();
@@ -166,6 +175,7 @@ export function useExercisesAPI() {
 
 
 
+
     return {
         exercises,
         addExercise,
@@ -175,6 +185,7 @@ export function useExercisesAPI() {
         editExercide,
         getExercisesByWeeks,
         changeNumberOfWeeks,
-        numberOfWeeks
+        numberOfWeeks,
+
     }
 }
