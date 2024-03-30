@@ -87,16 +87,22 @@ export function EditExerciseForm({ onAddExercise, exerciseToEdit, exercises }) {
             }} component="div" disablePadding>
             <ListItem>
                 <Autocomplete
+                    size='small'
+                    blurOnSelect
+                    disableClearable
                     isOptionEqualToValue={(option, value) => option.name === value.name}
                     disablePortal
                     aria-label={"Exercise"}
                     label={"Exercise"}
-                    value={exerciseOptions[0].name}
+                    value={exercise.name}
                     options={exerciseOptions.map((option) => ({ label: option.name, value: option }))}
                     sx={{ width: 300 }}
-                    renderInput={(params) => <TextField {...params} label={params.name} />}
+                    renderInput={(params) => <TextField {...params} label='Exercise' />}
                     onChange={(event, newValue) => {
-                        setExercise(newValue.value)
+                        console.log({ newValue });
+                        if (newValue && newValue.value) {
+                            setExercise(newValue.value)
+                        }
                     }}
                 />
 
@@ -105,6 +111,8 @@ export function EditExerciseForm({ onAddExercise, exerciseToEdit, exercises }) {
 
                 <TextField
                     label="Weekly Sets"
+                    size='small'
+                    sx={{ width: '100px' }}
                     value={totalWeeklySets}
                     onChange={(e) => setTotalWeeklySets(e.target.value)}
                     type="number" />
@@ -112,15 +120,20 @@ export function EditExerciseForm({ onAddExercise, exerciseToEdit, exercises }) {
             <ListItem>
                 <TextField
                     label="Reps"
+                    size='small'
+                    sx={{ width: '100px' }}
+
                     value={reps}
                     onChange={(e) => setReps(e.target.value)}
                     type="number" />
             </ListItem>
             <ListItem>
                 <TextField
+                    size='small'
                     // disabled={true}
                     disabled={exercise.bodyWeight}
                     label="Weight (kg)"
+                    sx={{ width: '100px' }}
                     value={exercise.bodyWeight ? 0 : weight}
                     onChange={(e) => setWeight(e.target.value)}
                     type="number" />
@@ -134,6 +147,8 @@ export function EditExerciseForm({ onAddExercise, exerciseToEdit, exercises }) {
 
 
                 <Select
+                    size='small'
+                    sx={{ width: '100px' }}
                     value={overloadType}
                     onChange={handleOverloadTypeChange}>   {
                         ['sets', 'reps', 'weight'].map((overloadType, index) => (
@@ -144,7 +159,9 @@ export function EditExerciseForm({ onAddExercise, exerciseToEdit, exercises }) {
             </ListItem>
             <ListItem>
                 <TextField
-                    label="Overload"
+                    size='small'
+                    sx={{ width: '100px' }}
+                    label="Overload %"
                     value={overloadValue}
                     onChange={(e) => setOverloadValue(e.target.value)}
                     type="number" />
