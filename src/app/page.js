@@ -16,6 +16,7 @@ import { TrainingPlan } from "./components/TrainingPlan";
 import _ from 'lodash'
 import { localStorageAPI } from "./localStorageAPI";
 import { Settings } from "./components/Settings";
+import { Workout } from "./components/Workout";
 
 const { getData, saveData, removeData } = localStorageAPI();
 
@@ -27,6 +28,7 @@ export default function Home() {
       <ClientTabs
         Comps={
           [
+            { label: "Workout", Comp: <Workout /> },
             { label: "Training Plan", Comp: <TrainingPlan /> },
             { label: "Edit Plan", Comp: <EditPlan /> },
             { label: "Settings", Comp: <Settings /> },

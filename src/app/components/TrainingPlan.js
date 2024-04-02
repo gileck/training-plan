@@ -75,12 +75,13 @@ export function ExercisesWeekly({ exercises, updateExercise, week }) {
     return (
         <List component="div" disablePadding sx={{ ml: '15px' }}>
             <Divider />
-            {_.take(exercises, 3)
+            {exercises
                 // .sort((a, b) => (a.totalWeeklySets - a.weeklyTarget) - (b.totalWeeklySets - b.weeklyTarget))
                 .map((exercise) => (
                     <React.Fragment key={exercise.id}>
 
-                        <Exercise key={exercise.id}
+                        <Exercise
+                            key={exercise.id}
                             exercise={exercise}
                             onRemoveSetComplete={() => onSetComplete(exercise, -1)}
                             onAddSetComplete={() => onSetComplete(exercise, 1)}
@@ -94,7 +95,7 @@ export function ExercisesWeekly({ exercises, updateExercise, week }) {
         </List>
     );
 }
-function Exercise({ exercise, onRemoveSetComplete, onAddSetComplete }) {
+export function Exercise({ exercise, onRemoveSetComplete, onAddSetComplete }) {
     const weeklyTargetReached = exercise.totalWeeklySets >= exercise.weeklyTarget;
     return (
         <ListItem

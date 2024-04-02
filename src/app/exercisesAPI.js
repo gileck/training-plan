@@ -14,12 +14,16 @@ export const exercisesList = [
     { name: "Burpees", bodyParts: ["Full Body"], pullPush: null, bodyWeight: true, category: "Core" },
     { name: "Mountain Climbers", bodyParts: ["Core", "Shoulders"], pullPush: null, bodyWeight: true, category: "Core" },
     { name: "Bicep Curls", bodyParts: ["Biceps"], pullPush: "Pull", bodyWeight: false, category: "Upper body" },
-    { name: "Shoulder Press", bodyParts: ["Shoulder"], pullPush: "Pull", bodyWeight: false, category: "Upper body" },
+    { name: "Shoulder Press", bodyParts: ["Shoulders"], pullPush: "Pull", bodyWeight: false, category: "Upper body" },
+    { name: "Shoulder Side raise", bodyParts: ["Shoulders"], pullPush: "Pull", bodyWeight: false, category: "Upper body" },
+    { name: "Shoulder Front raise", bodyParts: ["Shoulders"], pullPush: "Pull", bodyWeight: false, category: "Upper body" },
     { name: "Tricep Dips", bodyParts: ["Triceps"], pullPush: "Push", bodyWeight: true, category: "Upper body" },
     { name: "Jump Squats", bodyParts: ["Quadriceps", "Hamstrings", "Glutes"], pullPush: "Push", bodyWeight: true, category: "Legs" },
     { name: "Kettlebell Swings", bodyParts: ["Glutes", "Hamstrings", "Back"], pullPush: "Pull", bodyWeight: false, category: "Legs" },
     { name: "Box Jumps", bodyParts: ["Legs"], pullPush: "Push", bodyWeight: true, category: "Legs" },
-    { name: "Wall Sit", bodyParts: ["Quadriceps", "Glutes"], pullPush: null, bodyWeight: false, category: "Legs" }
+    { name: "Wall Sit", bodyParts: ["Quadriceps", "Glutes"], pullPush: null, bodyWeight: false, category: "Legs" },
+    { name: "ATG Split Squats", bodyParts: ["Quadriceps"], pullPush: "Push", bodyWeight: false, category: "Legs" },
+    { name: "Hip Extention", bodyParts: ["Glutes", "Hamstrings"], pullPush: "Pull", bodyWeight: false, category: "Legs" },
 ];
 
 // export const exercisesList = [
@@ -51,6 +55,13 @@ export function getCategory(name) {
     return exercisesList.find(e => e.name === name).category;
 }
 
+export function getAllBodyParts() {
+    return _.uniq(_.flatMap(exercisesList, e => e.bodyParts));
+}
+
+export function getPullPushType(name) {
+    return exercisesList.find(e => e.name === name).pullPush;
+}
 
 export function useExercisesAPI() {
 

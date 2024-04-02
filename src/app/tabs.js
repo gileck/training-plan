@@ -58,7 +58,7 @@ export function AppTabs({ Comps }) {
             {
                 Comps.map(({ Comp }, index) => (
                     <CustomTabPanel value={value} index={index}>
-                        <Box sx={{ width: '100%', maxWidth: 360, }}>
+                        <Box sx={{ width: '100%', maxWidth: 660, }}>
                             {Comp}
                         </Box>
 
