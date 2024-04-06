@@ -62,6 +62,11 @@ export function useExercisesAPI() {
         saveData('exercises', data);
     }
 
+    function setWorkoutData(data) {
+        setWorkouts(data);
+        saveData('workouts', data);
+    }
+
 
     function editExercide(exercise) {
         const newExercises = exercises.map((e) => {
@@ -108,25 +113,38 @@ export function useExercisesAPI() {
 
     }
 
-    const updateExercise = (exerciseId, weekIndex, partialUpdate) => {
-        const newExercises = exercises.map((e) => {
-            if (e.id === exerciseId) {
+    const updateExercise = (workoutId, exerciseId, weekIndex, partialUpdate) => {
+        console.log({ workoutId, exerciseId, weekIndex, partialUpdate });
+        const workout = workouts.find(w => w.id === workoutId);
+        const exercise = workout.exercises.find(e => e.id === exerciseId);
+        const newWorkouts = workouts.map(w => {
+            if (w.id === workoutId) {
                 return {
-                    ...e,
-                    weeks: e.weeks.map((w, index) => {
-                        if (index === Number(weekIndex)) {
+                    ...w,
+                    exercises: workout.exercises.map(e => {
+                        if (e.id === exerciseId) {
                             return {
-                                ...w,
-                                ...partialUpdate
+                                ...exercise,
+                                weeks: exercise.weeks.map(w => {
+                                    if (w.week === weekIndex) {
+                                        return {
+                                            ...w,
+                                            ...partialUpdate
+                                        }
+                                    }
+                                    return w;
+                                })
                             }
                         }
-                        return w;
+                        return e;
                     })
                 }
             }
-            return e;
-        });
-        setExercisesData(newExercises);
+            return w;
+        })
+
+
+        setWorkoutData(newWorkouts);
 
     }
 
@@ -188,6 +206,19 @@ export function useExercisesAPI() {
         saveData('workouts', newWorkouts);
     }
 
+    function calculateExerciseDone(exercise, week) {
+        const result1 = workouts.map(w => {
+            const ex = w.exercises.find(e => e.name === exercise.name);
+            if (ex) {
+                return ex.weeks[week].totalWeeklySets;
+            } else {
+                return 0
+            }
+        })
+        const sum = result1.reduce((acc, val) => acc + val, 0);
+        return sum;
+
+    }
 
 
 
@@ -204,7 +235,8 @@ export function useExercisesAPI() {
         saveWorkoutAPI,
         workouts,
         deleteWorkout,
-        editWorkout
+        editWorkout,
+        calculateExerciseDone
 
     }
 }

@@ -4,6 +4,7 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import { Card } from '@mui/material';
 
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -38,12 +39,13 @@ function a11yProps(index) {
     };
 }
 
-export function AppTabs({ Comps }) {
+export function AppTabs({ Comps, noCard }) {
     const [value, setValue] = React.useState(0);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
+    const Wrapper = noCard ? Box : Card;
     return (
         <Box sx={{ width: '100%' }}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -58,9 +60,9 @@ export function AppTabs({ Comps }) {
             {
                 Comps.map(({ Comp }, index) => (
                     <CustomTabPanel value={value} index={index}>
-                        <Box sx={{ width: '100%', maxWidth: 660, }}>
+                        <Wrapper sx={{ width: '100%', maxWidth: 660, padding: '5px' }}>
                             {Comp}
-                        </Box>
+                        </Wrapper>
 
                     </CustomTabPanel>
                 ))

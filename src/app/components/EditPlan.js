@@ -7,21 +7,33 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
-import { Delete, EditLocationAlt, EditNotifications, RemoveCircle } from "@mui/icons-material";
-import AddExerciseListItem, { EditExerciseForm } from "./AddExerciseListItem";
+import { AddCircle, Delete, EditLocationAlt, EditNotifications, RemoveCircle } from "@mui/icons-material";
+import { AddExerciseDialog, EditExerciseForm } from "./AddExerciseListItem";
 import _ from 'lodash'
 import { useExercisesAPI } from "../exercisesAPI";
 import EditIcon from '@mui/icons-material/Edit';
 import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 import { isBodyWeightExercise } from "../exercisesAPI";
+import { AppTabs } from "../tabs";
+import { WorkoutPlan } from "./WorkoutPlan";
+
 export function EditPlan() {
+    return <AppTabs noCard={true} Comps={[
+        { label: 'Training Plan', Comp: <EditTrainingPlan /> },
+        { label: 'Workout Plan', Comp: <WorkoutPlan /> },
+    ]} />
+
+
+}
+
+export function EditTrainingPlan() {
 
     const { addExercise, updateExercise, exercises, deleteExercise } = useExercisesAPI()
 
 
     const exerciseToShow = exercises.map(e => ({ ...e, ...e.weeks[0] }))
 
-    const [open, setOpen] = React.useState(false);
+    const [addExerciseDialogOpen, setOpen] = React.useState(false);
     const [editExerciseOpened, setEditExercise] = React.useState({});
 
     function handleEditExerciseClicked(id) {
@@ -31,6 +43,7 @@ export function EditPlan() {
         if (newExercise) {
             addExercise(newExercise);
         }
+        setOpen(false)
     }
 
     const onAddButtonClicked = (exercise) => {
@@ -72,11 +85,21 @@ export function EditPlan() {
 
     return (
         <div>
-            <AddExerciseListItem
+            <AddExerciseDialog
                 exercises={exercises}
                 onAddExercise={onAddExercise}
+                addExerciseDialogOpen={addExerciseDialogOpen}
+                onClose={() => setOpen(false)}
+
             />
-            <Divider />
+            <Button
+                startIcon={<AddCircle />}
+                variant="contained"
+                onClick={() => setOpen(!addExerciseDialogOpen)}>
+                Add Exercise
+
+            </Button>
+            <Divider sx={{ marginTop: '15px' }} />
             <List>
                 {exerciseToShow
                     .map((exercise) => (

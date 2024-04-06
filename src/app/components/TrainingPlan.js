@@ -18,7 +18,7 @@ const { getData, saveData } = localStorageAPI();
 
 export function TrainingPlan() {
     const [open, setOpen] = React.useState({});
-    const { getExercisesByWeeks, cleanData, updateExercise, addExercise } = useExercisesAPI()
+    const { getExercisesByWeeks, cleanData, updateExercise, addExercise, calculateExerciseDone } = useExercisesAPI()
     const groupByWeek = getExercisesByWeeks();
     console.log(' groupByWeek', groupByWeek);
     function handleCollapseClick(week) {
@@ -51,6 +51,7 @@ export function TrainingPlan() {
 
                         >
                             <ExercisesWeekly
+                                calculateExerciseDone={calculateExerciseDone}
                                 week={week}
                                 onAddExercise={e => onAddExercise(e, week)}
                                 updateExercise={updateExercise}
@@ -65,17 +66,30 @@ export function TrainingPlan() {
 
     );
 }
-export function ExercisesWeekly({ exercises, updateExercise, week }) {
+export function ExercisesWeekly({ exercises, updateExercise, week, calculateExerciseDone }) {
     function onSetComplete(exercise, sets) {
         updateExercise(exercise.id, week, {
             totalWeeklySets: Number(exercise.totalWeeklySets || 0) + Number(sets)
         });
     }
 
+    function getExercises() {
+        return exercises.map(exercise => {
+            const exerciseData = {
+                ...exercise,
+                sets: {
+                    done: calculateExerciseDone(exercise, week),
+                    target: Number(exercise.weeklyTarget || 0),
+                }
+            }
+            return exerciseData;
+        });
+    }
+
     return (
         <List component="div" disablePadding sx={{ ml: '15px' }}>
             <Divider />
-            {exercises
+            {getExercises()
                 // .sort((a, b) => (a.totalWeeklySets - a.weeklyTarget) - (b.totalWeeklySets - b.weeklyTarget))
                 .map((exercise) => (
                     <React.Fragment key={exercise.id}>
@@ -95,8 +109,8 @@ export function ExercisesWeekly({ exercises, updateExercise, week }) {
         </List>
     );
 }
-export function Exercise({ exercise, onRemoveSetComplete, onAddSetComplete }) {
-    const weeklyTargetReached = exercise.totalWeeklySets >= exercise.weeklyTarget;
+export function Exercise({ exercise, onRemoveSetComplete, onAddSetComplete, onSetDone }) {
+    const weeklyTargetReached = exercise.sets.done >= exercise.sets.target;
     return (
         <ListItem
 
@@ -121,9 +135,9 @@ export function Exercise({ exercise, onRemoveSetComplete, onAddSetComplete }) {
                                 color="text.secondary"
                             >
                                 {
-                                    exercise.weeklyTarget ? `${exercise.totalWeeklySets || 0} / ${exercise.weeklyTarget}` : exercise.sets
+                                    exercise.sets ?
+                                        `Sets: ${exercise.sets.done || 0} / ${exercise.sets.target}` : ''
                                 }
-
 
                             </Typography>
                             <Typography
@@ -137,15 +151,6 @@ export function Exercise({ exercise, onRemoveSetComplete, onAddSetComplete }) {
                             </Typography>
                         </React.Fragment>
                     } />
-
-
-
-                <IconButton onClick={() => onAddSetComplete()}>
-                    <AddCircleIcon />
-                </IconButton>
-                <IconButton onClick={() => onRemoveSetComplete()}>
-                    <RemoveCircle />
-                </IconButton>
             </Box>
             <Box sx={{ pt: 1 }}> {/* This Box is optional and provides padding top */}
 

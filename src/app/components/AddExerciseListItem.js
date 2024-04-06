@@ -13,45 +13,24 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { Delete, ExpandCircleDown, ExpandCircleUp, ExpandMore, ExpandLess, } from "@mui/icons-material";
 import { Autocomplete, Button, Chip, Dialog, DialogTitle, Grid, MenuItem, Select, TextField } from '@mui/material';
 import { exercisesList } from '../exercisesList';
-function AddExerciseListItem({ onAddExercise, exercises }) {
-    const [open, setOpen] = useState(false);
-
-    function onAddExerciseInternal(exercise) {
-        onAddExercise(exercise);
-        setOpen(false);
-    }
-
-
-    const handleClick = () => {
-        setOpen(!open)
-    }
-
-
+export function AddExerciseDialog({ onAddExercise, exercises, addExerciseDialogOpen, onClose }) {
     return (
-        <List>
-            <ListItem onClick={handleClick}>
-                <ListItemIcon>
-                    <Chip icon={open ? <ExpandLess /> : <AddCircleIcon />} label="Add Exercise" />
-                </ListItemIcon>
-                <ListItemText primary="" />
-            </ListItem>
-            <Dialog
-                disableEscapeKeyDown
-                open={open}
-                onClose={() => setOpen(false)}
-                fullWidth={true}
+        <Dialog
+            disableEscapeKeyDown
+            open={addExerciseDialogOpen}
+            onClose={() => onClose()}
+            fullWidth={true}
 
-            >
-                <DialogTitle>
-                    Add Exercise
-                </DialogTitle>
-                <EditExerciseForm
-                    onCancel={() => setOpen(false)}
-                    exercises={exercises}
-                    onAddExercise={onAddExerciseInternal}
-                />
-            </Dialog>
-        </List>
+        >
+            <DialogTitle>
+                Add Exercise
+            </DialogTitle>
+            <EditExerciseForm
+                onCancel={() => onClose()}
+                exercises={exercises}
+                onAddExercise={() => onAddExercise(exercise)}
+            />
+        </Dialog>
     );
 }
 
@@ -194,4 +173,3 @@ export function EditExerciseForm({ onAddExercise, exerciseToEdit, exercises, onC
     )
 }
 
-export default AddExerciseListItem;
