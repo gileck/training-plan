@@ -1,6 +1,6 @@
 "use client"
 import React from "react";
-import { Card, Collapse, Divider, } from "@mui/material";
+import { Button, Card, Collapse, Dialog, DialogActions, DialogTitle, Divider, } from "@mui/material";
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -11,6 +11,9 @@ import { Delete, EditLocationAlt, EditNotifications, RemoveCircle } from "@mui/i
 import AddExerciseListItem, { EditExerciseForm } from "./AddExerciseListItem";
 import _ from 'lodash'
 import { useExercisesAPI } from "../exercisesAPI";
+import EditIcon from '@mui/icons-material/Edit';
+import EditCalendarIcon from '@mui/icons-material/EditCalendar';
+import { isBodyWeightExercise } from "../exercisesAPI";
 export function EditPlan() {
 
     const { addExercise, updateExercise, exercises, deleteExercise } = useExercisesAPI()
@@ -48,19 +51,32 @@ export function EditPlan() {
     }
 
     function printSets(exercise) {
-        return `
-        Weekly Sets: ${exercise.weeklyTarget}
-        ${exercise.bodyWeight && exercise.numberOfReps ? exercise.numberOfReps : ""}
+        return <React.Fragment>
+            <div>
+                Weekly Sets: {exercise.weeklyTarget}
 
-        ${!exercise.bodyWeight && exercise.numberOfReps && exercise.weight ?
-                "(" + exercise.numberOfReps + 'x' + exercise.weight + 'kg' + ")" : ''} 
-            
-    `
+                <div>
+                    Reps: <span style={{ marginLeft: "2px" }}>
+                        {isBodyWeightExercise(exercise.name) && exercise.numberOfReps ? `${exercise.numberOfReps}` : ""}
+                        {!isBodyWeightExercise(exercise.name) && exercise.numberOfReps && exercise.weight ?
+                            exercise.numberOfReps + 'x' + exercise.weight + 'kg' : ''}
+                    </span>
+                </div>
+            </div>
+            <div>
+                Progressive Overload: {exercise.overloadType} ({exercise.overloadValue}%)
+            </div>
+        </React.Fragment >
     }
 
 
     return (
         <div>
+            <AddExerciseListItem
+                exercises={exercises}
+                onAddExercise={onAddExercise}
+            />
+            <Divider />
             <List>
                 {exerciseToShow
                     .map((exercise) => (
@@ -73,35 +89,48 @@ export function EditPlan() {
 
                                         secondary={printSets(exercise)} />
 
-                                    {/* <IconButton onClick={() => handleEditExerciseClicked(exercise.id)}>
-                                        <EditLocationAlt />
-                                    </IconButton> */}
+                                    <IconButton onClick={() => handleEditExerciseClicked(exercise.id)}>
+                                        <EditCalendarIcon />
+                                    </IconButton>
                                     <IconButton onClick={() => onDeleteButtonClicked(exercise)}>
                                         <Delete />
                                     </IconButton>
                                 </ListItemButton>
-                            </ListItem>
-                            <Collapse in={editExerciseOpened[exercise.id]}>
-                                <EditExerciseForm
-                                    onAddExercise={editExerciseInternal}
+                                <EditExerciseDialog
                                     exerciseToEdit={exercise}
+                                    open={editExerciseOpened[exercise.id]}
+                                    onAddExercise={editExerciseInternal}
                                     exercises={exercises}
-
+                                    onClose={() => handleEditExerciseClicked(exercise.id)}
                                 />
-                            </Collapse>
+                            </ListItem>
                             <Divider />
 
                         </React.Fragment>
 
                     ))}
 
-                <AddExerciseListItem
-                    exercises={exercises}
-                    onAddExercise={onAddExercise}
-                />
+
             </List>
 
         </div>
     )
 
+}
+
+function EditExerciseDialog({ exercises, exerciseToEdit, onAddExercise, open, onClose }) {
+    return <Dialog
+        open={open}
+        onClose={onClose}
+        fullWidth={true}
+    >
+        <DialogTitle>Edit Exercise</DialogTitle>
+        <EditExerciseForm
+            onCancel={onClose}
+            exerciseToEdit={exerciseToEdit}
+            exercises={exercises}
+            onAddExercise={onAddExercise}
+        />
+
+    </Dialog>
 }

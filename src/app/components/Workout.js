@@ -1,31 +1,336 @@
-import { Box, Chip, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
-import { getAllBodyParts, getBodyParts, getCategory, getPullPushType, useExercisesAPI } from "../exercisesAPI";
-import { Exercise, ExercisesWeekly } from "./TrainingPlan";
-import { useState } from "react";
+import React, { useState } from "react";
+import Box from '@mui/material/Box';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import IconButton from '@mui/material/IconButton';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import { Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormGroup, InputLabel, MenuItem, Select, TextField } from "@mui/material";
+import { Button, Chip, Collapse, Divider, ListItemSecondaryAction, Typography } from "@mui/material";
+import { Checkbox, ListItemIcon } from "@mui/material";
+import { getPrimaryMuscle, getSecondaryMuscles, getAllBodyParts, getBodyParts, getCategory, getPullPushType, useExercisesAPI } from "../exercisesAPI";
+import { RemoveCircle, AddCircle, AddCircleOutline, Delete, Edit, ExpandLess, ExpandMore, Label } from "@mui/icons-material";
 
-function createWorkeout({ numberOfExercises, pullPush }, exercises) {
-    const filteredExercises = exercises.filter(e => e.pullPush === pullPush)
-    return filteredExercises.slice(0, numberOfExercises)
+
+function WorkoutExercise({ exercise, onRemoveSetComplete, onAddSetComplete, onDeleteExercise }) {
+    const weeklyTargetReached = exercise.totalWeeklySets >= exercise.weeklyTarget;
+    return (
+        <ListItem
+
+
+            sx={{ flexDirection: 'column', alignItems: 'flex-start' }}
+        >
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    width: '100%'
+                }}>
+
+                <ListItemText
+                    style={{ textDecoration: weeklyTargetReached ? 'line-through' : '' }}
+                    primary={exercise.name}
+                    secondary={
+                        <React.Fragment>
+                            <Typography
+                                component="span"
+                                variant="body2"
+                                color="text.secondary"
+                            >
+                                Sets: {exercise.sets}
+
+                            </Typography>
+                        </React.Fragment>
+                    } />
+
+
+
+                <IconButton onClick={() => onDeleteExercise()}>
+                    <Delete />
+                </IconButton>
+                <IconButton onClick={() => onAddSetComplete()}>
+                    <AddCircleIcon />
+                </IconButton>
+                <IconButton onClick={() => onRemoveSetComplete()}>
+                    <RemoveCircle />
+                </IconButton>
+            </Box>
+            <Box sx={{ pt: 1 }}> {/* This Box is optional and provides padding top */}
+
+                <Chip
+                    sx={{ mr: 1 }}
+                    key={getPrimaryMuscle(exercise.name)}
+                    label={getPrimaryMuscle(exercise.name)}
+                    size="small"
+                />
+
+                {getSecondaryMuscles(exercise.name).map((bodyPart) => (
+                    <Chip
+                        sx={{ mr: 1 }}
+                        key={bodyPart}
+                        label={bodyPart}
+                        size="small"
+                        variant="outlined"
+                    />
+                ))}
+            </Box>
+        </ListItem>
+    );
+}
+
+function AddExerciseToWorkoutDialog({ open, handleClose, onAddExercise, exercises, workout }) {
+    const [selectedExercise, setSelectedExercise] = useState(null)
+    const [selectedSets, setSelectedSets] = useState(0)
+    function onExerciseSelected(e) {
+        setSelectedExercise(e.target.value)
+    }
+    function onSetsChanged(e) {
+        setSelectedSets(e.target.value)
+    }
+    function onAddButtonClicked() {
+        onAddExercise(selectedExercise, selectedSets)
+        handleClose()
+    }
+    return <Dialog
+        disableEscapeKeyDown
+        open={open}
+        onClose={handleClose}
+        fullWidth={true}
+    >
+        <DialogTitle>Add Exercise</DialogTitle>
+        <DialogContent>
+            <Box component="form" sx={{ padding: '15px' }}>
+                <FormGroup>
+
+
+                    <FormControl sx={{ marginBottom: '30px' }} component="div" >
+                        <InputLabel id="Select">Exercise</InputLabel>
+                        <Select
+                            labelId="Select"
+                            value={selectedExercise}
+                            onChange={onExerciseSelected}
+                        >
+                            {
+                                exercises.map((exercise) => (
+                                    <MenuItem key={exercise.id} value={exercise.name}>{exercise.name}</MenuItem>
+                                ))
+                            }
+                        </Select>
+                    </FormControl>
+                    <FormControl sx={{ marginBottom: '10px' }} component="div" >
+                        <TextField
+                            label="Sets"
+                            id="sets"
+                            type="number"
+                            value={selectedSets}
+                            onChange={onSetsChanged}
+                        />
+                    </FormControl>
+                </FormGroup>
+            </Box>
+        </DialogContent>
+        <DialogActions>
+            <Button onClick={handleClose}>Cancel</Button>
+            <Button
+                startIcon={<AddCircleOutline />}
+                variant="contained"
+                onClick={onAddButtonClicked}>
+                Add
+            </Button>
+        </DialogActions>
+    </Dialog>
 
 }
 
+function SelectWorkoutDialog({
+    open,
+    handleClose,
+    onExercisePullPushChanged,
+    onBodyPartChanged,
+    onExerciseTypeChanged,
+    changeSelectedWeek,
+    exType,
+    bodyParts,
+    selectedWeek,
+    pullPushType,
+    numberOfWeeks,
+    saveWorkout
+}) {
+
+    const [workoutName, setWorkoutName] = useState('')
+    function onWorkoutNameChanged(e) {
+        setWorkoutName(e.target.value)
+    }
+
+    function onSaveButtonClicked() {
+        saveWorkout({ workoutName, exType, bodyParts, selectedWeek, pullPushType })
+        handleClose()
+    }
+
+
+    return <Dialog
+        disableEscapeKeyDown
+        open={open}
+        onClose={handleClose}
+        fullWidth={true}
+    >
+        <DialogTitle sx={{
+            backgroundColor: '#d4ecf4',
+        }}>Create Workout</DialogTitle>
+        <DialogContent>
+            <Box component="form" sx={{ padding: '15px' }}>
+                <FormGroup>
+                    <FormControl sx={{ marginBottom: '10px', padding: '10px' }} component="div" >
+                        {/* <InputLabel id="name">Exercise Type</InputLabel> */}
+
+                        <TextField label="Workout Name  " id="name" value={workoutName} onChange={onWorkoutNameChanged} />
+                    </FormControl>
+
+                    {/* <FormControl sx={{ marginBottom: '10px', padding: '10px' }} component="div" >
+                        <InputLabel id="Select">Week</InputLabel>
+                        <Select value={selectedWeek} onChange={changeSelectedWeek}>
+                            {
+                                _.range(0, numberOfWeeks).map((week) => (
+                                    <MenuItem key={week} value={week}>Week {week}</MenuItem>
+                                ))
+                            }
+                        </Select>
+                    </FormControl> */}
+                    <FormControl sx={{ marginBottom: '10px', padding: '10px' }} component="div" >
+                        <InputLabel id="Select">Exercise Type</InputLabel>
+
+                        <Select value={exType} onChange={onExerciseTypeChanged}>
+                            <MenuItem value={"fullBody"}>Full Body</MenuItem>
+                            <MenuItem value={"Upper body"}>Upper Body</MenuItem>
+                            <MenuItem value={"Legs"}>Legs</MenuItem>
+                        </Select>
+                    </FormControl>
+
+
+
+                    <FormControl sx={{ marginBottom: '10px', padding: '10px' }} component="div" >
+                        <InputLabel id="Select">Pull/Push</InputLabel>
+                        <Select value={pullPushType} onChange={onExercisePullPushChanged}>
+                            <MenuItem value={"all"}>All</MenuItem>
+                            <MenuItem value={"Pull"}>Pull</MenuItem>
+                            <MenuItem value={"Push"}>Push</MenuItem>
+                        </Select>
+                    </FormControl>
+                    <FormControl sx={{ marginBottom: '10px', padding: '10px' }} component="div" >
+                        <InputLabel id="Select">Body Parts</InputLabel>
+                        <Select
+                            labelId="Select"
+                            multiple
+                            value={bodyParts || []}
+                            onChange={onBodyPartChanged}
+                            MenuProps={{
+                                PaperProps: {
+                                    style: {
+                                        maxHeight: 300,
+                                    },
+                                },
+                            }}
+                            renderValue={(selected) => (
+                                <Box sx={{}}>
+                                    {selected.map((value) => (
+                                        <div>
+                                            <span key={value}>{value}</span>
+                                        </div>
+                                    ))}
+                                </Box>
+                            )}
+                        >
+                            <MenuItem key={'all'} value={'All'}>
+                                <Checkbox checked={bodyParts.indexOf("All") > -1} />
+                                <ListItemText primary={"All"} />
+                            </MenuItem>
+                            {
+                                getAllBodyParts().map((part) => (
+
+                                    <MenuItem key={part} value={part}>
+                                        <Checkbox checked={bodyParts.indexOf(part) > -1} />
+                                        <ListItemText primary={part} />
+
+                                    </MenuItem>
+                                ))
+                            }
+
+                        </Select>
+                    </FormControl>
+                </FormGroup>
+            </Box>
+        </DialogContent>
+        <DialogActions>
+            <Button onClick={handleClose}>Cancel</Button>
+            <Button
+                startIcon={<AddCircleOutline />}
+                variant="contained"
+                onClick={onSaveButtonClicked}>
+                Add
+            </Button>
+
+        </DialogActions>
+    </Dialog>
+
+}
+
+
+
 export function Workout() {
-    const { exercises, updateExercise, numberOfWeeks } = useExercisesAPI()
+
+    const { workouts, exercises, updateExercise, numberOfWeeks, saveWorkoutAPI, deleteWorkout, editWorkout } = useExercisesAPI()
+    console.log('workouts', workouts);
+
+    const [open, setOpen] = useState(false);
+    const [openAddExercise, setOpenAddExercise] = useState(false)
+    const [currentWoroutId, setCurrentWoroutId] = useState('')
     const [exType, setExerciseType] = useState('fullBody')
     const [selectedWeek, setSelectedWeek] = useState(0)
-    const [bodyParts, setBodyParts] = useState(null)
+    const [bodyParts, setBodyParts] = useState(['All'])
     const [pullPushType, setPullPushType] = useState('all')
-    const exerciseToShow = exercises
-        .map(e => ({ ...e, ...e.weeks[selectedWeek] }))
-        .filter(e => exType === "fullBody" ? true : getCategory(e.name) === exType)
-        // .filter(e => bodyParts === "all" ? true : getBodyParts(e.name).includes(bodyPart))
-        .filter(e => !bodyParts ? true : bodyParts.some(part => getBodyParts(e.name).includes(part)))
-        .filter(e => pullPushType === "all" ? true : getPullPushType(e.name) === pullPushType)
+    const [openWorkouts, setOpenWorkouts] = useState({})
+    function displayWorkout(workoutId) {
+        setOpenWorkouts({ ...openWorkouts, [workoutId]: !openWorkouts[workoutId] })
+    }
 
-    function onSetComplete(exercise, sets) {
-        updateExercise(exercise.id, 0, {
-            totalWeeklySets: Number(exercise.totalWeeklySets || 0) + Number(sets)
-        });
+    function getExercise(name) {
+        return exercises.find(e => e.name === name)
+    }
+    function getExercises() {
+        return exercises
+            .map(e => ({ ...e, ...e.weeks[selectedWeek] }))
+            .filter(e => exType === "fullBody" ? true : getCategory(e.name) === exType)
+            // .filter(e => bodyParts === "all" ? true : getBodyParts(e.name).includes(bodyPart))
+            .filter(e => bodyParts.includes('All') ? true : bodyParts.some(part => getBodyParts(e.name).includes(part)))
+            .filter(e => pullPushType === "all" ? true : getPullPushType(e.name) === pullPushType)
+    }
+    const exerciseToShow = getExercises()
+
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    function saveWorkout({ workoutName }) {
+        const exercises = getExercises().map(e => ({
+            name: e.name,
+            sets: e.weeklyTarget,
+            id: `${e.name}-${workoutName}`
+
+        }))
+        saveWorkoutAPI({ name: workoutName, exercises })
+        console.log('workout', workoutName, exercises);
+    }
+
+    function onSetComplete(workout, exercise, sets) {
+        workout.exercises = workout.exercises.map(e => e.id === exercise.id ? { ...e, sets: Number(e.sets || 0) + Number(sets) } : e)
+        editWorkout(workout)
+        // updateExercise(exercise.id, 0, {
+        //     totalWeeklySets: Number(exercise.totalWeeklySets || 0) + Number(sets)
+        // });
     }
 
     function onExercisePullPushChanged(e) {
@@ -42,71 +347,121 @@ export function Workout() {
     function changeSelectedWeek(e) {
         setSelectedWeek(e.target.value);
     }
+    function onDeleteIconClicked(workoutId) {
+        deleteWorkout(workoutId)
+    }
+    function onAddIconClicked(workoutId) {
+        setCurrentWoroutId(workoutId)
+        setOpenAddExercise(true)
+    }
+    function onEditIconClicked(workoutId) {
+        const workout = workouts.find(w => w.id === workoutId)
+    }
+    function updateWorkoutExercise({ currentWoroutId, exerciseName, sets }) {
+        debugger
+        console.log({ currentWoroutId, exerciseName, sets });
+
+        const workout = workouts.find(w => w.id === currentWoroutId)
+        workout.exercises.push({ id: `${exerciseName}-${currentWoroutId}`, name: exerciseName, sets })
+        editWorkout(workout)
+    }
     return (
         <div>
-            <div>
-                {/* <span
-                    style={{ marginRight: '20px' }}>
-                    Filter:
-                </span> */}
-                <div>
-                    <FormControl sx={{ m: 1, width: 300 }}>
-                        <InputLabel id="demo-multiple-checkbox-label">Body Parts</InputLabel>
-                        <Select
-                            labelId="demo-multiple-checkbox-label"
-                            id="demo-multiple-checkbox"
-                            multiple
-                            value={bodyParts || []}
-                            onChange={onBodyPartChanged}
-                            renderValue={(selected) => (
-                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                    {selected.map((value) => (
-                                        <Chip key={value} label={value} />
-                                    ))}
-                                </Box>
-                            )}>
-                            <MenuItem key={'all'} value={'all'}>All</MenuItem>
-                            {
-                                getAllBodyParts().map((part) => (
-                                    <MenuItem key={part} value={part}>{part}</MenuItem>
-                                ))
-                            }
-                        </Select>
-                    </FormControl>
-                </div>
 
-                <Select value={selectedWeek} onChange={changeSelectedWeek}>
-                    {
-                        _.range(0, numberOfWeeks).map((week) => (
-                            <MenuItem key={week} value={week}>Week {week}</MenuItem>
-                        ))
-                    }
-                </Select>
-                <Select value={exType} onChange={onExerciseTypeChanged}>
-                    <MenuItem value={"fullBody"}>Full Body</MenuItem>
-                    <MenuItem value={"Upper body"}>Upper Body</MenuItem>
-                    <MenuItem value={"Legs"}>Legs</MenuItem>
-                </Select>
+            <SelectWorkoutDialog
+                open={open}
+                handleClose={handleClose}
+                onExercisePullPushChanged={onExercisePullPushChanged}
+                onBodyPartChanged={onBodyPartChanged}
+                onExerciseTypeChanged={onExerciseTypeChanged}
+                changeSelectedWeek={changeSelectedWeek}
+                exType={exType}
+                bodyParts={bodyParts}
+                selectedWeek={selectedWeek}
+                pullPushType={pullPushType}
+                numberOfWeeks={numberOfWeeks}
+                saveWorkout={saveWorkout}
+            />
+
+            <AddExerciseToWorkoutDialog
+                open={openAddExercise}
+                currentWoroutId={currentWoroutId}
+                handleClose={() => setOpenAddExercise(false)}
+                onAddExercise={(exerciseName, sets) => { updateWorkoutExercise({ currentWoroutId, exerciseName, sets }) }}
+                exercises={exercises}
+            // exercises={exercises.filter(e => !exerciseToShow.find(ex => ex.name === e.name))}
+            />
 
 
-                <Select value={pullPushType} onChange={onExercisePullPushChanged}>
-                    <MenuItem value={"all"}>All</MenuItem>
-                    <MenuItem value={"Pull"}>Pull</MenuItem>
-                    <MenuItem value={"Push"}>Push</MenuItem>
-                </Select>
+            <Button
+                variant="contained"
+                sx={{
+                    marginBottom: '10px'
+                }}
+                startIcon={<AddCircleOutline />}
+                Label="Add Workout"
+                onClick={handleClickOpen}>
+                Add Workout
+            </Button>
+            <List
+                sx={{
+                    border: '0.1px solid lightgray',
+                    padding: '0px',
+                }}
+            >
+                {
+                    workouts.map((workout) => (
+                        <React.Fragment key={workout.id}>
+                            <ListItem
+                                sx={{ backgroundColor: '#d4ecf4' }}
+                                key={workout.id}
+                                onClick={() => displayWorkout(workout.id)}>
+                                <ListItemText
+                                    primary={workout.name}
+                                    secondary={`Total Sets: ${workout.exercises.reduce((acc, exercise) => acc + (Number(exercise.sets) || 0), 0)}`}
+
+                                />
+
+                                <ListItemSecondaryAction >
+                                    <IconButton onClick={() => displayWorkout(workout.id)}>
+                                        {openWorkouts[workout.id] ? <ExpandLess /> : <ExpandMore />}
+                                    </IconButton>
+                                    <IconButton onClick={() => onAddIconClicked(workout.id)} >
+                                        <AddCircle />
+                                    </IconButton>
+                                    <IconButton onClick={() => onEditIconClicked(workout.id)} >
+                                        <Edit />
+                                    </IconButton>
+                                    <IconButton onClick={() => onDeleteIconClicked(workout.id)} >
+                                        <Delete />
+                                    </IconButton>
+
+                                </ListItemSecondaryAction>
 
 
-            </div>
-            {
-                exerciseToShow.map((exercise) => (
-                    <Exercise
-                        key={exercise.id}
-                        exercise={exercise}
-                        onRemoveSetComplete={() => onSetComplete(exercise, -1)}
-                        onAddSetComplete={() => onSetComplete(exercise, 1)}
-                    />
-                ))
-            }
+                            </ListItem>
+                            <Collapse in={openWorkouts[workout.id]}>
+                                {
+                                    workout.exercises.map((exercise) => (
+                                        <React.Fragment key={exercise.id}>
+                                            <Divider />
+
+                                            <WorkoutExercise
+                                                key={exercise.id}
+                                                exercise={exercise}
+                                                onRemoveSetComplete={() => onSetComplete(workout, exercise, -1)}
+                                                onAddSetComplete={() => onSetComplete(workout, exercise, 1)}
+                                            />
+                                        </React.Fragment>
+                                    ))
+                                }
+                            </Collapse>
+                            <Divider />
+                        </React.Fragment>
+                    ))
+                }
+            </List>
+
         </div >
     );
 }

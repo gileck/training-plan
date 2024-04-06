@@ -12,7 +12,7 @@ import { localStorageAPI } from "../localStorageAPI";
 import { ExpandLess, ExpandMore, RemoveCircle } from "@mui/icons-material";
 import _ from 'lodash'
 import { Button, Chip, Collapse, Divider, Typography } from "@mui/material";
-import { useExercisesAPI, getBodyParts, getCategory } from "../exercisesAPI";
+import { useExercisesAPI, getBodyParts, getCategory, getSecondaryMuscles, getPrimaryMuscle } from "../exercisesAPI";
 import AddExerciseListItem from "./AddExerciseListItem";
 const { getData, saveData } = localStorageAPI();
 
@@ -120,15 +120,18 @@ export function Exercise({ exercise, onRemoveSetComplete, onAddSetComplete }) {
                                 variant="body2"
                                 color="text.secondary"
                             >
-                                Sets: {exercise.totalWeeklySets || 0} / {exercise.weeklyTarget}
+                                {
+                                    exercise.weeklyTarget ? `${exercise.totalWeeklySets || 0} / ${exercise.weeklyTarget}` : exercise.sets
+                                }
 
 
                             </Typography>
                             <Typography
-                                sx={{ ml: '10px' }}
+                                sx={{ ml: '10px', display: !exercise.bodyWeight && exercise.numberOfReps && exercise.weight ? 'inline' : 'none' }}
                                 component="span"
                                 variant="body2"
                                 color="text.secondary"
+
                             >
                                 ({exercise.numberOfReps}x{exercise.weight}kg)
                             </Typography>
@@ -148,12 +151,14 @@ export function Exercise({ exercise, onRemoveSetComplete, onAddSetComplete }) {
 
                 <Chip
                     sx={{ mr: 1 }}
-                    key={getCategory(exercise.name)}
-                    label={getCategory(exercise.name)}
+                    key={getPrimaryMuscle(exercise.name)}
+                    label={getPrimaryMuscle(exercise.name)}
                     size="small"
                 />
 
-                {getBodyParts(exercise.name).map((bodyPart) => (
+
+
+                {getSecondaryMuscles(exercise.name).map((bodyPart) => (
                     <Chip
                         sx={{ mr: 1 }}
                         key={bodyPart}

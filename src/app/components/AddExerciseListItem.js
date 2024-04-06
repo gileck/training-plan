@@ -11,9 +11,8 @@ import AddIcon from '@mui/icons-material/Add';
 import IconButton from '@mui/material/IconButton';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { Delete, ExpandCircleDown, ExpandCircleUp, ExpandMore, ExpandLess, } from "@mui/icons-material";
-import { Autocomplete, Button, Chip, Grid, MenuItem, Select, TextField } from '@mui/material';
-import { exercisesList } from '../exercisesAPI';
-
+import { Autocomplete, Button, Chip, Dialog, DialogTitle, Grid, MenuItem, Select, TextField } from '@mui/material';
+import { exercisesList } from '../exercisesList';
 function AddExerciseListItem({ onAddExercise, exercises }) {
     const [open, setOpen] = useState(false);
 
@@ -36,17 +35,27 @@ function AddExerciseListItem({ onAddExercise, exercises }) {
                 </ListItemIcon>
                 <ListItemText primary="" />
             </ListItem>
-            <Collapse in={open} timeout="auto" unmountOnExit>
+            <Dialog
+                disableEscapeKeyDown
+                open={open}
+                onClose={() => setOpen(false)}
+                fullWidth={true}
+
+            >
+                <DialogTitle>
+                    Add Exercise
+                </DialogTitle>
                 <EditExerciseForm
+                    onCancel={() => setOpen(false)}
                     exercises={exercises}
                     onAddExercise={onAddExerciseInternal}
                 />
-            </Collapse>
+            </Dialog>
         </List>
     );
 }
 
-export function EditExerciseForm({ onAddExercise, exerciseToEdit, exercises }) {
+export function EditExerciseForm({ onAddExercise, exerciseToEdit, exercises, onCancel }) {
 
     console.log({ exerciseToEdit });
     const exerciseOptions = exercisesList.filter(e => !exercises.find(ex => ex.name === e.name))
@@ -174,7 +183,11 @@ export function EditExerciseForm({ onAddExercise, exerciseToEdit, exercises }) {
                     variant="contained"
                     color="primary"
                 >Add</Button>
-                {/* <ListItemButton>Clean</ListItemButton> */}
+                <Button
+                    onClick={onCancel}
+                    sx={{ marginLeft: '10px' }}
+                    variant="outlined"
+                >Cancel</Button>
 
             </ListItem>
         </List>
