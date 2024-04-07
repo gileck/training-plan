@@ -20,7 +20,7 @@ import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 export default function Home() {
 
-  const ClientTabs = dynamic(() => Promise.resolve(AppTabs), { ssr: false })
+
     const [value, setValue] = React.useState(2);
     console.log({value})
 
@@ -31,7 +31,7 @@ export default function Home() {
         { label: "Settings", Comp: Settings , icon: <SettingsIcon />  },
     ]
 
-    const CompToRender = Comps[value].Comp
+    const CompToRender = dynamic(() => Promise.resolve(Comps[value].Comp), { ssr: false })
 
   return (
     <main className={styles.main}>
