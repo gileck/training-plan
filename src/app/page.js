@@ -35,7 +35,10 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
-        <CompToRender />
+        <div style={{height: '50%'}}>
+            <CompToRender />
+        </div>
+
 
         <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
             <SimpleBottomNavigation
