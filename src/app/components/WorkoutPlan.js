@@ -288,7 +288,7 @@ export function WorkoutPlan() {
     const [currentWorkoutId, setCurrentWorkoutId] = useState('')
     const [exType, setExerciseType] = useState('fullBody')
     const [selectedWeek, setSelectedWeek] = useState(0)
-    const [bodyParts, setBodyParts] = useState(['All'])
+    const [bodyParts, setBodyParts] = useState([])
     const [pullPushType, setPullPushType] = useState('all')
     const [openWorkouts, setOpenWorkouts] = useState({})
     function displayWorkout(workoutId) {
