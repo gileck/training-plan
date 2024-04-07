@@ -28,7 +28,7 @@ export function AddExerciseDialog({ onAddExercise, exercises, addExerciseDialogO
             <EditExerciseForm
                 onCancel={() => onClose()}
                 exercises={exercises}
-                onAddExercise={() => onAddExercise(exercise)}
+                onAddExercise={onAddExercise}
             />
         </Dialog>
     );

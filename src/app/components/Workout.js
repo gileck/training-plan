@@ -100,7 +100,7 @@ export function Workout() {
 
     const { workouts, exercises, updateExercise, numberOfWeeks } = useExercisesAPI()
 
-    const [selectedWorkoutId, setSelectedWorkoutId] = useState(workouts[0].id)
+    const [selectedWorkoutId, setSelectedWorkoutId] = useState('all')
     const [selectedWeek, setSelectedWeek] = useState(0)
 
     console.log({ workouts, exercises, selectedWorkoutId });
