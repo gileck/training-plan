@@ -19,11 +19,7 @@ import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 export default function Home() {
-
-
     const [value, setValue] = React.useState(2);
-    console.log({value})
-
     const Comps = [
         { label: "Workout", Comp: Workout, icon: <FitnessCenterIcon /> },
         { label: "Training Plan", Comp: TrainingPlan , icon: <FormatListBulletedIcon />  },
@@ -63,7 +59,7 @@ export default function Home() {
             >
                 {
                     Comps.map(({ label, icon }, index) => (
-                        <BottomNavigationAction label={label} icon={icon || <SettingsIcon/> } />
+                        <BottomNavigationAction key={index} label={label} icon={icon || <SettingsIcon/> } />
                     ))
                 }
             </BottomNavigation>
