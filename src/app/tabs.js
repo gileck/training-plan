@@ -39,8 +39,8 @@ function a11yProps(index) {
     };
 }
 
-export function AppTabs({ Comps, noCard }) {
-    const [value, setValue] = React.useState(0);
+export function AppTabs({ Comps, noCard, initialState }) {
+    const [value, setValue] = React.useState(initialState || 0);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);

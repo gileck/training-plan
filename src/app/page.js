@@ -26,6 +26,7 @@ export default function Home() {
   return (
     <main className={styles.main}>
       <ClientTabs
+          initialState={2}
         Comps={
           [
             { label: "Workout", Comp: <Workout /> },
