@@ -398,6 +398,8 @@ export function WorkoutPlan() {
             .filter(e => !workouts.some(w => w.exercises.some(ex => ex.name === e.name)))
             .map(e => ({ ...e, sets: 0 }))
     }
+    const exercisesNotInsideWorkouts = getExercisesNotInsideWorkouts()
+
     function getExercisesLeft() {
         return exercises.map(e => {
             const name = e.name
@@ -510,7 +512,7 @@ export function WorkoutPlan() {
                 }
             </List>
 
-            <Card>
+            { exercisesNotInsideWorkouts.length > 0 ? (<Card>
                 <CardHeader
                     sx={{ backgroundColor: '#d4ecf4', padding: '10px' }}
                     title={
@@ -529,7 +531,7 @@ export function WorkoutPlan() {
                 <Collapse in={openWorkouts['left']}>
                     <List>
                         {
-                            getExercisesLeft().filter(e => e.left !== 0).map((exercise) => (
+                            exercisesNotInsideWorkouts.map((exercise) => (
                                 <ListItem key={exercise.id}>
                                     <ListItemText
                                         primary={exercise.name}
@@ -546,7 +548,7 @@ export function WorkoutPlan() {
                 </Collapse>
 
 
-            </Card>
+            </Card>) : null}
 
         </div >
     );
