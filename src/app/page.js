@@ -52,7 +52,7 @@ export default function Home() {
  function SimpleBottomNavigation({ Comps, onChange, value }) {
 
     return (
-        <Box sx={{ maxWidth: 380 }}>
+        <Box sx={{ minWidth: 380 }}>
             <BottomNavigation
                 showLabels
                 value={value}
