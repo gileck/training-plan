@@ -35,7 +35,7 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
-        <div style={{height: '50%'}}>
+        <div>
             <CompToRender />
         </div>
 
