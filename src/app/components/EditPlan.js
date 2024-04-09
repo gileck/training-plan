@@ -32,7 +32,7 @@ export function EditPlan() {
 
 export function EditTrainingPlan() {
 
-    const { addExercise, updateExercise, exercises, deleteExercise } = useExercisesAPI()
+    const { editExercise, addExercise, updateExercise, exercises, deleteExercise } = useExercisesAPI()
 
 
 
@@ -66,7 +66,7 @@ export function EditTrainingPlan() {
     }
 
     const editExerciseInternal = (exercise) => {
-        addExercise(exercise);
+        editExercise(exercise);
         setEditExercise({ ...editExerciseOpened, [exercise.id]: false });
     }
 

@@ -68,7 +68,7 @@ export function useExercisesAPI() {
     }
 
 
-    function editExercide(exercise) {
+    function editExercise(exercise) {
         const newExercises = exercises.map((e) => {
             if (e.id === exercise.id) {
                 return Object.assign(e, exercise)
@@ -228,7 +228,7 @@ export function useExercisesAPI() {
         deleteExercise,
         updateExercise,
         cleanData,
-        editExercide,
+        editExercise,
         getExercisesByWeeks,
         changeNumberOfWeeks,
         numberOfWeeks,
