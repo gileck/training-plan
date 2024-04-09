@@ -42,7 +42,7 @@ const staticExercisesList = [
     { name: "Nordic Hamstring Curl", primaryMuscle: "Hamstrings", secondaryMuscles: [], pullPush: "Pull", bodyWeight: true, category: "Legs" },
 ];
 
-const exercisesListFromLocalStorage = JSON.parse(localStorage.getItem("exercisesList")) || [];
+const exercisesListFromLocalStorage = typeof localStorage !== "undefined" && JSON.parse(localStorage.getItem("exercisesList")) || [];
 
 export const exercisesListFromLocal = exercisesListFromLocalStorage
 export const exercisesList = [
