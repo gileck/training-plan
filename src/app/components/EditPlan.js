@@ -142,6 +142,7 @@ export function EditTrainingPlan() {
                                     </IconButton>
                                 </ListItemButton>
                                 <EditExerciseDialog
+                                    exerciseList={exercisesList}
                                     exerciseToEdit={exercise}
                                     open={editExerciseOpened[exercise.id]}
                                     onAddExercise={editExerciseInternal}
@@ -158,7 +159,7 @@ export function EditTrainingPlan() {
 
 }
 
-function EditExerciseDialog({ exercises, exerciseToEdit, onAddExercise, open, onClose }) {
+function EditExerciseDialog({ exerciseList, exercises, exerciseToEdit, onAddExercise, open, onClose }) {
     return <Dialog
         open={open}
         onClose={onClose}
@@ -166,6 +167,7 @@ function EditExerciseDialog({ exercises, exerciseToEdit, onAddExercise, open, on
     >
         <DialogTitle>Edit Exercise</DialogTitle>
         <EditExerciseForm
+            exerciseList={exerciseList}
             onCancel={onClose}
             exerciseToEdit={exerciseToEdit}
             exercises={exercises}
