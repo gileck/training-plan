@@ -34,6 +34,8 @@ export function EditTrainingPlan() {
 
     const { editExercise, addExercise, updateExercise, exercises, deleteExercise } = useExercisesAPI()
 
+    console.log({exercises})
+
 
 
     const exerciseToShow = exercises.map(e => ({ ...e, ...e.weeks[0] }))

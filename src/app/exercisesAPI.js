@@ -71,10 +71,14 @@ export function useExercisesAPI() {
     function editExercise(exercise) {
         const newExercises = exercises.map((e) => {
             if (e.id === exercise.id) {
-                return Object.assign(e, exercise)
+                return Object.assign(e, exercise, {
+                    weeks: calcWeekValues(_.range(0, numberOfWeeks), exercise)
+                })
             }
             return e;
         });
+        debugger
+
         setExercisesData(newExercises);
     }
 
