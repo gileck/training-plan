@@ -13,6 +13,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { Delete, ExpandCircleDown, ExpandCircleUp, ExpandMore, ExpandLess, Label, } from "@mui/icons-material";
 import { Autocomplete, Button, Chip, Dialog, DialogTitle, FormControl, FormControlLabel, FormGroup, Grid, InputLabel, MenuItem, Select, Switch, TextField } from '@mui/material';
 import { localStorageAPI } from '../localStorageAPI';
+import {getAllBodyParts} from "@/app/exercisesAPI";
 
 // import { exercisesList } from '../exercisesList';
 export function CreateNewExerciseDialog({
@@ -118,17 +119,12 @@ export function CreateNewExerciseDialog({
                     <Select
                         label="Primary Muscle"
                         onChange={handlePrimaryMuscleChange}>
-                        <MenuItem value="Chest">Chest</MenuItem>
-                        <MenuItem value="Back">Back</MenuItem>
-                        <MenuItem value="Shoulders">Shoulders</MenuItem>
-                        <MenuItem value="Legs">Legs</MenuItem>
-                        <MenuItem value="Arms">Arms</MenuItem>
-                        <MenuItem value="Gluts">Gluts</MenuItem>
-                        <MenuItem value="Hamstring">Hamstring</MenuItem>
-                        <MenuItem value="Biceps">Biceps</MenuItem>
-                        <MenuItem value="Triceps">Triceps</MenuItem>
-                        <MenuItem value="Calves">Calves</MenuItem>
-                        <MenuItem value="Forearms">Forearms</MenuItem>
+
+                        {
+                            getAllBodyParts().map((bodyPart, index) => (
+                                <MenuItem key={index} value={bodyPart}>{bodyPart}</MenuItem>
+                            ))
+                        }
 
                     </Select>
                 </FormControl>
@@ -137,17 +133,11 @@ export function CreateNewExerciseDialog({
                     <Select
                         label="Secondary Muscle"
                         multiple value={secondaryMuscle} onChange={handleSecondaryMuscleChange}>
-                        <MenuItem value="Chest">Chest</MenuItem>
-                        <MenuItem value="Back">Back</MenuItem>
-                        <MenuItem value="Shoulders">Shoulders</MenuItem>
-                        <MenuItem value="Legs">Legs</MenuItem>
-                        <MenuItem value="Arms">Arms</MenuItem>
-                        <MenuItem value="Gluts">Gluts</MenuItem>
-                        <MenuItem value="Hamstring">Hamstring</MenuItem>
-                        <MenuItem value="Biceps">Biceps</MenuItem>
-                        <MenuItem value="Triceps">Triceps</MenuItem>
-                        <MenuItem value="Calves">Calves</MenuItem>
-                        <MenuItem value="Forearms">Forearms</MenuItem>
+                        {
+                            getAllBodyParts().map((bodyPart, index) => (
+                                <MenuItem key={index} value={bodyPart}>{bodyPart}</MenuItem>
+                            ))
+                        }
                     </Select>
                 </FormControl>
                 <Button
