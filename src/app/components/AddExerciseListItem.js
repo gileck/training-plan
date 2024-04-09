@@ -184,7 +184,7 @@ export function AddExerciseDialog({ exerciseList, createNewExercise, onAddExerci
 
 export function EditExerciseForm({ exerciseList, onAddExercise, exerciseToEdit, exercises, onCancel, createNewExercise }) {
     const { getData, saveData, cleanData } = localStorageAPI();
-    const localExercises = getData('exercisesList');
+    const localExercises = getData('exercisesList') || []
     console.log({ localExercises });
     const filteredExercises = exerciseList.filter(e => !exercises.find(ex => ex.name === e.name))
     const exerciseOptions = [...filteredExercises, ...localExercises]
