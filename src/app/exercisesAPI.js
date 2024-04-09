@@ -17,12 +17,12 @@ export function getBodyParts(name) {
     }
     return [
         e.primaryMuscle,
-        ...e.secondaryMuscles
+        ...(e.secondaryMuscles || [])
     ]
 }
 
 export function getCategory(name) {
-    return exercisesList.find(e => e.name === name).category;
+    return exercisesList.find(e => e.name === name)?.category;
 }
 
 export function getAllBodyParts() {
@@ -30,11 +30,11 @@ export function getAllBodyParts() {
 }
 
 export function getPullPushType(name) {
-    return exercisesList.find(e => e.name === name).pullPush;
+    return exercisesList.find(e => e.name === name)?.pullPush;
 }
 
 export function isBodyWeightExercise(name) {
-    return exercisesList.find(e => e.name === name).bodyWeight;
+    return exercisesList.find(e => e.name === name)?.bodyWeight;
 }
 
 export function useExercisesAPI() {

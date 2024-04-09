@@ -10,41 +10,190 @@ import Collapse from '@mui/material/Collapse';
 import AddIcon from '@mui/icons-material/Add';
 import IconButton from '@mui/material/IconButton';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { Delete, ExpandCircleDown, ExpandCircleUp, ExpandMore, ExpandLess, } from "@mui/icons-material";
-import { Autocomplete, Button, Chip, Dialog, DialogTitle, Grid, MenuItem, Select, TextField } from '@mui/material';
-import { exercisesList } from '../exercisesList';
-export function AddExerciseDialog({ onAddExercise, exercises, addExerciseDialogOpen, onClose }) {
+import { Delete, ExpandCircleDown, ExpandCircleUp, ExpandMore, ExpandLess, Label, } from "@mui/icons-material";
+import { Autocomplete, Button, Chip, Dialog, DialogTitle, FormControl, FormControlLabel, FormGroup, Grid, InputLabel, MenuItem, Select, Switch, TextField } from '@mui/material';
+import { localStorageAPI } from '../localStorageAPI';
+
+// import { exercisesList } from '../exercisesList';
+export function CreateNewExerciseDialog({
+    exercises,
+    onCreateNewExercise,
+    isDialogOpen,
+    onClose,
+
+}) {
+    const [exerciseName, setExerciseName] = useState('');
+    const [isBodyWeight, setIsBodyWeight] = useState(false);
+    const [exerciseCategory, setExerciseCategory] = useState('');
+    const [pushPull, setPushPull] = useState('');
+    const [primaryMuscle, setPrimaryMuscle] = useState('');
+    const [secondaryMuscle, setSecondaryMuscle] = useState([]);
+
+    const handleExerciseNameChange = (event) => {
+        setExerciseName(event.target.value);
+    }
+    const handleExerciseTypeChange = (event) => {
+        setIsBodyWeight(event.target.checked);
+    }
+    const handleExerciseCategoryChange = (event) => {
+        setExerciseCategory(event.target.value);
+    }
+    const handlePushPullChange = (event) => {
+        setPushPull(event.target.value);
+    }
+    const handlePrimaryMuscleChange = (event) => {
+        setPrimaryMuscle(event.target.value);
+    }
+    const handleSecondaryMuscleChange = (event) => {
+        setSecondaryMuscle(event.target.value);
+    }
+    const handleAddExercise = () => {
+        if (!exerciseName || !exerciseCategory || !primaryMuscle) {
+            return;
+        }
+        console.log({
+            name: exerciseName,
+            isBodyWeight,
+            category: exerciseCategory,
+            pushPull: pushPull,
+            primaryMuscle: primaryMuscle,
+            secondaryMuscle: secondaryMuscle
+        });
+        onCreateNewExercise({
+            name: exerciseName,
+            isBodyWeight,
+            category: exerciseCategory,
+            pushPull: pushPull,
+            primaryMuscle: primaryMuscle,
+            secondaryMuscle: secondaryMuscle
+        })
+    }
+    return (
+        <Dialog
+            disableEscapeKeyDown
+            open={isDialogOpen}
+            onClose={() => onClose()}
+        >
+            <DialogTitle>
+                Create Exercise
+            </DialogTitle>
+            <FormGroup sx={{ padding: '40px' }}>
+                <FormControl sx={{ mb: '10px' }}>
+                    <TextField
+                        label="Exercise Name"
+                        onChange={
+                            handleExerciseNameChange
+                        } />
+                </FormControl>
+                <FormControl sx={{ mb: '10px' }}>
+                    <FormControlLabel
+
+                        control={<Switch onChange={handleExerciseTypeChange} checked={isBodyWeight} />}
+                        label="isBodyWeight"
+                    />
+                </FormControl>
+                <FormControl sx={{ mb: '10px' }}>
+                    <InputLabel>Category</InputLabel>
+                    <Select
+                        label="Category"
+                        onChange={handleExerciseCategoryChange}>
+                        <MenuItem value="Upper body">Upper body</MenuItem>
+                        <MenuItem value="Left">Legs</MenuItem>
+                        <MenuItem value="Core">Core</MenuItem>
+                        <MenuItem value="fullBody">Full Body</MenuItem>
+                    </Select>
+                </FormControl>
+                <FormControl sx={{ mb: '10px' }}>
+                    <InputLabel>Push/Pull</InputLabel>
+                    <Select
+                        label="Push/Pull"
+                        onChange={handlePushPullChange}>
+                        <MenuItem value="push">Push</MenuItem>
+                        <MenuItem value="pull">Pull</MenuItem>
+                        <MenuItem value={null}>None</MenuItem>
+                    </Select>
+                </FormControl>
+                <FormControl sx={{ mb: '10px' }}>
+                    <InputLabel>Primary Muscle</InputLabel>
+                    <Select
+                        label="Primary Muscle"
+                        onChange={handlePrimaryMuscleChange}>
+                        <MenuItem value="Chest">Chest</MenuItem>
+                        <MenuItem value="Back">Back</MenuItem>
+                        <MenuItem value="Shoulders">Shoulders</MenuItem>
+                        <MenuItem value="Legs">Legs</MenuItem>
+                        <MenuItem value="Arms">Arms</MenuItem>
+                        <MenuItem value="Gluts">Gluts</MenuItem>
+                        <MenuItem value="Hamstring">Hamstring</MenuItem>
+                        <MenuItem value="Biceps">Biceps</MenuItem>
+                        <MenuItem value="Triceps">Triceps</MenuItem>
+                        <MenuItem value="Calves">Calves</MenuItem>
+                        <MenuItem value="Forearms">Forearms</MenuItem>
+
+                    </Select>
+                </FormControl>
+                <FormControl sx={{ mb: '10px' }}>
+                    <InputLabel>Secondary Muscle</InputLabel>
+                    <Select
+                        label="Secondary Muscle"
+                        multiple value={secondaryMuscle} onChange={handleSecondaryMuscleChange}>
+                        <MenuItem value="Chest">Chest</MenuItem>
+                        <MenuItem value="Back">Back</MenuItem>
+                        <MenuItem value="Shoulders">Shoulders</MenuItem>
+                        <MenuItem value="Legs">Legs</MenuItem>
+                        <MenuItem value="Arms">Arms</MenuItem>
+                        <MenuItem value="Gluts">Gluts</MenuItem>
+                        <MenuItem value="Hamstring">Hamstring</MenuItem>
+                        <MenuItem value="Biceps">Biceps</MenuItem>
+                        <MenuItem value="Triceps">Triceps</MenuItem>
+                        <MenuItem value="Calves">Calves</MenuItem>
+                        <MenuItem value="Forearms">Forearms</MenuItem>
+                    </Select>
+                </FormControl>
+                <Button
+                    iconStart={<AddIcon />}
+                    variant='contained'
+                    onClick={handleAddExercise}>Add</Button>
+            </FormGroup>
+        </Dialog>
+    );
+}
+export function AddExerciseDialog({ exerciseList, createNewExercise, onAddExercise, exercises, addExerciseDialogOpen, onClose }) {
+
+
     return (
         <Dialog
             disableEscapeKeyDown
             open={addExerciseDialogOpen}
             onClose={() => onClose()}
             fullWidth={true}
-
         >
             <DialogTitle>
                 Add Exercise
             </DialogTitle>
             <EditExerciseForm
+                exerciseList={exerciseList}
                 onCancel={() => onClose()}
                 exercises={exercises}
                 onAddExercise={onAddExercise}
+                createNewExercise={createNewExercise}
             />
         </Dialog>
     );
 }
 
-export function EditExerciseForm({ onAddExercise, exerciseToEdit, exercises, onCancel }) {
-
-    console.log({ exerciseToEdit });
-    const exerciseOptions = exercisesList.filter(e => !exercises.find(ex => ex.name === e.name))
+export function EditExerciseForm({ exerciseList, onAddExercise, exerciseToEdit, exercises, onCancel, createNewExercise }) {
+    const { getData, saveData, cleanData } = localStorageAPI();
+    const localExercises = getData('exercisesList');
+    console.log({ localExercises });
+    const filteredExercises = exerciseList.filter(e => !exercises.find(ex => ex.name === e.name))
+    const exerciseOptions = [...filteredExercises, ...localExercises]
     const [exercise, setExercise] = useState(exerciseToEdit || exerciseOptions[0]);
     const [totalWeeklySets, setTotalWeeklySets] = useState(exerciseToEdit?.weeklySets || 5);
     const [reps, setReps] = useState(exerciseToEdit?.numberOfReps || 8);
     const [weight, setWeight] = useState(exerciseToEdit?.weight || 12);
     const [overloadType, setOverloadType] = useState(exerciseToEdit?.overloadType || 'sets');
     const [overloadValue, setOverloadValue] = useState(exerciseToEdit?.overloadValue || 5);
-    console.log({ exercise });
 
     const onAddButtonClicked = () => {
         onAddExercise(Object.assign(exerciseToEdit || {}, {
@@ -93,6 +242,10 @@ export function EditExerciseForm({ onAddExercise, exerciseToEdit, exercises, onC
                         }
                     }}
                 />
+
+                {createNewExercise ? <IconButton onClick={createNewExercise}>
+                    <AddCircleIcon />
+                </IconButton> : ''}
 
             </ListItem>
             <ListItem>

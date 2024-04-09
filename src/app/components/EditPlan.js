@@ -8,7 +8,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
 import { AddCircle, Delete, EditLocationAlt, EditNotifications, RemoveCircle } from "@mui/icons-material";
-import { AddExerciseDialog, EditExerciseForm } from "./AddExerciseListItem";
+import { AddExerciseDialog, EditExerciseForm, CreateNewExerciseDialog } from "./AddExerciseListItem";
 import _ from 'lodash'
 import { useExercisesAPI } from "../exercisesAPI";
 import EditIcon from '@mui/icons-material/Edit';
@@ -16,6 +16,10 @@ import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 import { isBodyWeightExercise } from "../exercisesAPI";
 import { AppTabs } from "../tabs";
 import { WorkoutPlan } from "./WorkoutPlan";
+import { exercisesList, exercisesListFromLocal } from "../exercisesList";
+import { localStorageAPI } from "../localStorageAPI";
+
+const { getData, saveData, cleanData } = localStorageAPI();
 
 export function EditPlan() {
     return <AppTabs noCard={true} Comps={[
@@ -31,10 +35,17 @@ export function EditTrainingPlan() {
     const { addExercise, updateExercise, exercises, deleteExercise } = useExercisesAPI()
 
 
+
     const exerciseToShow = exercises.map(e => ({ ...e, ...e.weeks[0] }))
 
     const [addExerciseDialogOpen, setOpen] = React.useState(false);
+    const [createNewExerciseDialogOpen, setCreateNewExerciseDialogOpen] = React.useState(false);
     const [editExerciseOpened, setEditExercise] = React.useState({});
+
+    function createNewExercise() {
+        setOpen(false);
+        setCreateNewExerciseDialogOpen(true);
+    }
 
     function handleEditExerciseClicked(id) {
         setEditExercise({ ...editExerciseOpened, [id]: !editExerciseOpened[id] });
@@ -61,6 +72,12 @@ export function EditTrainingPlan() {
 
     const onDeleteButtonClicked = (exercise) => {
         deleteExercise(exercise);
+    }
+
+    const onCreateNewExercise = (exercise) => {
+        saveData('exercisesList', [...exercisesListFromLocal, exercise]);
+        setCreateNewExerciseDialogOpen(false);
+        setOpen(true);
     }
 
     function printSets(exercise) {
@@ -90,7 +107,16 @@ export function EditTrainingPlan() {
                 onAddExercise={onAddExercise}
                 addExerciseDialogOpen={addExerciseDialogOpen}
                 onClose={() => setOpen(false)}
+                createNewExercise={createNewExercise}
+                exerciseList={exercisesList}
 
+            />
+            <CreateNewExerciseDialog
+                exercises={exercises}
+                onAddExercise={onAddExercise}
+                isDialogOpen={createNewExerciseDialogOpen}
+                onClose={() => setCreateNewExerciseDialogOpen(false)}
+                onCreateNewExercise={onCreateNewExercise}
             />
             <Button
                 startIcon={<AddCircle />}
@@ -104,14 +130,10 @@ export function EditTrainingPlan() {
                 {exerciseToShow
                     .map((exercise) => (
                         <React.Fragment key={exercise.id}>
-
-
                             <ListItem disablePadding>
                                 <ListItemButton>
                                     <ListItemText primary={exercise.name}
-
                                         secondary={printSets(exercise)} />
-
                                     <IconButton onClick={() => handleEditExerciseClicked(exercise.id)}>
                                         <EditCalendarIcon />
                                     </IconButton>
@@ -128,14 +150,9 @@ export function EditTrainingPlan() {
                                 />
                             </ListItem>
                             <Divider />
-
                         </React.Fragment>
-
                     ))}
-
-
             </List>
-
         </div>
     )
 

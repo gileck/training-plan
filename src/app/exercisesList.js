@@ -1,4 +1,4 @@
-export const exercisesList = [
+const staticExercisesList = [
     { name: "Wide Push-ups", primaryMuscle: "Chest", secondaryMuscles: ["Triceps", "Shoulders"], pullPush: "Push", bodyWeight: true, category: "Upper body" },
     { name: "Push-ups", primaryMuscle: "Triceps", secondaryMuscles: ["Chest", "Shoulders"], pullPush: "Push", bodyWeight: true, category: "Upper body" },
     { name: "Squats", primaryMuscle: "Quadriceps", secondaryMuscles: ["Hamstrings", "Glutes"], pullPush: "Push", bodyWeight: false, category: "Legs" },
@@ -40,6 +40,12 @@ export const exercisesList = [
     { name: "Archer Push-ups", primaryMuscle: "Chest", secondaryMuscles: ["Triceps", "Shoulders"], pullPush: "Push", bodyWeight: true, category: "Upper body" },
     { name: "Single-leg Deadlift", primaryMuscle: "Hamstrings", secondaryMuscles: ["Glutes", "Core"], pullPush: "Pull", bodyWeight: true, category: "Legs" },
     { name: "Nordic Hamstring Curl", primaryMuscle: "Hamstrings", secondaryMuscles: [], pullPush: "Pull", bodyWeight: true, category: "Legs" },
-
-
 ];
+
+const exercisesListFromLocalStorage = JSON.parse(localStorage.getItem("exercisesList")) || [];
+
+export const exercisesListFromLocal = exercisesListFromLocalStorage
+export const exercisesList = [
+    ...staticExercisesList,
+    ...exercisesListFromLocalStorage
+]
