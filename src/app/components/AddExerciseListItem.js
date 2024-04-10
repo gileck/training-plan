@@ -13,7 +13,8 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { Delete, ExpandCircleDown, ExpandCircleUp, ExpandMore, ExpandLess, Label, } from "@mui/icons-material";
 import { Autocomplete, Button, Chip, Dialog, DialogTitle, FormControl, FormControlLabel, FormGroup, Grid, InputLabel, MenuItem, Select, Switch, TextField } from '@mui/material';
 import { localStorageAPI } from '../localStorageAPI';
-import {getAllBodyParts} from "@/app/exercisesAPI";
+import { getExercisesList } from '../exercisesList';
+import { getAllBodyParts } from "../exercisesAPI";
 
 // import { exercisesList } from '../exercisesList';
 export function CreateNewExerciseDialog({
@@ -173,11 +174,8 @@ export function AddExerciseDialog({ exerciseList, createNewExercise, onAddExerci
 }
 
 export function EditExerciseForm({ exerciseList, onAddExercise, exerciseToEdit, exercises, onCancel, createNewExercise }) {
-    const { getData, saveData, cleanData } = localStorageAPI();
-    const localExercises = getData('exercisesList') || []
-    console.log({ localExercises });
-    const filteredExercises = exerciseList.filter(e => !exercises.find(ex => ex.name === e.name))
-    const exerciseOptions = [...filteredExercises, ...localExercises]
+
+    const exerciseOptions = getExercisesList().filter(e => !exercises.find(ex => ex.name === e.name))
     const [exercise, setExercise] = useState(exerciseToEdit || exerciseOptions[0]);
     const [totalWeeklySets, setTotalWeeklySets] = useState(exerciseToEdit?.weeklySets || 5);
     const [reps, setReps] = useState(exerciseToEdit?.numberOfReps || 8);

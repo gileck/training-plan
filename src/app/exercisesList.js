@@ -1,3 +1,5 @@
+import { localStorageAPI } from "./localStorageAPI";
+
 const staticExercisesList = [
     { name: "Wide Push-ups", primaryMuscle: "Chest", secondaryMuscles: ["Triceps", "Shoulders"], pullPush: "Push", bodyWeight: true, category: "Upper body" },
     { name: "Push-ups", primaryMuscle: "Triceps", secondaryMuscles: ["Chest", "Shoulders"], pullPush: "Push", bodyWeight: true, category: "Upper body" },
@@ -40,6 +42,11 @@ const staticExercisesList = [
     { name: "Archer Push-ups", primaryMuscle: "Chest", secondaryMuscles: ["Triceps", "Shoulders"], pullPush: "Push", bodyWeight: true, category: "Upper body" },
     { name: "Single-leg Deadlift", primaryMuscle: "Hamstrings", secondaryMuscles: ["Glutes", "Core"], pullPush: "Pull", bodyWeight: true, category: "Legs" },
     { name: "Nordic Hamstring Curl", primaryMuscle: "Hamstrings", secondaryMuscles: [], pullPush: "Pull", bodyWeight: true, category: "Legs" },
+    { name: "Bulgarian split squats", primaryMuscle: "Quadriceps", secondaryMuscles: ["Glutes", "Hamstrings"], pullPush: "Push", bodyWeight: true, category: "Legs" },
+    { name: "Single leg deadlift", primaryMuscle: "Hamstrings", secondaryMuscles: ["Glutes", "Core"], pullPush: "Pull", bodyWeight: true, category: "Legs" },
+    { name: "Single leg Squats", primaryMuscle: "Quadriceps", secondaryMuscles: ["Glutes", "Calves"], pullPush: "Push", bodyWeight: true, category: "Legs" },
+    { name: "Thrusters", primaryMuscle: "Quadriceps", secondaryMuscles: ["Shoulders", "Glutes", "Hamstrings"], pullPush: "Push", bodyWeight: false, category: "Legs" },
+
     { name: "Romanian Deadlift", primaryMuscle: "Hamstrings", secondaryMuscles: ["Glutes", "Back"], pullPush: "Pull", bodyWeight: false, category: "Legs" },
     { name: "Incline Bench Press", primaryMuscle: "Chest", secondaryMuscles: ["Triceps", "Shoulders"], pullPush: "Push", bodyWeight: false, category: "Upper body" },
 ];
@@ -51,3 +58,12 @@ export const exercisesList = [
     ...staticExercisesList,
     ...exercisesListFromLocalStorage
 ]
+const { getData } = localStorageAPI()
+export const getExercisesList = () => {
+    const exercisesListFromLocalStorage = getData("exercisesList") || []
+    const exercisesListFromLocal = exercisesListFromLocalStorage
+    return [
+        ...staticExercisesList,
+        ...exercisesListFromLocal
+    ]
+}

@@ -16,7 +16,7 @@ import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 import { isBodyWeightExercise } from "../exercisesAPI";
 import { AppTabs } from "../tabs";
 import { WorkoutPlan } from "./WorkoutPlan";
-import { exercisesList, exercisesListFromLocal } from "../exercisesList";
+import { exercisesList, exercisesListFromLocal, getExercisesList } from "../exercisesList";
 import { localStorageAPI } from "../localStorageAPI";
 
 const { getData, saveData, cleanData } = localStorageAPI();

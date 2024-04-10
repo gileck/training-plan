@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import _ from 'lodash';
 import { localStorageAPI } from "./localStorageAPI";
-import { exercisesList } from "./exercisesList";
+import { getExercisesList } from "./exercisesList";
 
 export function getPrimaryMuscle(name) {
-    return exercisesList.find(e => e.name === name)?.primaryMuscle;
+    return getExercisesList().find(e => e.name === name)?.primaryMuscle;
 }
 export function getSecondaryMuscles(name) {
-    return exercisesList.find(e => e.name === name)?.secondaryMuscles || [];
+    return getExercisesList().find(e => e.name === name)?.secondaryMuscles || [];
 }
 export function getBodyParts(name) {
-    const e = exercisesList.find(e => e.name === name)
+    const e = getExercisesList().find(e => e.name === name)
     if (!e) {
         console.error('Exercise not found', name);
         return [];
@@ -22,19 +22,19 @@ export function getBodyParts(name) {
 }
 
 export function getCategory(name) {
-    return exercisesList.find(e => e.name === name)?.category;
+    return getExercisesList().find(e => e.name === name)?.category;
 }
 
 export function getAllBodyParts() {
-    return _.uniq(_.flatMap(exercisesList, e => getBodyParts(e.name)));
+    return _.uniq(_.flatMap(getExercisesList(), e => getBodyParts(e.name)));
 }
 
 export function getPullPushType(name) {
-    return exercisesList.find(e => e.name === name)?.pullPush;
+    return getExercisesList().find(e => e.name === name)?.pullPush;
 }
 
 export function isBodyWeightExercise(name) {
-    return exercisesList.find(e => e.name === name)?.bodyWeight;
+    return getExercisesList().find(e => e.name === name)?.bodyWeight;
 }
 
 export function useExercisesAPI() {
@@ -77,8 +77,6 @@ export function useExercisesAPI() {
             }
             return e;
         });
-        debugger
-
         setExercisesData(newExercises);
     }
 
