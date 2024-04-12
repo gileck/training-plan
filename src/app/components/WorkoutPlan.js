@@ -5,11 +5,11 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormGroup, InputLabel, MenuItem, Select, TextField } from "@mui/material";
+import { Alert, CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormGroup, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import { Card, Button, Chip, Collapse, Divider, ListItemSecondaryAction, Typography } from "@mui/material";
 import { Checkbox, ListItemIcon } from "@mui/material";
 import { getPrimaryMuscle, getSecondaryMuscles, getAllBodyParts, getBodyParts, getCategory, getPullPushType, useExercisesAPI } from "../exercisesAPI";
-import { RemoveCircle, AddCircle, AddCircleOutline, Delete, Edit, ExpandLess, ExpandMore, Label } from "@mui/icons-material";
+import { RemoveCircle, AddCircle, AddCircleOutline, Delete, Edit, ExpandLess, ExpandMore, Label, CheckCircleOutline } from "@mui/icons-material";
 
 function WorkoutExercise({ exercise, onRemoveSetComplete, onAddSetComplete, onDeleteExercise }) {
     const weeklyTargetReached = exercise.totalWeeklySets >= exercise.weeklyTarget;
@@ -80,8 +80,15 @@ function WorkoutExercise({ exercise, onRemoveSetComplete, onAddSetComplete, onDe
 function AddExerciseToWorkoutDialog({ open, handleClose, onAddExercise, exercises, workout }) {
     const [selectedExercise, setSelectedExercise] = useState(null)
     const [selectedSets, setSelectedSets] = useState(0)
+    console.log({ selectedSets });
     function onExerciseSelected(e) {
-        setSelectedExercise(e.target.value)
+        const exerciseName = e.target.value
+        setSelectedExercise(exerciseName)
+        const ex = exercises.find(e => e.name === exerciseName)
+        console.log({ ex });
+        if (ex) {
+            setSelectedSets(ex.weeklySets)
+        }
     }
     function onSetsChanged(e) {
         setSelectedSets(e.target.value)
@@ -280,7 +287,7 @@ function SelectWorkoutDialog({
 
 export function WorkoutPlan() {
 
-    const { workouts, exercises, updateExercise, numberOfWeeks, saveWorkoutAPI, deleteWorkout, editWorkout } = useExercisesAPI()
+    const { addExerciseToWorkout, workouts, exercises, updateExercise, numberOfWeeks, saveWorkoutAPI, deleteWorkout, editWorkout } = useExercisesAPI()
     console.log({ workouts, exercises });
 
     const [open, setOpen] = useState(false);
@@ -292,7 +299,7 @@ export function WorkoutPlan() {
     const [pullPushType, setPullPushType] = useState('all')
     const [openWorkouts, setOpenWorkouts] = useState({})
     function displayWorkout(workoutId) {
-        openWorkouts['left'] = false
+        openWorkouts['left'] = workoutId === 'left' ? openWorkouts[workoutId] : false
         setOpenWorkouts({ ...openWorkouts, [workoutId]: !openWorkouts[workoutId] })
     }
 
@@ -379,15 +386,11 @@ export function WorkoutPlan() {
         const workout = workouts.find(w => w.id === workoutId)
     }
     function updateWorkoutExercise({ currentWorkoutId, exerciseName, sets }) {
-        console.log({ currentWorkoutId, exerciseName, sets });
-
-        const workout = workouts.find(w => w.id === currentWorkoutId)
-        const e = createExerciseObject({
-            ...getExercise(exerciseName),
-            weeklyTarget: sets
-        }, workout.name)
-        workout.exercises.push(e)
-        editWorkout(workout)
+        addExerciseToWorkout({
+            workoutId: currentWorkoutId,
+            exerciseName,
+            sets
+        })
     }
     function deleteExerciseFromWorkout(workout, exercise) {
         workout.exercises = workout.exercises.filter(e => e.id !== exercise.id)
@@ -512,22 +515,16 @@ export function WorkoutPlan() {
                 }
             </List>
 
-            { exercisesNotInsideWorkouts.length > 0 ? (<Card>
-                <CardHeader
-                    sx={{ backgroundColor: '#d4ecf4', padding: '10px' }}
-                    title={
-                        <Typography >Exercises Left
-                            <IconButton onClick={() => displayWorkout('left')}>
-                                {openWorkouts['left'] ? <ExpandLess /> : <ExpandMore />}
-                            </IconButton>
-                        </Typography>
-
-                    }
+            {exercisesNotInsideWorkouts.length > 0 ? (<Card sx={{ mt: '30px' }}>
+                <Alert
                     onClick={() => displayWorkout('left')}
-                >
 
+                    icon={openWorkouts['left'] ? <ExpandLess /> : <ExpandMore />
 
-                </CardHeader>
+                    } severity="warning">
+                    {exercisesNotInsideWorkouts.length} Exercise(s) are not inside any workout
+                </Alert>
+
                 <Collapse in={openWorkouts['left']}>
                     <List>
                         {
@@ -548,7 +545,8 @@ export function WorkoutPlan() {
                 </Collapse>
 
 
-            </Card>) : null}
+            </Card>) : null
+            }
 
         </div >
     );

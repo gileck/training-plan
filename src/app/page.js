@@ -13,56 +13,56 @@ import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import RestoreIcon from '@mui/icons-material/Restore';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import {Paper} from "@mui/material";
+import { Paper } from "@mui/material";
 import SettingsIcon from '@mui/icons-material/Settings';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 export default function Home() {
-    const [value, setValue] = React.useState(2);
-    const Comps = [
-        { label: "Workout", Comp: Workout, icon: <FitnessCenterIcon /> },
-        { label: "Training Plan", Comp: TrainingPlan , icon: <FormatListBulletedIcon />  },
-        { label: "Edit Plan", Comp: EditPlan, icon: <NoteAddIcon />  },
-        { label: "Settings", Comp: Settings , icon: <SettingsIcon />  },
-    ]
+  const [value, setValue] = React.useState(0);
+  const Comps = [
+    { label: "Workout", Comp: Workout, icon: <FitnessCenterIcon /> },
+    { label: "Training Plan", Comp: TrainingPlan, icon: <FormatListBulletedIcon /> },
+    { label: "Edit Plan", Comp: EditPlan, icon: <NoteAddIcon /> },
+    { label: "Settings", Comp: Settings, icon: <SettingsIcon /> },
+  ]
 
-    const CompToRender = dynamic(() => Promise.resolve(Comps[value].Comp), { ssr: false })
+  const CompToRender = dynamic(() => Promise.resolve(Comps[value].Comp), { ssr: false })
 
   return (
     <main className={styles.main}>
-        <div>
-            <CompToRender />
-        </div>
+      <div>
+        <CompToRender />
+      </div>
 
 
-        <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
-            <SimpleBottomNavigation
-                onChange={(event, newValue) => setValue(newValue)}
-                Comps={Comps}
-                value={value}
-            />
-        </Paper>
+      <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
+        <SimpleBottomNavigation
+          onChange={(event, newValue) => setValue(newValue)}
+          Comps={Comps}
+          value={value}
+        />
+      </Paper>
 
     </main>
   );
 }
 
- function SimpleBottomNavigation({ Comps, onChange, value }) {
+function SimpleBottomNavigation({ Comps, onChange, value }) {
 
-    return (
-        <Box sx={{ minWidth: 380 }}>
-            <BottomNavigation
-                showLabels
-                value={value}
-                onChange={onChange}
-            >
-                {
-                    Comps.map(({ label, icon }, index) => (
-                        <BottomNavigationAction key={index} label={label} icon={icon || <SettingsIcon/> } />
-                    ))
-                }
-            </BottomNavigation>
-        </Box>
-    );
+  return (
+    <Box sx={{ minWidth: 380 }}>
+      <BottomNavigation
+        showLabels
+        value={value}
+        onChange={onChange}
+      >
+        {
+          Comps.map(({ label, icon }, index) => (
+            <BottomNavigationAction key={index} label={label} icon={icon || <SettingsIcon />} />
+          ))
+        }
+      </BottomNavigation>
+    </Box>
+  );
 }
