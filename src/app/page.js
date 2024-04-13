@@ -21,7 +21,7 @@ import NoteAddIcon from '@mui/icons-material/NoteAdd';
 export default function Home() {
   const [value, setValue] = React.useState(0);
   const Comps = [
-    { label: "Workout", Comp: Workout, icon: <FitnessCenterIcon /> },
+    { label: "Workouts", Comp: Workout, icon: <FitnessCenterIcon /> },
     { label: "Training Plan", Comp: TrainingPlan, icon: <FormatListBulletedIcon /> },
     { label: "Edit Plan", Comp: EditPlan, icon: <NoteAddIcon /> },
     { label: "Settings", Comp: Settings, icon: <SettingsIcon /> },
@@ -33,6 +33,13 @@ export default function Home() {
     <main className={styles.main}>
       <div>
         <CompToRender />
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '60px',
+        }}>
+        </div>
       </div>
 
 

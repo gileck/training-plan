@@ -5,7 +5,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { Alert, CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormGroup, InputLabel, MenuItem, Select, TextField } from "@mui/material";
+import { Alert, CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormGroup, InputLabel, MenuItem, Select, Slider, SliderMarkLabel, Stack, TextField } from "@mui/material";
 import { Card, Button, Chip, Collapse, Divider, ListItemSecondaryAction, Typography } from "@mui/material";
 import { Checkbox, ListItemIcon } from "@mui/material";
 import { getPrimaryMuscle, getSecondaryMuscles, getAllBodyParts, getBodyParts, getCategory, getPullPushType, useExercisesAPI } from "../exercisesAPI";
@@ -77,24 +77,39 @@ function WorkoutExercise({ exercise, onRemoveSetComplete, onAddSetComplete, onDe
     );
 }
 
-function AddExerciseToWorkoutDialog({ open, handleClose, onAddExercise, exercises, workout }) {
+function AddExerciseToWorkoutDialog({ workouts, open, handleClose, onAddExercise, exercises, workoutId }) {
+
+    if (!workoutId) {
+        return null
+    }
+
     const [selectedExercise, setSelectedExercise] = useState(null)
     const [selectedSets, setSelectedSets] = useState(0)
-    console.log({ selectedSets });
+    console.log({
+        workoutId,
+        workouts,
+    });
+    const workout = workouts.find(w => w.id === workoutId)
+    const exericesNotInTheWorkout = exercises.filter(e => !workout.exercises.find(ex => ex.name === e.name))
+    const ex = exercises.find(e => e.name === selectedExercise)
+    const maxSetsInExercise = ex?.weeklySets
+    console.log({ maxSetsInExercise });
+    const totalSetsCountInExercise = workouts.map(w => w.exercises.find(e => e.name === selectedExercise)).filter(e => e).reduce((acc, e) => acc + e.sets, 0)
+    console.log({ totalSetsCountInExercise });
+    const setsLeft = maxSetsInExercise - totalSetsCountInExercise
+    console.log({ totalSetsCountInExercise });
+
+    console.log({ selectedExercise });
+
     function onExerciseSelected(e) {
-        const exerciseName = e.target.value
-        setSelectedExercise(exerciseName)
-        const ex = exercises.find(e => e.name === exerciseName)
-        console.log({ ex });
-        if (ex) {
-            setSelectedSets(ex.weeklySets)
-        }
+        setSelectedExercise(e.target.value)
     }
     function onSetsChanged(e) {
         setSelectedSets(e.target.value)
     }
     function onAddButtonClicked() {
         onAddExercise(selectedExercise, selectedSets)
+        setSelectedExercise(null)
         handleClose()
     }
     return <Dialog
@@ -121,20 +136,48 @@ function AddExerciseToWorkoutDialog({ open, handleClose, onAddExercise, exercise
                             onChange={onExerciseSelected}
                         >
                             {
-                                exercises.map((exercise) => (
+                                exericesNotInTheWorkout.map((exercise) => (
                                     <MenuItem key={exercise.id} value={exercise.name}>{exercise.name}</MenuItem>
                                 ))
                             }
                         </Select>
                     </FormControl>
                     <FormControl sx={{ marginBottom: '10px' }} component="div" >
-                        <TextField
+                        {/* <TextField
                             label="Sets"
                             id="sets"
                             type="number"
                             value={selectedSets}
                             onChange={onSetsChanged}
-                        />
+                        /> */}
+
+                        {selectedExercise ? <Stack spacing={2}>
+
+                            Sets: {selectedSets} / {setsLeft} ({maxSetsInExercise})
+
+                            <Slider
+                                value={selectedSets}
+                                onChange={(_e, v) => setSelectedSets(v)}
+                                step={1}
+                                min={0}
+                                max={setsLeft}
+                                valueLabelDisplay="auto"
+                                marks={[
+                                    {
+                                        value: 0,
+                                        label: '0'
+                                    },
+                                    {
+                                        value: setsLeft,
+                                        label: setsLeft.toString()
+                                    }
+                                ]}
+                            />
+
+                        </Stack> : ''}
+
+
+
                     </FormControl>
                 </FormGroup>
             </Box>
@@ -448,7 +491,8 @@ export function WorkoutPlan() {
                 handleClose={() => setOpenAddExercise(false)}
                 onAddExercise={(exerciseName, sets) => { updateWorkoutExercise({ currentWorkoutId, exerciseName, sets }) }}
                 exercises={exercises}
-            // exercises={exercises.filter(e => !exerciseToShow.find(ex => ex.name === e.name))}
+                workouts={workouts}
+                workoutId={currentWorkoutId}
             />
 
 
@@ -483,7 +527,9 @@ export function WorkoutPlan() {
                                     <IconButton onClick={() => displayWorkout(workout.id)}>
                                         {openWorkouts[workout.id] ? <ExpandLess /> : <ExpandMore />}
                                     </IconButton>
-                                    <IconButton onClick={() => onAddIconClicked(workout.id)} >
+                                    <IconButton
+                                        disabled={workout.exercises.length === exercises.length}
+                                        onClick={() => onAddIconClicked(workout.id)} >
                                         <AddCircle />
                                     </IconButton>
                                     <IconButton onClick={() => onDeleteIconClicked(workout.id)} >

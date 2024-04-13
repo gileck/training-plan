@@ -14,7 +14,7 @@ import { Delete, ExpandCircleDown, ExpandCircleUp, ExpandMore, ExpandLess, Label
 import { Autocomplete, Button, Chip, Dialog, DialogTitle, FormControl, FormControlLabel, FormGroup, Grid, InputLabel, MenuItem, Select, Switch, TextField } from '@mui/material';
 import { localStorageAPI } from '../localStorageAPI';
 import { getExercisesList } from '../exercisesList';
-import { getAllBodyParts } from "../exercisesAPI";
+import { getAllBodyParts, getPrimaryMuscle, isBodyWeightExercise } from "../exercisesAPI";
 
 // import { exercisesList } from '../exercisesList';
 export function CreateNewExerciseDialog({
@@ -183,6 +183,7 @@ export function EditExerciseForm({ exerciseList, onAddExercise, exerciseToEdit, 
     const [overloadType, setOverloadType] = useState(exerciseToEdit?.overloadType || 'sets');
     const [overloadValue, setOverloadValue] = useState(exerciseToEdit?.overloadValue || 5);
 
+    console.log({ exercise });
     const onAddButtonClicked = () => {
         onAddExercise(Object.assign(exerciseToEdit || {}, {
             ...exercise,
@@ -218,9 +219,12 @@ export function EditExerciseForm({ exerciseList, onAddExercise, exerciseToEdit, 
                     isOptionEqualToValue={(option, value) => option.name === value.name}
                     disablePortal
                     aria-label={"Exercise"}
+                    groupBy={(exercise) => getPrimaryMuscle(exercise.label)}
                     label={"Exercise"}
                     value={exercise.name}
-                    options={exerciseOptions.map((option) => ({ label: option.name, value: option }))}
+                    options={exerciseOptions
+                        .sort((a, b) => getPrimaryMuscle(a.name).localeCompare(getPrimaryMuscle(b.name)))
+                        .map((option) => ({ label: option.name, value: option }))}
                     sx={{ width: 300 }}
                     renderInput={(params) => <TextField {...params} label='Exercise' />}
                     onChange={(event, newValue) => {
@@ -260,10 +264,10 @@ export function EditExerciseForm({ exerciseList, onAddExercise, exerciseToEdit, 
                 <TextField
                     size='small'
                     // disabled={true}
-                    disabled={exercise.bodyWeight}
+                    disabled={isBodyWeightExercise(exercise.name)}
                     label="Weight (kg)"
                     sx={{ width: '100px' }}
-                    value={exercise.bodyWeight ? 0 : weight}
+                    value={isBodyWeightExercise(exercise.name) ? 0 : weight}
                     onChange={(e) => setWeight(e.target.value)}
                     type="number" />
             </ListItem>

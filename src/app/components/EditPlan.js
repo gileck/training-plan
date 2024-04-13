@@ -18,6 +18,7 @@ import { AppTabs } from "../tabs";
 import { WorkoutPlan } from "./WorkoutPlan";
 import { exercisesList, exercisesListFromLocal, getExercisesList } from "../exercisesList";
 import { localStorageAPI } from "../localStorageAPI";
+import { BodyPartsPlan } from "./BodyPartsPlan";
 
 const { getData, saveData, cleanData } = localStorageAPI();
 
@@ -25,6 +26,7 @@ export function EditPlan() {
     return <AppTabs noCard={true} Comps={[
         { label: 'Training Plan', Comp: <EditTrainingPlan /> },
         { label: 'Workout Plan', Comp: <WorkoutPlan /> },
+        { label: 'Body Parts', Comp: <BodyPartsPlan /> },
     ]} />
 
 

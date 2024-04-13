@@ -5,13 +5,20 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormGroup, InputLabel, ListSubheader, MenuItem, Select, TextField } from "@mui/material";
-import { Button, Chip, Collapse, Divider, ListItemSecondaryAction, Typography } from "@mui/material";
-import { Checkbox, ListItemIcon } from "@mui/material";
+import { Chip, Collapse, Divider, ListItemSecondaryAction, Typography } from "@mui/material";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { getPrimaryMuscle, getSecondaryMuscles, getAllBodyParts, getBodyParts, getCategory, getPullPushType, useExercisesAPI } from "../exercisesAPI";
-import { RemoveCircle, AddCircle, AddCircleOutline, Delete, Edit, ExpandLess, ExpandMore, Label } from "@mui/icons-material";
+import { getPrimaryMuscle, getSecondaryMuscles, useExercisesAPI } from "../exercisesAPI";
+import { RemoveCircle, ExpandLess, ExpandMore, Label, ExpandMoreOutlined, ExpandLessRounded, ArrowLeft, ArrowRight } from "@mui/icons-material";
 // import { Exercise } from "./TrainingPlan";
+
+const colors = {
+    listHeaderBackground: '#a8cbe1',
+    listHeaderText: '#FFFFFF',
+    listHeaderSecondaryText: '#FFFFFF',
+    workoutBackground: '#e4e4e4',
+    exerciseBackground: '#FAFAFA',
+}
+
 
 function Exercise({ exercise, onRemoveSetComplete, onAddSetComplete, onSetDone }) {
     if (!exercise) {
@@ -22,7 +29,11 @@ function Exercise({ exercise, onRemoveSetComplete, onAddSetComplete, onSetDone }
         <ListItem
 
 
-            sx={{ flexDirection: 'column', alignItems: 'flex-start' }}
+            sx={{
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                backgroundColor: colors.exerciseBackground,
+            }}
         >
             <Box
                 sx={{
@@ -93,6 +104,7 @@ function Exercise({ exercise, onRemoveSetComplete, onAddSetComplete, onSetDone }
                 ))}
             </Box>
         </ListItem >
+
     );
 }
 
@@ -102,12 +114,14 @@ function Exercise({ exercise, onRemoveSetComplete, onAddSetComplete, onSetDone }
 export function Workout() {
 
     const { workouts, exercises, updateExercise, numberOfWeeks } = useExercisesAPI()
+    const firstWeekWithExercisesLeft = _.range(0, numberOfWeeks).find(week => !workouts.every(w => w.exercises.every(e => e.weeks[week].totalWeeklySets >= e.weeks[week].weeklyTarget)))
+    const firstWorkoutWithExercisesLeft = workouts.find(w => w.exercises.some(e => e.weeks[firstWeekWithExercisesLeft].totalWeeklySets < e.weeks[firstWeekWithExercisesLeft].weeklyTarget))
+    const [selectedWeek, setSelectedWeek] = useState(firstWeekWithExercisesLeft)
+    const [openWorkouts, setOpenWorkouts] = useState({
+        [firstWorkoutWithExercisesLeft.id]: true
+    });
 
-    const [selectedWorkoutId, setSelectedWorkoutId] = useState('all')
-    const [selectedWeek, setSelectedWeek] = useState(0)
-    const [openWorkouts, setOpenWorkouts] = useState({});
 
-    console.log({ workouts, exercises, selectedWorkoutId });
 
 
     function getExercise(exercise) {
@@ -136,7 +150,7 @@ export function Workout() {
 
     function onExerciseDone(workoutId, exercise) {
         updateExercise(workoutId, exercise.id, selectedWeek, {
-            totalWeeklySets: Number(exercise.sets)
+            totalWeeklySets: Number(exercise.weeks[selectedWeek].weeklyTarget || 0)
         });
     }
 
@@ -149,7 +163,6 @@ export function Workout() {
         }).flat();
     }
 
-    const workout = selectedWorkoutId === 'all' ? null : workouts.find(w => w.id === selectedWorkoutId);
     const openWorkout = (workoutId) => setOpenWorkouts({ ...openWorkouts, [workoutId]: !openWorkouts[workoutId] })
     function isWorkoutFinished(workout) {
         return workout.exercises.every((exercise) => {
@@ -157,44 +170,80 @@ export function Workout() {
             return e.sets.done >= e.sets.target;
         })
     }
+    const totalSetsThisWeek = workouts.reduce((acc, w) => acc + w.exercises.reduce((acc, e) => acc + (e.weeks[selectedWeek].totalWeeklySets || 0), 0), 0)
+    const thisWeekSetsTarget = workouts.reduce((acc, w) => acc + w.exercises.reduce((acc, e) => acc + (e.weeks[selectedWeek].weeklyTarget || 0), 0), 0)
+    const isWeekDone = totalSetsThisWeek >= thisWeekSetsTarget
     return (<div>
-        <List>
-            <ListItem>
+        <List
+            sx={{
+                paddingTop: '0px',
+
+            }}
+
+        >
+            <ListItem
+                sx={{
+                    backgroundColor: colors.listHeaderBackground,
+                    borderTopLeftRadius: '10px',
+                    borderTopRightRadius: '10px',
+                }}
+            >
                 <ListItemText
+                    sx={{
+                        // color: colors.listHeaderText,
+                    }}
                     primary={<div style={{ fontSize: '25px' }}>
                         Workouts
                     </div>}
 
                     secondary={<React.Fragment>
-                        <div>Week: {selectedWeek + 1} / {numberOfWeeks}
+                        <div>Week:
                             <IconButton
-                                sx={{ padding: '3px', ml: '10px', mb: '2px' }}
-                                onClick={() => setSelectedWeek((selectedWeek + 1) % numberOfWeeks)}>
-                                <AddCircle sx={{ fontSize: '15px' }} />
+                                sx={{ padding: '3px', mb: '2px' }}
+                                disabled={selectedWeek === 0}
+
+                                onClick={() => setSelectedWeek((selectedWeek - 1) % numberOfWeeks)}>
+                                <ArrowLeft sx={{ fontSize: '15px' }} />
                             </IconButton>
+                            {selectedWeek + 1}
+
+                            <span style={{ marginLeft: '5px', marginRight: '5px' }}>/</span>
+
+                            {numberOfWeeks}
+
                             <IconButton
                                 sx={{ padding: '3px' }}
-                                onClick={() => setSelectedWeek((selectedWeek - 1 + numberOfWeeks) % numberOfWeeks)}>
-                                <RemoveCircle sx={{ fontSize: '15px' }} />
+                                disabled={selectedWeek === numberOfWeeks - 1}
+
+                                onClick={() => setSelectedWeek(selectedWeek + 1 % numberOfWeeks)}>
+                                <ArrowRight sx={{ fontSize: '15px' }} />
                             </IconButton>
 
                         </div>
 
-                        <div>Sets: {`
-                            ${workouts.reduce((acc, w) => acc + w.exercises.reduce((acc, e) => acc + (e.weeks[selectedWeek].totalWeeklySets || 0), 0), 0)}
-                            /
-                            ${workouts.reduce((acc, w) => acc + w.exercises.reduce((acc, e) => acc + (e.weeks[selectedWeek].weeklyTarget || 0), 0), 0)}
-                            `}
+                        <div>Sets:
+                            <span style={{ marginLeft: '5px', }}>{totalSetsThisWeek}</span>
+                            <span style={{ marginLeft: '5px', marginRight: '5px' }}>/</span>
+                            <span style={{ marginRight: '5px', }}>{thisWeekSetsTarget}</span>
+                            {isWeekDone ? '✅' : ''}
                         </div>
                     </React.Fragment>}
 
                 />
 
+
+
             </ListItem>
+            <Divider />
             {
                 workouts.map((workout) => (
                     <React.Fragment key={workout.id}>
+
                         <ListItem
+
+                            sx={{
+                                backgroundColor: colors.workoutBackground,
+                            }}
 
                             onClick={() => openWorkout(workout.id)} key={workout.id}>
                             <ListItemText
@@ -204,10 +253,12 @@ export function Workout() {
                                     ${isWorkoutFinished(workout) ? '✅' : ''}
                                 `}
                                 secondary={<React.Fragment>
-                                    <div style={{ textDecoration: isWorkoutFinished(workout) ? 'line-through' : '' }}>
-                                        Sets:
+                                    <div>
+
+                                        <span style={{ marginRight: '5px' }}>Sets:</span>
                                         {workout.exercises.reduce((acc, e) => acc + (e.weeks[selectedWeek].totalWeeklySets || 0), 0)}
-                                        /
+                                        <span style={{ marginLeft: '5px', marginRight: '5px' }}>/</span>
+
                                         {workout.exercises.reduce((acc, e) => acc + (e.weeks[selectedWeek].weeklyTarget || 0), 0)}
                                     </div>
                                 </React.Fragment>}
@@ -218,17 +269,24 @@ export function Workout() {
                                     {openWorkouts[workout.id] ? <ExpandLess /> : <ExpandMore />}
                                 </IconButton>
                             </ListItemSecondaryAction>
+
                         </ListItem>
+                        {openWorkouts[workout.id] ? <Divider /> : ''}
+
                         <Collapse in={openWorkouts[workout.id]} timeout="auto" unmountOnExit>
                             {
                                 workout.exercises.map((exercise) => (
-                                    <Exercise
-                                        key={exercise.id}
-                                        exercise={getExercise(exercise)}
-                                        onRemoveSetComplete={() => onSetComplete(workout.id, exercise, -1)}
-                                        onAddSetComplete={() => onSetComplete(workout.id, exercise, 1)}
-                                        onSetDone={() => onExerciseDone(workout.id, exercise)}
-                                    />
+                                    <React.Fragment key={exercise.id}>
+                                        <Exercise
+                                            key={exercise.id}
+                                            exercise={getExercise(exercise)}
+                                            onRemoveSetComplete={() => onSetComplete(workout.id, exercise, -1)}
+                                            onAddSetComplete={() => onSetComplete(workout.id, exercise, 1)}
+                                            onSetDone={() => onExerciseDone(workout.id, exercise)}
+                                        />
+                                        <Divider />
+                                    </React.Fragment>
+
                                 ))
                             }
                         </Collapse>

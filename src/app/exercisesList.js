@@ -31,7 +31,7 @@ const staticExercisesList = [
     { name: "Seated Row", primaryMuscle: "Back", secondaryMuscles: ["Biceps"], pullPush: "Pull", bodyWeight: false, category: "Upper body" },
     { name: "Leg Curls", primaryMuscle: "Hamstrings", secondaryMuscles: [], pullPush: "Pull", bodyWeight: false, category: "Legs" },
     { name: "Leg Extensions", primaryMuscle: "Quadriceps", secondaryMuscles: [], pullPush: "Push", bodyWeight: false, category: "Legs" },
-    { name: "Face Pulls", primaryMuscle: "Shoulders", secondaryMuscles: ["Upper Back"], pullPush: "Pull", bodyWeight: false, category: "Upper body" },
+    { name: "Face Pulls", primaryMuscle: "Shoulders", secondaryMuscles: ["Back"], pullPush: "Pull", bodyWeight: false, category: "Upper body" },
     { name: "Calf Raises", primaryMuscle: "Calves", secondaryMuscles: [], pullPush: "Push", bodyWeight: false, category: "Legs" },
     { name: "Diamond Push-ups", primaryMuscle: "Triceps", secondaryMuscles: ["Chest", "Shoulders"], pullPush: "Push", bodyWeight: true, category: "Upper body" },
     { name: "Pistol Squats", primaryMuscle: "Quadriceps", secondaryMuscles: ["Glutes", "Calves"], pullPush: "Push", bodyWeight: true, category: "Legs" },

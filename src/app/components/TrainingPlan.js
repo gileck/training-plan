@@ -7,7 +7,6 @@ import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { allExercises } from "./exercises";
 import { localStorageAPI } from "../localStorageAPI";
 import { ExpandLess, ExpandMore, RemoveCircle } from "@mui/icons-material";
 import _ from 'lodash'

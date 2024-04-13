@@ -1,15 +1,24 @@
-import { Button, IconButton, List, ListItem, ListItemText, TextField } from "@mui/material";
+import { useState } from "react";
+import { Button, IconButton, InputLabel, List, ListItem, ListItemText, MenuItem, Select, TextField } from "@mui/material";
 import { localStorageAPI } from "../localStorageAPI";
-import { Delete } from "@mui/icons-material";
+import { Delete, Label } from "@mui/icons-material";
 import { useExercisesAPI } from "../exercisesAPI";
 
 export function Settings() {
     const { changeNumberOfWeeks, numberOfWeeks } = useExercisesAPI()
+    const [cleanDataOption, setCleanDataOption] = useState('')
     function cleanData() {
-        localStorageAPI().cleanData('exercises')
+        const res = confirm("Are you sure you want to clear " + cleanDataOption + "?")
+        if (res) {
+            localStorageAPI().cleanData(cleanDataOption)
+        }
     }
     function onNumberOfWeeksChanged(e) {
         changeNumberOfWeeks(e.target.value)
+    }
+    function onClearDataChanged(e) {
+        console.log('onClearDataChanged', e.target.value)
+        setCleanDataOption(e.target.value)
     }
     return (
         <List>
@@ -20,6 +29,21 @@ export function Settings() {
             </ListItem>
             <ListItem>
                 <ListItemText primary="Clear Local Storage" />
+
+                <Select
+                    onChange={onClearDataChanged}
+                    value={cleanDataOption}
+                    placeholder="Select option"
+
+                >
+
+                    {
+                        Object.keys(localStorage).map((key, index) => (
+                            <MenuItem key={index} value={key}>{key}</MenuItem>
+                        ))
+                    }
+                </Select>
+
                 <IconButton onClick={cleanData}>
                     <Delete color="error" />
                 </IconButton>
