@@ -116,7 +116,7 @@ export function Workout() {
     const { workouts, exercises, updateExercise, numberOfWeeks } = useExercisesAPI()
     const firstWeekWithExercisesLeft = _.range(0, numberOfWeeks).find(week => !workouts.every(w => w.exercises.every(e => e.weeks[week].totalWeeklySets >= e.weeks[week].weeklyTarget)))
     const firstWorkoutWithExercisesLeft = workouts.find(w => w.exercises.some(e => e.weeks[firstWeekWithExercisesLeft].totalWeeklySets < e.weeks[firstWeekWithExercisesLeft].weeklyTarget))
-    const [selectedWeek, setSelectedWeek] = useState(firstWeekWithExercisesLeft)
+    const [selectedWeek, setSelectedWeek] = useState(firstWeekWithExercisesLeft || 0)
     const [openWorkouts, setOpenWorkouts] = useState({
         [firstWorkoutWithExercisesLeft?.id]: true
     });
