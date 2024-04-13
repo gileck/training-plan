@@ -118,7 +118,7 @@ export function Workout() {
     const firstWorkoutWithExercisesLeft = workouts.find(w => w.exercises.some(e => e.weeks[firstWeekWithExercisesLeft].totalWeeklySets < e.weeks[firstWeekWithExercisesLeft].weeklyTarget))
     const [selectedWeek, setSelectedWeek] = useState(firstWeekWithExercisesLeft)
     const [openWorkouts, setOpenWorkouts] = useState({
-        [firstWorkoutWithExercisesLeft.id]: true
+        [firstWorkoutWithExercisesLeft?.id]: true
     });
 
 
