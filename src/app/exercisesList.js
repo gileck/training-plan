@@ -46,9 +46,10 @@ const staticExercisesList = [
     { name: "Single leg deadlift", primaryMuscle: "Hamstrings", secondaryMuscles: ["Glutes", "Core"], pullPush: "Pull", bodyWeight: true, category: "Legs" },
     { name: "Single leg Squats", primaryMuscle: "Quadriceps", secondaryMuscles: ["Glutes", "Calves"], pullPush: "Push", bodyWeight: true, category: "Legs" },
     { name: "Thrusters", primaryMuscle: "Quadriceps", secondaryMuscles: ["Shoulders", "Glutes", "Hamstrings"], pullPush: "Push", bodyWeight: false, category: "Legs" },
-
+    { name: "Hip Thrust", primaryMuscle: "Glutes", secondaryMuscles: ["Hamstrings", "Core"], pullPush: "Push", bodyWeight: false, category: "Legs" },
     { name: "Romanian Deadlift", primaryMuscle: "Hamstrings", secondaryMuscles: ["Glutes", "Back"], pullPush: "Pull", bodyWeight: false, category: "Legs" },
     { name: "Incline Bench Press", primaryMuscle: "Chest", secondaryMuscles: ["Triceps", "Shoulders"], pullPush: "Push", bodyWeight: false, category: "Upper body" },
+    { name: "Farmer Carry", primaryMuscle: "Forearms", secondaryMuscles: ["Core", "Shoulders"], pullPush: null, bodyWeight: false, category: "Core" },
 ];
 
 const exercisesListFromLocalStorage = typeof localStorage !== "undefined" && JSON.parse(localStorage.getItem("exercisesList")) || [];
