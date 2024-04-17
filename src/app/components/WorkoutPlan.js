@@ -11,8 +11,8 @@ import { Checkbox, ListItemIcon } from "@mui/material";
 import { getPrimaryMuscle, getSecondaryMuscles, getAllBodyParts, getBodyParts, getCategory, getPullPushType, useExercisesAPI } from "../exercisesAPI";
 import { RemoveCircle, AddCircle, AddCircleOutline, Delete, Edit, ExpandLess, ExpandMore, Label, CheckCircleOutline } from "@mui/icons-material";
 
-function WorkoutExercise({ exercise, onRemoveSetComplete, onAddSetComplete, onDeleteExercise }) {
-    const weeklyTargetReached = exercise.totalWeeklySets >= exercise.weeklyTarget;
+function WorkoutExercise({ totalWeeklySetsInAllWorkouts, totalWeeklySets, exercise, onRemoveSetComplete, onAddSetComplete, onDeleteExercise }) {
+    console.log({ exercise });
     return (
         <ListItem
 
@@ -27,18 +27,27 @@ function WorkoutExercise({ exercise, onRemoveSetComplete, onAddSetComplete, onDe
                 }}>
 
                 <ListItemText
-                    style={{ textDecoration: weeklyTargetReached ? 'line-through' : '' }}
                     primary={exercise.name}
                     secondary={
                         <React.Fragment>
                             <Typography
-                                component="span"
+                                component="div"
                                 variant="body2"
                                 color="text.secondary"
                             >
                                 Sets: {exercise.sets}
 
                             </Typography>
+                            {totalWeeklySetsInAllWorkouts - totalWeeklySets < 0 ?
+                                <Typography
+                                    component="div"
+                                    variant="body2"
+                                    color="orange"
+                                >
+                                    Sets Left: {totalWeeklySets - totalWeeklySetsInAllWorkouts}
+                                </Typography>
+                                : ''}
+
                         </React.Fragment>
                     } />
 
@@ -82,22 +91,34 @@ function AddExerciseToWorkoutDialog({ workouts, open, handleClose, onAddExercise
     if (!workoutId) {
         return null
     }
-
     const [selectedExercise, setSelectedExercise] = useState(null)
-    const [selectedSets, setSelectedSets] = useState(0)
-    console.log({
-        workoutId,
-        workouts,
-    });
+
     const workout = workouts.find(w => w.id === workoutId)
     const exericesNotInTheWorkout = exercises.filter(e => !workout.exercises.find(ex => ex.name === e.name))
     const ex = exercises.find(e => e.name === selectedExercise)
     const maxSetsInExercise = ex?.weeklySets
-    console.log({ maxSetsInExercise });
+
+
+    console.log({
+        workoutId,
+        workouts,
+    });
+
     const totalSetsCountInExercise = workouts.map(w => w.exercises.find(e => e.name === selectedExercise)).filter(e => e).reduce((acc, e) => acc + e.sets, 0)
-    console.log({ totalSetsCountInExercise });
     const setsLeft = maxSetsInExercise - totalSetsCountInExercise
-    console.log({ totalSetsCountInExercise });
+
+
+    console.log({
+        totalSetsCountInExercise,
+        maxSetsInExercise,
+        setsLeft
+
+    });
+    const [selectedSets, setSelectedSets] = useState(0)
+
+    React.useEffect(() => {
+        setSelectedSets(setsLeft)
+    }, [selectedExercise])
 
     console.log({ selectedExercise });
 
@@ -109,6 +130,10 @@ function AddExerciseToWorkoutDialog({ workouts, open, handleClose, onAddExercise
     }
     function onAddButtonClicked() {
         onAddExercise(selectedExercise, selectedSets)
+        setSelectedExercise(null)
+        handleClose()
+    }
+    function handleCancelClicked() {
         setSelectedExercise(null)
         handleClose()
     }
@@ -151,9 +176,9 @@ function AddExerciseToWorkoutDialog({ workouts, open, handleClose, onAddExercise
                             onChange={onSetsChanged}
                         /> */}
 
-                        {selectedExercise ? <Stack spacing={2}>
+                        {selectedExercise && setsLeft ? <Stack spacing={2}>
 
-                            Sets: {selectedSets} / {setsLeft} ({maxSetsInExercise})
+                            Sets: {selectedSets} / {setsLeft}  ({maxSetsInExercise} Weekly Total)
 
                             <Slider
                                 value={selectedSets}
@@ -176,6 +201,12 @@ function AddExerciseToWorkoutDialog({ workouts, open, handleClose, onAddExercise
 
                         </Stack> : ''}
 
+                        {
+                            selectedExercise && !setsLeft ? <Alert severity="warning">
+                                You have reached the maximum weekly sets for this exercise ({maxSetsInExercise})
+                            </Alert> : ''
+                        }
+
 
 
                     </FormControl>
@@ -183,7 +214,7 @@ function AddExerciseToWorkoutDialog({ workouts, open, handleClose, onAddExercise
             </Box>
         </DialogContent>
         <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
+            <Button onClick={handleCancelClicked}>Cancel</Button>
             <Button
                 startIcon={<AddCircleOutline />}
                 variant="contained"
@@ -468,6 +499,13 @@ export function WorkoutPlan() {
             }
         })
     }
+
+    function getTotalWeeklySets(exerciseName) {
+        return exercises.find(e => e.name === exerciseName).weeklySets
+    }
+    function getTotalWeeklySetsInAllWorkouts(exerciseName) {
+        return workouts.map(w => w.exercises.find(e => e.name === exerciseName)).filter(e => e).reduce((acc, e) => acc + e.sets, 0)
+    }
     return (
         <div>
 
@@ -547,6 +585,8 @@ export function WorkoutPlan() {
                                             <WorkoutExercise
                                                 key={exercise.id}
                                                 exercise={exercise}
+                                                totalWeeklySets={getTotalWeeklySets(exercise.name)}
+                                                totalWeeklySetsInAllWorkouts={getTotalWeeklySetsInAllWorkouts(exercise.name)}
                                                 onRemoveSetComplete={() => onSetComplete(workout, exercise, -1)}
                                                 onAddSetComplete={() => onSetComplete(workout, exercise, 1)}
                                                 onDeleteExercise={() => deleteExerciseFromWorkout(workout, exercise)}

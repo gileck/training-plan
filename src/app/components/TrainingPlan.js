@@ -17,7 +17,7 @@ const { getData, saveData } = localStorageAPI();
 
 export function TrainingPlan() {
     const [open, setOpen] = React.useState({});
-    const { getExercisesByWeeks, cleanData, updateExercise, addExercise, calculateExerciseDone } = useExercisesAPI()
+    const { getExercisesByWeeks, cleanData, updateExercise, addExercise, calculateExerciseDone, calculateTotalSetsDoneWeek, calculateTotalSetsTargetWeek } = useExercisesAPI()
     const groupByWeek = getExercisesByWeeks();
     console.log(' groupByWeek', groupByWeek);
     function handleCollapseClick(week) {
@@ -35,11 +35,15 @@ export function TrainingPlan() {
                     <React.Fragment key={week.id}>
                         <ListItem key={week} onClick={() => handleCollapseClick(week)}>
                             <ListItemText
-                                primary={`Week ${Number(week) + 1}`}
+                                primary={`
+                                Week ${Number(week) + 1} 
+                                ${calculateTotalSetsDoneWeek(week) === calculateTotalSetsTargetWeek(week) ? '✅' : ''}
+                                `}
                                 secondary={`Total Sets: 
-                                        ${groupByWeek[week].reduce((acc, exercise) => acc + (Number(exercise.totalWeeklySets) || 0), 0)} 
+                                        ${calculateTotalSetsDoneWeek(week)}
                                         / 
-                                        ${groupByWeek[week].reduce((acc, exercise) => acc + Number(exercise.weeklyTarget), 0)}`}
+                                        ${calculateTotalSetsTargetWeek(week)}
+                                        `}
                             />
                             {open[week.id] ? <ExpandLess /> : <ExpandMore />}
                         </ListItem>

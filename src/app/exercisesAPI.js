@@ -50,7 +50,10 @@ export function useExercisesAPI() {
     const [exercises, setExercises] = useState(localExercises);
     const [numberOfWeeks, setWeeksValue] = useState(getData('numberOfWeeks') || 7);
     const [workouts, setWorkouts] = useState(getData('workouts') || []);
-
+    console.log({
+        workouts,
+        exercises
+    });
 
     function setNumberOfWeeks(_numberOfWeeks) {
         setWeeksValue(_numberOfWeeks);
@@ -225,6 +228,25 @@ export function useExercisesAPI() {
 
     }
 
+    function calculateSetsDoneWeek(week, field) {
+        const result1 = workouts.map(w => {
+            return w.exercises.reduce((acc, ex) => {
+                return acc + ex.weeks[week][field];
+            }, 0)
+        })
+        const sum = result1.reduce((acc, val) => acc + val, 0);
+        return sum;
+    }
+
+    function calculateTotalSetsDoneWeek(week) {
+        return calculateSetsDoneWeek(week, 'totalWeeklySets');
+
+    }
+
+    function calculateTotalSetsTargetWeek(week) {
+        return calculateSetsDoneWeek(week, 'weeklyTarget');
+    }
+
     function createExerciseObject(exercise, workoutName) {
         return {
             name: exercise.name,
@@ -266,7 +288,9 @@ export function useExercisesAPI() {
         deleteWorkout,
         editWorkout,
         calculateExerciseDone,
-        addExerciseToWorkout
+        addExerciseToWorkout,
+        calculateTotalSetsDoneWeek,
+        calculateTotalSetsTargetWeek
 
     }
 }

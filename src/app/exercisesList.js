@@ -26,6 +26,7 @@ const staticExercisesList = [
     { name: "Dips", primaryMuscle: "Triceps", secondaryMuscles: ["Chest", "Shoulders"], pullPush: "Push", bodyWeight: true, category: "Upper body" },
     { name: "Plank", primaryMuscle: "Core", secondaryMuscles: [], pullPush: null, bodyWeight: true, category: "Core" },
     { name: "Lat Pull-downs", primaryMuscle: "Back", secondaryMuscles: ["Biceps"], pullPush: "Pull", bodyWeight: false, category: "Upper body" },
+    { name: "Chin-ups", primaryMuscle: "Back", secondaryMuscles: ["Biceps"], pullPush: "Pull", bodyWeight: true, category: "Upper body" },
     { name: "Leg Press", primaryMuscle: "Quadriceps", secondaryMuscles: ["Glutes", "Hamstrings"], pullPush: "Push", bodyWeight: false, category: "Legs" },
     { name: "Cable Chest Fly", primaryMuscle: "Chest", secondaryMuscles: ["Shoulders"], pullPush: "Push", bodyWeight: false, category: "Upper body" },
     { name: "Seated Row", primaryMuscle: "Back", secondaryMuscles: ["Biceps"], pullPush: "Pull", bodyWeight: false, category: "Upper body" },
