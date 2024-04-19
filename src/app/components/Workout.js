@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -8,7 +8,10 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { Chip, Collapse, Divider, ListItemSecondaryAction, Typography } from "@mui/material";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { getPrimaryMuscle, getSecondaryMuscles, useExercisesAPI } from "../exercisesAPI";
-import { RemoveCircle, ExpandLess, ExpandMore, Label, ExpandMoreOutlined, ExpandLessRounded, ArrowLeft, ArrowRight } from "@mui/icons-material";
+import { RemoveCircle, ExpandLess, ExpandMore, Label, ExpandMoreOutlined, ExpandLessRounded, ArrowLeft, ArrowRight, NavigationOutlined } from "@mui/icons-material";
+import { AppContext } from "../AppContext";
+import Fab from '@mui/material/Fab';
+
 // import { Exercise } from "./TrainingPlan";
 
 const colors = {
@@ -17,22 +20,28 @@ const colors = {
     listHeaderSecondaryText: '#FFFFFF',
     workoutBackground: '#e4e4e4',
     exerciseBackground: '#FAFAFA',
+    exerciseBackgroundSelected: '#aff4ff',
 }
 
 
-function Exercise({ exercise, onRemoveSetComplete, onAddSetComplete, onSetDone }) {
+function Exercise({ isSelected, selectExercise, selectedWeek, exercise, onRemoveSetComplete, onAddSetComplete, onSetDone }) {
     if (!exercise) {
         return null;
     }
+
     const weeklyTargetReached = exercise.sets.done >= exercise.sets.target;
     return (
         <ListItem
-
-
+            // onClick={() => selectExercise('runExercise', {
+            //     exerciseIds: exercise.id,
+            //     week: selectedWeek
+            // })}
+            onClick={() => selectExercise(exercise.id)}
             sx={{
+
                 flexDirection: 'column',
                 alignItems: 'flex-start',
-                backgroundColor: colors.exerciseBackground,
+                backgroundColor: isSelected ? colors.exerciseBackgroundSelected : colors.exerciseBackground,
             }}
         >
             <Box
@@ -43,6 +52,7 @@ function Exercise({ exercise, onRemoveSetComplete, onAddSetComplete, onSetDone }
                 }}>
 
                 <ListItemText
+
                     style={{ textDecoration: weeklyTargetReached ? 'line-through' : '' }}
                     primary={exercise.name}
                     secondary={
@@ -116,13 +126,29 @@ export function Workout() {
     const { workouts, exercises, updateExercise, numberOfWeeks } = useExercisesAPI()
     const firstWeekWithExercisesLeft = _.range(0, numberOfWeeks).find(week => !workouts.every(w => w.exercises.every(e => e.weeks[week].totalWeeklySets >= e.weeks[week].weeklyTarget)))
     const firstWorkoutWithExercisesLeft = workouts.find(w => w.exercises.some(e => e.weeks[firstWeekWithExercisesLeft].totalWeeklySets < e.weeks[firstWeekWithExercisesLeft].weeklyTarget))
+    const [selectedExercises, setSelectedExercises] = useState([])
+
     const [selectedWeek, setSelectedWeek] = useState(firstWeekWithExercisesLeft || 0)
     const [openWorkouts, setOpenWorkouts] = useState({
         [firstWorkoutWithExercisesLeft?.id]: true
     });
 
+    function selectExercise(exerciseId) {
 
+        if (selectedExercises.includes(exerciseId)) {
+            setSelectedExercises(selectedExercises.filter(id => id !== exerciseId))
+            return;
+        } else {
+            if (selectedExercises.length === 2) {
+                setSelectedExercises([exerciseId, selectedExercises[0]])
+                return;
+            } else {
+                setSelectedExercises([exerciseId, ...selectedExercises])
+            }
 
+        }
+
+    }
 
     function getExercise(exercise) {
         const e = exercises.find(e => e.name === exercise.name);
@@ -173,8 +199,27 @@ export function Workout() {
     const totalSetsThisWeek = workouts.reduce((acc, w) => acc + w.exercises.reduce((acc, e) => acc + (e.weeks[selectedWeek].totalWeeklySets || 0), 0), 0)
     const thisWeekSetsTarget = workouts.reduce((acc, w) => acc + w.exercises.reduce((acc, e) => acc + (e.weeks[selectedWeek].weeklyTarget || 0), 0), 0)
     const isWeekDone = totalSetsThisWeek >= thisWeekSetsTarget
+    const { setRoute } = useContext(AppContext);
     return (<div>
-        <List
+        {
+            selectedExercises.length === 2 ? <Fab
+                onClick={() => setRoute('runExercise', {
+                    exerciseIds: selectedExercises.join(','),
+                    week: selectedWeek
+                })
+                }
+                variant="extended"
+                color="primary"
+                sx={{
+                    position: 'fixed',
+                    bottom: '70px',
+                    right: "130px",
+                }}>
+
+                {/* <NavigationOutlined sx={{ mr: 1 }} /> */}
+                Super Set
+            </Fab> : ''}
+        < List
             sx={{
                 paddingTop: '0px',
 
@@ -278,6 +323,9 @@ export function Workout() {
                                 workout.exercises.map((exercise) => (
                                     <React.Fragment key={exercise.id}>
                                         <Exercise
+                                            isSelected={selectedExercises.includes(exercise.id)}
+                                            selectExercise={selectExercise}
+                                            selectedWeek={selectedWeek}
                                             key={exercise.id}
                                             exercise={getExercise(exercise)}
                                             onRemoveSetComplete={() => onSetComplete(workout.id, exercise, -1)}
@@ -383,6 +431,7 @@ export function Workout() {
                 }
             </Box>
         </Box > */}
-    </div>
+
+    </div >
     );
 }
