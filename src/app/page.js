@@ -40,6 +40,7 @@ export default function Home() {
   console.log({ route });
 
   function setInernalRoute(route, params) {
+    if (typeof window === 'undefined') return;
     const url = new URL(window.location);
     url.searchParams.set("route", route);
 
@@ -59,6 +60,7 @@ export default function Home() {
   }
 
   function getParams() {
+    if (typeof window === 'undefined') return;
     const url = new URL(window.location);
     const params = {};
     for (const key of url.searchParams.keys()) {
@@ -70,6 +72,7 @@ export default function Home() {
 
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const url = new URL(window.location);
     const routeParam = url.searchParams.get("route");
     setValue(routeParam || 'workouts');
