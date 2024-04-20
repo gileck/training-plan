@@ -20,7 +20,7 @@ const colors = {
     listHeaderSecondaryText: '#FFFFFF',
     workoutBackground: '#e4e4e4',
     exerciseBackground: '#FAFAFA',
-    exerciseBackgroundSelected: '#aff4ff',
+    exerciseBackgroundSelected: '#96ddff',
 }
 
 
@@ -139,12 +139,14 @@ export function Workout() {
             setSelectedExercises(selectedExercises.filter(id => id !== exerciseId))
             return;
         } else {
-            if (selectedExercises.length === 2) {
-                setSelectedExercises([exerciseId, selectedExercises[0]])
-                return;
-            } else {
-                setSelectedExercises([exerciseId, ...selectedExercises])
-            }
+            setSelectedExercises([exerciseId, ...selectedExercises])
+
+            // if (selectedExercises.length === 2) {
+            //     setSelectedExercises([exerciseId, selectedExercises[0]])
+            //     return;
+            // } else {
+            //     setSelectedExercises([exerciseId, ...selectedExercises])
+            // }
 
         }
 
@@ -202,7 +204,7 @@ export function Workout() {
     const { setRoute } = useContext(AppContext);
     return (<div>
         {
-            selectedExercises.length === 2 ? <Fab
+            selectedExercises.length > 0 ? <Fab
                 onClick={() => setRoute('runExercise', {
                     exerciseIds: selectedExercises.join(','),
                     week: selectedWeek
