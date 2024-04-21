@@ -36,7 +36,7 @@ function Exercise({ isSelected, selectExercise, selectedWeek, exercise, onRemove
             //     exerciseIds: exercise.id,
             //     week: selectedWeek
             // })}
-            onClick={() => selectExercise(exercise.id)}
+
             sx={{
 
                 flexDirection: 'column',
@@ -52,7 +52,7 @@ function Exercise({ isSelected, selectExercise, selectedWeek, exercise, onRemove
                 }}>
 
                 <ListItemText
-
+                    onClick={() => selectExercise(exercise.id)}
                     style={{ textDecoration: weeklyTargetReached ? 'line-through' : '' }}
                     primary={exercise.name}
                     secondary={
@@ -66,7 +66,6 @@ function Exercise({ isSelected, selectExercise, selectedWeek, exercise, onRemove
                                     exercise.sets ?
                                         `Sets: ${exercise.sets.done || 0} / ${exercise.sets.target}` : ''
                                 }
-
                             </Typography>
                             <Typography
                                 sx={{ ml: '10px', display: !exercise.bodyWeight && exercise.numberOfReps && exercise.weight ? 'inline' : 'none' }}
@@ -79,12 +78,9 @@ function Exercise({ isSelected, selectExercise, selectedWeek, exercise, onRemove
                             </Typography>
                         </React.Fragment>
                     } />
-
-
                 <IconButton onClick={() => onSetDone()}>
                     <CheckCircleIcon />
                 </IconButton>
-
                 <IconButton onClick={() => onAddSetComplete()}>
                     <AddCircleIcon />
                 </IconButton>
@@ -93,16 +89,12 @@ function Exercise({ isSelected, selectExercise, selectedWeek, exercise, onRemove
                 </IconButton>
             </Box>
             <Box sx={{ pt: 1 }}> {/* This Box is optional and provides padding top */}
-
                 <Chip
                     sx={{ mr: 1 }}
                     key={getPrimaryMuscle(exercise.name)}
                     label={getPrimaryMuscle(exercise.name)}
                     size="small"
                 />
-
-
-
                 {getSecondaryMuscles(exercise.name).map((bodyPart) => (
                     <Chip
                         sx={{ mr: 1 }}
@@ -114,12 +106,8 @@ function Exercise({ isSelected, selectExercise, selectedWeek, exercise, onRemove
                 ))}
             </Box>
         </ListItem >
-
     );
 }
-
-
-
 
 export function Workout() {
 
