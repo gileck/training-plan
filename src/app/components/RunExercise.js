@@ -21,7 +21,6 @@ function TimerClock({ seconds }) {
     useEffect(() => {
         const interval = setInterval(() => {
             if (!isRunning) return;
-            console.log('tick');
             if (time === 0) {
                 clearInterval(interval);
             }
@@ -135,7 +134,7 @@ export function RunExercise(props) {
     }
 
     return (
-        <Paper elevation={3} sx={{ maxWidth: 345, p: 2 }}>
+        <Paper elevation={3} sx={{  p: 2 }}>
             <Typography variant="h6" gutterBottom align="center">
                 Super Set
             </Typography>

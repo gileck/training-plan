@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -10,20 +10,35 @@ import Collapse from '@mui/material/Collapse';
 import AddIcon from '@mui/icons-material/Add';
 import IconButton from '@mui/material/IconButton';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { Delete, ExpandCircleDown, ExpandCircleUp, ExpandMore, ExpandLess, Label, } from "@mui/icons-material";
-import { Autocomplete, Button, Chip, Dialog, DialogTitle, FormControl, FormControlLabel, FormGroup, Grid, InputLabel, MenuItem, Select, Switch, TextField } from '@mui/material';
-import { localStorageAPI } from '../localStorageAPI';
-import { getExercisesList } from '../exercisesList';
-import { getAllBodyParts, getPrimaryMuscle, isBodyWeightExercise } from "../exercisesAPI";
+import {Delete, ExpandCircleDown, ExpandCircleUp, ExpandMore, ExpandLess, Label,} from "@mui/icons-material";
+import {
+    Autocomplete,
+    Button,
+    Chip,
+    Dialog,
+    DialogTitle,
+    FormControl,
+    FormControlLabel,
+    FormGroup,
+    Grid,
+    InputLabel,
+    MenuItem,
+    Select,
+    Switch,
+    TextField
+} from '@mui/material';
+import {localStorageAPI} from '../localStorageAPI';
+import {getExercisesList} from '../exercisesList';
+import {getAllBodyParts, getPrimaryMuscle, isBodyWeightExercise, isStaticExercise} from "../exercisesAPI";
 
 // import { exercisesList } from '../exercisesList';
 export function CreateNewExerciseDialog({
-    exercises,
-    onCreateNewExercise,
-    isDialogOpen,
-    onClose,
+                                            exercises,
+                                            onCreateNewExercise,
+                                            isDialogOpen,
+                                            onClose,
 
-}) {
+                                        }) {
     const [exerciseName, setExerciseName] = useState('');
     const [isBodyWeight, setIsBodyWeight] = useState(false);
     const [exerciseCategory, setExerciseCategory] = useState('');
@@ -79,22 +94,22 @@ export function CreateNewExerciseDialog({
             <DialogTitle>
                 Create Exercise
             </DialogTitle>
-            <FormGroup sx={{ padding: '40px' }}>
-                <FormControl sx={{ mb: '10px' }}>
+            <FormGroup sx={{padding: '40px'}}>
+                <FormControl sx={{mb: '10px'}}>
                     <TextField
                         label="Exercise Name"
                         onChange={
                             handleExerciseNameChange
-                        } />
+                        }/>
                 </FormControl>
-                <FormControl sx={{ mb: '10px' }}>
+                <FormControl sx={{mb: '10px'}}>
                     <FormControlLabel
 
-                        control={<Switch onChange={handleExerciseTypeChange} checked={isBodyWeight} />}
+                        control={<Switch onChange={handleExerciseTypeChange} checked={isBodyWeight}/>}
                         label="isBodyWeight"
                     />
                 </FormControl>
-                <FormControl sx={{ mb: '10px' }}>
+                <FormControl sx={{mb: '10px'}}>
                     <InputLabel>Category</InputLabel>
                     <Select
                         label="Category"
@@ -105,7 +120,7 @@ export function CreateNewExerciseDialog({
                         <MenuItem value="fullBody">Full Body</MenuItem>
                     </Select>
                 </FormControl>
-                <FormControl sx={{ mb: '10px' }}>
+                <FormControl sx={{mb: '10px'}}>
                     <InputLabel>Push/Pull</InputLabel>
                     <Select
                         label="Push/Pull"
@@ -115,7 +130,7 @@ export function CreateNewExerciseDialog({
                         <MenuItem value={null}>None</MenuItem>
                     </Select>
                 </FormControl>
-                <FormControl sx={{ mb: '10px' }}>
+                <FormControl sx={{mb: '10px'}}>
                     <InputLabel>Primary Muscle</InputLabel>
                     <Select
                         label="Primary Muscle"
@@ -129,7 +144,7 @@ export function CreateNewExerciseDialog({
 
                     </Select>
                 </FormControl>
-                <FormControl sx={{ mb: '10px' }}>
+                <FormControl sx={{mb: '10px'}}>
                     <InputLabel>Secondary Muscle</InputLabel>
                     <Select
                         label="Secondary Muscle"
@@ -142,14 +157,22 @@ export function CreateNewExerciseDialog({
                     </Select>
                 </FormControl>
                 <Button
-                    iconStart={<AddIcon />}
+                    iconStart={<AddIcon/>}
                     variant='contained'
                     onClick={handleAddExercise}>Add</Button>
             </FormGroup>
         </Dialog>
     );
 }
-export function AddExerciseDialog({ exerciseList, createNewExercise, onAddExercise, exercises, addExerciseDialogOpen, onClose }) {
+
+export function AddExerciseDialog({
+                                      exerciseList,
+                                      createNewExercise,
+                                      onAddExercise,
+                                      exercises,
+                                      addExerciseDialogOpen,
+                                      onClose
+                                  }) {
 
 
     return (
@@ -173,7 +196,14 @@ export function AddExerciseDialog({ exerciseList, createNewExercise, onAddExerci
     );
 }
 
-export function EditExerciseForm({ exerciseList, onAddExercise, exerciseToEdit, exercises, onCancel, createNewExercise }) {
+export function EditExerciseForm({
+                                     exerciseList,
+                                     onAddExercise,
+                                     exerciseToEdit,
+                                     exercises,
+                                     onCancel,
+                                     createNewExercise
+                                 }) {
 
     const exerciseOptions = getExercisesList().filter(e => !exercises.find(ex => ex.name === e.name))
     const [exercise, setExercise] = useState(exerciseToEdit || exerciseOptions[0]);
@@ -183,7 +213,7 @@ export function EditExerciseForm({ exerciseList, onAddExercise, exerciseToEdit, 
     const [overloadType, setOverloadType] = useState(exerciseToEdit?.overloadType || 'sets');
     const [overloadValue, setOverloadValue] = useState(exerciseToEdit?.overloadValue || 5);
 
-    console.log({ exercise });
+    console.log({exercise});
     const onAddButtonClicked = () => {
         onAddExercise(Object.assign(exerciseToEdit || {}, {
             ...exercise,
@@ -199,6 +229,18 @@ export function EditExerciseForm({ exerciseList, onAddExercise, exerciseToEdit, 
 
     const handleOverloadTypeChange = (event) => {
         setOverloadType(event.target.value);
+    }
+
+    function getOverloadLabel(overloadType) {
+        if (overloadType === 'sets') {
+            return 'Sets'
+        }   else if (overloadType === 'reps') {
+            return isStaticExercise(exercise.name) ? 'Duration' : 'Reps'
+        } else if (overloadType === 'weight') {
+            return 'Weight'
+        } else {
+            return 'All'
+        }
     }
 
 
@@ -224,11 +266,11 @@ export function EditExerciseForm({ exerciseList, onAddExercise, exerciseToEdit, 
                     value={exercise.name}
                     options={exerciseOptions
                         .sort((a, b) => getPrimaryMuscle(a.name).localeCompare(getPrimaryMuscle(b.name)))
-                        .map((option) => ({ label: option.name, value: option }))}
-                    sx={{ width: 300 }}
-                    renderInput={(params) => <TextField {...params} label='Exercise' />}
+                        .map((option) => ({label: option.name, value: option}))}
+                    sx={{width: 300}}
+                    renderInput={(params) => <TextField {...params} label='Exercise'/>}
                     onChange={(event, newValue) => {
-                        console.log({ newValue });
+                        console.log({newValue});
                         if (newValue && newValue.value) {
                             setExercise(newValue.value)
                         }
@@ -236,7 +278,7 @@ export function EditExerciseForm({ exerciseList, onAddExercise, exerciseToEdit, 
                 />
 
                 {createNewExercise ? <IconButton onClick={createNewExercise}>
-                    <AddCircleIcon />
+                    <AddCircleIcon/>
                 </IconButton> : ''}
 
             </ListItem>
@@ -245,20 +287,20 @@ export function EditExerciseForm({ exerciseList, onAddExercise, exerciseToEdit, 
                 <TextField
                     label="Weekly Sets"
                     size='small'
-                    sx={{ width: '100px' }}
+                    sx={{width: '100px'}}
                     value={totalWeeklySets}
                     onChange={(e) => setTotalWeeklySets(e.target.value)}
-                    type="number" />
+                    type="number"/>
             </ListItem>
             <ListItem>
                 <TextField
-                    label="Reps"
+                    label={isStaticExercise(exercise.name) ? 'Duration(sec)' : 'Reps'}
                     size='small'
-                    sx={{ width: '100px' }}
+                    sx={{width: '100px'}}
 
                     value={reps}
                     onChange={(e) => setReps(e.target.value)}
-                    type="number" />
+                    type="number"/>
             </ListItem>
             <ListItem>
                 <TextField
@@ -266,12 +308,12 @@ export function EditExerciseForm({ exerciseList, onAddExercise, exerciseToEdit, 
                     // disabled={true}
                     disabled={isBodyWeightExercise(exercise.name)}
                     label="Weight (kg)"
-                    sx={{ width: '100px' }}
+                    sx={{width: '100px'}}
                     value={isBodyWeightExercise(exercise.name) ? 0 : weight}
                     onChange={(e) => setWeight(e.target.value)}
-                    type="number" />
+                    type="number"/>
             </ListItem>
-            <Divider />
+            <Divider/>
             <ListItem>
                 <ListItemText>Progressive Overload:</ListItemText>
             </ListItem>
@@ -281,25 +323,27 @@ export function EditExerciseForm({ exerciseList, onAddExercise, exerciseToEdit, 
 
                 <Select
                     size='small'
-                    sx={{ width: '100px' }}
+                    sx={{width: '100px'}}
                     value={overloadType}
                     onChange={handleOverloadTypeChange}>   {
-                        ['sets', 'reps', 'weight'].map((overloadType, index) => (
-                            <MenuItem key={index} value={overloadType}>{overloadType}</MenuItem>
-                        ))
-                    }
+                    ['sets', 'reps', 'weight'].map((overloadType, index) => (
+                        <MenuItem key={index} value={overloadType}>
+                            { getOverloadLabel(overloadType) }
+                        </MenuItem>
+                    ))
+                }
                 </Select>
             </ListItem>
             <ListItem>
                 <TextField
                     size='small'
-                    sx={{ width: '100px' }}
+                    sx={{width: '100px'}}
                     label="Overload %"
                     value={overloadValue}
                     onChange={(e) => setOverloadValue(e.target.value)}
-                    type="number" />
+                    type="number"/>
             </ListItem>
-            <Divider />
+            <Divider/>
 
             <ListItem>
                 <Button
@@ -309,7 +353,7 @@ export function EditExerciseForm({ exerciseList, onAddExercise, exerciseToEdit, 
                 >Add</Button>
                 <Button
                     onClick={onCancel}
-                    sx={{ marginLeft: '10px' }}
+                    sx={{marginLeft: '10px'}}
                     variant="outlined"
                 >Cancel</Button>
 

@@ -37,9 +37,28 @@ export function isBodyWeightExercise(name) {
     return getExercisesList().find(e => e.name === name)?.bodyWeight;
 }
 
+export function isStaticExercise(name) {
+    return getExercisesList().find(e => e.name === name)?.static;
+}
+
 export function useExercisesAPI() {
 
     const { getData, saveData, cleanData } = localStorageAPI();
+
+    function calcWeeklyAllTarget(weeklyTarget, week, overloadValue, index) {
+        const progressiveOverload = overloadValue && (overloadValue / 100) || 0.05; // 5% increase per week
+        console.log({
+            week,
+            index,
+            value: week % 2 === index,
+            weeklyTarget,
+            progressiveOverload: Math.round(weeklyTarget * Math.pow(1 + progressiveOverload, Number(week)))
+        })
+        if (week % 2 === index) {
+            return Math.round(weeklyTarget * Math.pow(1 + progressiveOverload, Number(week)));
+        }
+        return Math.round(weeklyTarget * Math.pow(1 + progressiveOverload, Number(week) === 0 ? 0 : Number(week) - 1));
+    }
 
     function calcWeelklyTarget(weeklyTarget, week, overloadValue) {
         const progressiveOverload = overloadValue && (overloadValue / 100) || 0.05; // 5% increase per week
@@ -84,13 +103,16 @@ export function useExercisesAPI() {
     }
 
     function calcWeekValues(range, { overloadType, overloadValue, numberOfReps, weight, weeklySets }) {
-        const calcFn = type => overloadType === type ? calcWeelklyTarget : v => v
+        console.log({overloadType})
+        const calcFn = type => overloadType === "all" ? calcWeeklyAllTarget : (overloadType === type ? calcWeelklyTarget : v => v)
+
+
         return range.map(week => ({
             week,
             totalWeeklySets: 0,
-            weeklyTarget: calcFn('sets')(weeklySets || 10, week, overloadValue),
-            numberOfReps: calcFn('reps')(numberOfReps || 8, week, overloadValue),
-            weight: calcFn('weight')(weight || 12, week, overloadValue),
+            weeklyTarget: calcFn('sets')(weeklySets || 10, week, overloadValue, 0),
+            numberOfReps: calcFn('reps')(numberOfReps || 8, week, overloadValue, 1),
+            weight: calcFn('weight')(weight || 12, week, overloadValue, 2),
         }))
     }
 

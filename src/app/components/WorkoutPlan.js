@@ -501,7 +501,7 @@ export function WorkoutPlan() {
     }
 
     function getTotalWeeklySets(exerciseName) {
-        return exercises.find(e => e.name === exerciseName).weeklySets
+        return exercises.find(e => e.name === exerciseName)?.weeklySets
     }
     function getTotalWeeklySetsInAllWorkouts(exerciseName) {
         return workouts.map(w => w.exercises.find(e => e.name === exerciseName)).filter(e => e).reduce((acc, e) => acc + e.sets, 0)

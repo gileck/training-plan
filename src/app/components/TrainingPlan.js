@@ -17,9 +17,10 @@ const { getData, saveData } = localStorageAPI();
 
 export function TrainingPlan() {
     const [open, setOpen] = React.useState({});
-    const { getExercisesByWeeks, cleanData, updateExercise, addExercise, calculateExerciseDone, calculateTotalSetsDoneWeek, calculateTotalSetsTargetWeek } = useExercisesAPI()
+    const { exercises, getExercisesByWeeks, cleanData, updateExercise, addExercise, calculateExerciseDone, calculateTotalSetsDoneWeek, calculateTotalSetsTargetWeek } = useExercisesAPI()
     const groupByWeek = getExercisesByWeeks();
-    console.log(' groupByWeek', groupByWeek);
+    // console.log(' groupByWeek', groupByWeek);
+    console.log({exercises})
     function handleCollapseClick(week) {
         setOpen({ ...open, [week]: !open[week] });
     }

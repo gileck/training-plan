@@ -11,6 +11,7 @@ import { getPrimaryMuscle, getSecondaryMuscles, useExercisesAPI } from "../exerc
 import { RemoveCircle, ExpandLess, ExpandMore, Label, ExpandMoreOutlined, ExpandLessRounded, ArrowLeft, ArrowRight, NavigationOutlined } from "@mui/icons-material";
 import { AppContext } from "../AppContext";
 import Fab from '@mui/material/Fab';
+import {localStorageAPI} from "@/app/localStorageAPI";
 
 // import { Exercise } from "./TrainingPlan";
 
@@ -111,10 +112,11 @@ function Exercise({ isSelected, selectExercise, selectedWeek, exercise, onRemove
 
 export function Workout() {
 
+    const { saveData, getData } = localStorageAPI()
     const { workouts, exercises, updateExercise, numberOfWeeks } = useExercisesAPI()
     const firstWeekWithExercisesLeft = _.range(0, numberOfWeeks).find(week => !workouts.every(w => w.exercises.every(e => e.weeks[week].totalWeeklySets >= e.weeks[week].weeklyTarget)))
     const firstWorkoutWithExercisesLeft = workouts.find(w => w.exercises.some(e => e.weeks[firstWeekWithExercisesLeft].totalWeeklySets < e.weeks[firstWeekWithExercisesLeft].weeklyTarget))
-    const [selectedExercises, setSelectedExercises] = useState([])
+    const [selectedExercises, setSelectedExercises] = useState(getData('selectedExercises') || [])
 
     const [selectedWeek, setSelectedWeek] = useState(firstWeekWithExercisesLeft || 0)
     const [openWorkouts, setOpenWorkouts] = useState({
@@ -123,20 +125,14 @@ export function Workout() {
 
     function selectExercise(exerciseId) {
 
+        let newSelectedExercises = [];
         if (selectedExercises.includes(exerciseId)) {
-            setSelectedExercises(selectedExercises.filter(id => id !== exerciseId))
-            return;
+            newSelectedExercises = selectedExercises.filter(id => id !== exerciseId)
         } else {
-            setSelectedExercises([exerciseId, ...selectedExercises])
-
-            // if (selectedExercises.length === 2) {
-            //     setSelectedExercises([exerciseId, selectedExercises[0]])
-            //     return;
-            // } else {
-            //     setSelectedExercises([exerciseId, ...selectedExercises])
-            // }
-
+            newSelectedExercises = [exerciseId, ...selectedExercises]
         }
+        setSelectedExercises(newSelectedExercises)
+        saveData('selectedExercises', newSelectedExercises)
 
     }
 
@@ -207,7 +203,7 @@ export function Workout() {
                 }}>
 
                 {/* <NavigationOutlined sx={{ mr: 1 }} /> */}
-                Super Set
+                Super Set ({selectedExercises.length})
             </Fab> : ''}
         < List
             sx={{
