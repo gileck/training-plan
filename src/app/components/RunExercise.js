@@ -4,9 +4,10 @@ import { AppContext } from "../AppContext";
 import { Grid, Button, IconButton, Paper, Box, Typography, Divider, Stack, CircularProgress } from '@mui/material';
 import RemoveIcon from '@mui/icons-material/Remove';
 import AddIcon from '@mui/icons-material/Add';
-import { AddCircle, PauseCircleFilledOutlined, PlayArrow, PlayCircleFilledOutlined, RemoveCircle } from "@mui/icons-material";
+import { AddCircle, Delete, DeleteForever, DeleteForeverRounded, PauseCircleFilledOutlined, PlayArrow, PlayCircleFilledOutlined, RemoveCircle, RemoveCircleOutlineSharp } from "@mui/icons-material";
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import ReplayIcon from '@mui/icons-material/Replay';
+import { localStorageAPI } from "../localStorageAPI";
 
 const primaryTextFontSize = 25;
 const secondaryTextFontSize = 20;
@@ -93,8 +94,9 @@ function TimerClock({ seconds }) {
                     </Box>
                 </Box>
                 <IconButton
-                    onClick={() => setTime(seconds)}
+                    onClick={() => { setTime(seconds); setIsRunning(true) }}
                 >
+
                     <ReplayIcon
                         sx={{ fontSize: 60 }}
                     />
@@ -106,15 +108,29 @@ function TimerClock({ seconds }) {
     )
 
 }
+
+const { getData, saveData } = localStorageAPI()
 export function RunExercise(props) {
+
     const { updateExercise, workouts, exercises } = useExercisesAPI()
+    const { params: { week } } = useContext(AppContext);
+
+    const selectedExercisesFromLocal = getData('selectedExercises') || [];
+
+
+    const [selectedExercises, setExerciseIds] = useState(selectedExercisesFromLocal);
+
+    function removeExercise(id) {
+        const newSelectedExercises = selectedExercises.filter(e => e !== id);
+        console.log({ newSelectedExercises });
+        setExerciseIds(newSelectedExercises);
+        saveData('selectedExercises', newSelectedExercises)
+    }
 
 
 
-    const { params: { week, exerciseIds } } = useContext(AppContext);
     const exercisesToShow =
-        exerciseIds
-            .split(',')
+        selectedExercises
             .map(id => workouts.flatMap(w => w.exercises.map(e => Object.assign(e, { workoutId: w.id }))).find(e => e.id === id))
             .map(exercise => {
                 return Object.assign(exercise, exercise.weeks[Number(week)])
@@ -134,7 +150,7 @@ export function RunExercise(props) {
     }
 
     return (
-        <Paper elevation={3} sx={{  p: 2 }}>
+        <Paper elevation={3} sx={{ p: 2 }}>
             <Typography variant="h6" gutterBottom align="center">
                 Super Set
             </Typography>
@@ -146,12 +162,22 @@ export function RunExercise(props) {
 
                         <div container spacing={1} alignItems="center" sx={{ my: 1, mx: 1 }}>
                             <div style={{ padding: 7 }}>
+
                                 <Typography
                                     sx={{
                                         fontSize: primaryTextFontSize,
                                     }}
                                 >
+
                                     {exercise.name}
+
+                                    <span
+                                        style={{ float: 'right' }}
+                                    >
+                                        <IconButton size="xs" onClick={() => removeExercise(exercise.id)}>
+                                            <DeleteForeverRounded />
+                                        </IconButton>
+                                    </span>
                                 </Typography>
                                 <Typography
                                     sx={{
@@ -194,7 +220,7 @@ export function RunExercise(props) {
                                     />
                                 </IconButton>
                             </Grid>
-                        </div>
+                        </div >
                         <Divider variant="middle" />
                     </>
                 ))
@@ -206,7 +232,7 @@ export function RunExercise(props) {
                 <TimerClock seconds={120} />
             </div>
 
-        </Paper>
+        </Paper >
     );
 
 }

@@ -227,6 +227,7 @@ function AddExerciseToWorkoutDialog({ workouts, open, handleClose, onAddExercise
 }
 
 function SelectWorkoutDialog({
+    currentNumberOfWorkouts,
     open,
     handleClose,
     onExercisePullPushChanged,
@@ -241,13 +242,22 @@ function SelectWorkoutDialog({
     saveWorkout
 }) {
 
-    const [workoutName, setWorkoutName] = useState('')
+    const [workoutName, setWorkoutName] = useState(createWorkoutName())
+    function createWorkoutName() {
+        return `Workout ${currentNumberOfWorkouts + 1}`
+    }
     function onWorkoutNameChanged(e) {
         setWorkoutName(e.target.value)
     }
 
     function onSaveButtonClicked() {
-        saveWorkout({ workoutName, exType, bodyParts, selectedWeek, pullPushType })
+        saveWorkout({
+            workoutName: workoutName || createWorkoutName(),
+            exType,
+            bodyParts,
+            selectedWeek,
+            pullPushType
+        })
         handleClose()
     }
 
@@ -510,6 +520,7 @@ export function WorkoutPlan() {
         <div>
 
             <SelectWorkoutDialog
+                currentNumberOfWorkouts={workouts.length}
                 open={open}
                 handleClose={handleClose}
                 onExercisePullPushChanged={onExercisePullPushChanged}

@@ -11,7 +11,7 @@ import { getPrimaryMuscle, getSecondaryMuscles, useExercisesAPI } from "../exerc
 import { RemoveCircle, ExpandLess, ExpandMore, Label, ExpandMoreOutlined, ExpandLessRounded, ArrowLeft, ArrowRight, NavigationOutlined } from "@mui/icons-material";
 import { AppContext } from "../AppContext";
 import Fab from '@mui/material/Fab';
-import {localStorageAPI} from "@/app/localStorageAPI";
+import { localStorageAPI } from "@/app/localStorageAPI";
 
 // import { Exercise } from "./TrainingPlan";
 
@@ -190,7 +190,6 @@ export function Workout() {
         {
             selectedExercises.length > 0 ? <Fab
                 onClick={() => setRoute('runExercise', {
-                    exerciseIds: selectedExercises.join(','),
                     week: selectedWeek
                 })
                 }

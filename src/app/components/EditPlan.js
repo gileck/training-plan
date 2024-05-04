@@ -19,6 +19,7 @@ import { WorkoutPlan } from "./WorkoutPlan";
 import { exercisesList, exercisesListFromLocal, getExercisesList } from "../exercisesList";
 import { localStorageAPI } from "../localStorageAPI";
 import { BodyPartsPlan } from "./BodyPartsPlan";
+import { BuildTrainingPlanDialog } from "./BuildTrainingPlanDialog";
 
 const { getData, saveData, cleanData } = localStorageAPI();
 
@@ -36,13 +37,14 @@ export function EditTrainingPlan() {
 
     const { editExercise, addExercise, updateExercise, exercises, deleteExercise } = useExercisesAPI()
 
-    console.log({exercises})
+    console.log({ exercises })
 
 
 
     const exerciseToShow = exercises.map(e => ({ ...e, ...e.weeks[0] }))
 
     const [addExerciseDialogOpen, setOpen] = React.useState(false);
+    const [buildTrainingPlanOpen, setBuildTrainingPlanOpen] = React.useState(false);
     const [createNewExerciseDialogOpen, setCreateNewExerciseDialogOpen] = React.useState(false);
     const [editExerciseOpened, setEditExercise] = React.useState({});
 
@@ -102,6 +104,12 @@ export function EditTrainingPlan() {
             </div>
         </React.Fragment >
     }
+    function onBuildTrainingPlan(newExercises) {
+
+        console.log({ newExercises });
+        // exercises.forEach(exercise => addExercise(exercise));
+        // setBuildTrainingPlanOpen(false);
+    }
 
 
     return (
@@ -115,6 +123,16 @@ export function EditTrainingPlan() {
                 exerciseList={exercisesList}
 
             />
+
+            <BuildTrainingPlanDialog
+                buildTrainigPlanDialigOpen={buildTrainingPlanOpen}
+                exercises={exercises}
+                onBuildTrainingPlan={onBuildTrainingPlan}
+                onClose={() => setBuildTrainingPlanOpen(false)}
+                exerciseList={exercisesList}
+
+            />
+
             <CreateNewExerciseDialog
                 exercises={exercises}
                 onAddExercise={onAddExercise}
@@ -122,13 +140,29 @@ export function EditTrainingPlan() {
                 onClose={() => setCreateNewExerciseDialogOpen(false)}
                 onCreateNewExercise={onCreateNewExercise}
             />
-            <Button
-                startIcon={<AddCircle />}
-                variant="contained"
-                onClick={() => setOpen(!addExerciseDialogOpen)}>
-                Add Exercise
+            <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+            }}>
 
-            </Button>
+
+                <Button
+                    sx={{ fontSize: '13px', marginRight: '10px' }}
+                    startIcon={<AddCircle />}
+                    variant="contained"
+                    onClick={() => setOpen(!addExerciseDialogOpen)}>
+                    Add Exercise
+
+                </Button>
+                <Button
+                    sx={{ fontSize: '13px', float: 'right' }}
+                    startIcon={<AddCircle />}
+                    variant="contained"
+                    onClick={() => setBuildTrainingPlanOpen(true)}>
+                    Training Plan
+
+                </Button>
+            </div>
             <Divider sx={{ marginTop: '15px' }} />
             <List>
                 {exerciseToShow

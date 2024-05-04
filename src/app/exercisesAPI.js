@@ -103,7 +103,7 @@ export function useExercisesAPI() {
     }
 
     function calcWeekValues(range, { overloadType, overloadValue, numberOfReps, weight, weeklySets }) {
-        console.log({overloadType})
+        console.log({ overloadType })
         const calcFn = type => overloadType === "all" ? calcWeeklyAllTarget : (overloadType === type ? calcWeelklyTarget : v => v)
 
 
