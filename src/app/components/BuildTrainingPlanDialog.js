@@ -1,6 +1,7 @@
 import { FormControl } from "@mui/base";
 import { Button, Box, ButtonBase, Checkbox, Dialog, DialogTitle, FormControlLabel, FormGroup, InputLabel, MenuItem, Radio, RadioGroup, Select } from "@mui/material";
 import { useState } from "react";
+import { getAllBodyParts } from "../exercisesAPI";
 
 export function BuildTrainingPlanDialog({
     exercises,
@@ -12,15 +13,26 @@ export function BuildTrainingPlanDialog({
 
     const [workoutType, setWorkoutType] = useState([]);
     const [weeklyExercises, setWeeklyExercises] = useState(3);
+    const [level, setLevel] = useState(3);
+    const [focusMuscles, setFocusMuscles] = useState([])
+
+    function handleFocusMuscleChange(e) {
+        const value = e.target.value;
+        setFocusMuscles((prev) => {
+            if (prev.includes(value)) {
+                return prev.filter((v) => v !== value)
+            } else {
+                return [...prev, value]
+            }
+        });
+    }
 
     function onBuildTrainingPlanInternal() {
 
-        
-
-
         console.log({
             workoutType,
-            weeklyExercises
+            weeklyExercises,
+            level
         });
 
     }
@@ -39,9 +51,6 @@ export function BuildTrainingPlanDialog({
         console.log({ workoutType, value });
     }
 
-    function onWeeklyExercisesNumberChanged(weeklyExercises) {
-        console.log({ weeklyExercises });
-    }
     return (
         <Dialog
             disableEscapeKeyDown
@@ -56,6 +65,9 @@ export function BuildTrainingPlanDialog({
             <Box component="form" sx={{ padding: '15px' }}>
                 <FormGroup>
                     <FormControl sx={{ marginBottom: '30px' }} component="div" >
+
+
+
                         <InputLabel>Select</InputLabel>
                         <RadioGroup>
                             <FormControlLabel
@@ -81,7 +93,12 @@ export function BuildTrainingPlanDialog({
                         <Select
                             label="Weekly exercises"
                             defaultValue="3"
-                            onChange={(e) => onWeeklyExercisesNumberChanged(e.target.value)}
+                            size="xs"
+                            sx={{
+                                padding: '5px',
+
+                            }}
+                            onChange={(e) => setWeeklyExercises(e.target.value)}
                         >
                             <MenuItem value="1">1</MenuItem>
                             <MenuItem value="2">2</MenuItem>
@@ -90,6 +107,41 @@ export function BuildTrainingPlanDialog({
                             <MenuItem value="5">5</MenuItem>
                             <MenuItem value="6">6</MenuItem>
                             <MenuItem value="7">7</MenuItem>
+                        </Select>
+                    </FormControl>
+
+                    <FormControl sx={{ marginBottom: '30px' }} component="div" >
+                        <InputLabel>Level</InputLabel>
+                        <Select
+                            label="Level"
+                            defaultValue="3"
+                            size="xs"
+                            sx={{
+                                padding: '5px',
+
+                            }}
+                            onChange={(e) => setLevel(e.target.value)}
+                        >
+
+                            <MenuItem value="1">First Time</MenuItem>
+                            <MenuItem value="2">Beginner</MenuItem>
+                            <MenuItem selected value="3">Intermediate</MenuItem>
+                            <MenuItem value="4">Advanced</MenuItem>
+                            <MenuItem value="5">Professional</MenuItem>
+                        </Select>
+                    </FormControl>
+                    <FormControl sx={{ mb: '10px' }}>
+                        <InputLabel>Secondary Muscle</InputLabel>
+                        <Select
+                            label="Focus Muscles"
+                            multiple
+                            value={focusMuscles}
+                            onChange={handleFocusMuscleChange}>
+                            {
+                                getAllBodyParts().map((bodyPart, index) => (
+                                    <MenuItem key={index} value={bodyPart}>{bodyPart}</MenuItem>
+                                ))
+                            }
                         </Select>
                     </FormControl>
 
