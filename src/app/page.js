@@ -20,7 +20,28 @@ import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import { RunExercise } from "./components/RunExercise";
 import { AppContext } from "./AppContext";
+import { BuildTrainingPlan } from "./components/buildTrainingPlanLogic";
+import { getExercisesList } from "./exercisesList";
 export default function Home() {
+
+  const traininPlan = BuildTrainingPlan({
+    exerciseList: getExercisesList(),
+    weeklyExercises: 3,
+    level: 3,
+    focusMuscles: [
+      'Biceps',
+      'Shoulders',
+    ],
+    workoutType: [
+      'gym',
+    ]
+  })
+  return <pre>
+    {
+      JSON.stringify(traininPlan, null, 2)
+    }
+  </pre>
+
   const routeToComp = {
     'workouts': Workout,
     'training_plan': TrainingPlan,
@@ -79,6 +100,9 @@ export default function Home() {
   }, [route])
 
   const CompToRender = dynamic(() => Promise.resolve(routeToComp[route]), { ssr: false })
+
+
+
 
   return (
     <main className={styles.main}>

@@ -1,7 +1,9 @@
 import { FormControl } from "@mui/base";
-import { Button, Box, ButtonBase, Checkbox, Dialog, DialogTitle, FormControlLabel, FormGroup, InputLabel, MenuItem, Radio, RadioGroup, Select } from "@mui/material";
+import { Button, Box, ButtonBase, Checkbox, Dialog, DialogTitle, FormControlLabel, FormGroup, InputLabel, MenuItem, Radio, RadioGroup, Select, Chip } from "@mui/material";
 import { useState } from "react";
 import { getAllBodyParts } from "../exercisesAPI";
+import { CheckBox } from "@mui/icons-material";
+import { BuildTrainingPlan } from "./buildTrainingPlanLogic";
 
 export function BuildTrainingPlanDialog({
     exercises,
@@ -18,22 +20,49 @@ export function BuildTrainingPlanDialog({
 
     function handleFocusMuscleChange(e) {
         const value = e.target.value;
-        setFocusMuscles((prev) => {
-            if (prev.includes(value)) {
-                return prev.filter((v) => v !== value)
-            } else {
-                return [...prev, value]
-            }
-        });
+        console.log({ value });
+
+        if (value.length > 3 && value.length >= focusMuscles.length) {
+            return;
+        }
+
+        setFocusMuscles(value)
+
+        // setFocusMuscles((prev) => {
+        //     if (prev.includes(value)) {
+        //         return prev.filter((v) => v !== value)
+        //     } else {
+        //         return [...prev, value]
+        //     }
+        // });
     }
 
     function onBuildTrainingPlanInternal() {
 
         console.log({
+
             workoutType,
             weeklyExercises,
-            level
+            level,
+            focusMuscles
         });
+
+        const traininPlan = BuildTrainingPlan({
+            exerciseList,
+            weeklyExercises,
+            level,
+            focusMuscles,
+            workoutType
+        })
+
+        console.log({
+            traininPlan
+        });
+
+
+        onBuildTrainingPlan(traininPlan)
+
+
 
     }
 
@@ -88,14 +117,20 @@ export function BuildTrainingPlanDialog({
                         </RadioGroup>
                     </FormControl>
 
-                    <FormControl sx={{ marginBottom: '30px' }} component="div" >
-                        <InputLabel>Weekly exercises</InputLabel>
-                        <Select
-                            label="Weekly exercises"
-                            defaultValue="3"
-                            size="xs"
+                    <Box sx={{ display: 'flex', }}>
+                        <InputLabel
+                            id="label_weeklyExercises"
                             sx={{
-                                padding: '5px',
+                                marginTop: '7px',
+                                marginRight: '10px'
+
+                            }}
+                        >Weekly exercises</InputLabel>
+                        <Select
+                            labelId="label_weeklyExercises"
+                            defaultValue="3"
+                            size="small"
+                            sx={{
 
                             }}
                             onChange={(e) => setWeeklyExercises(e.target.value)}
@@ -108,16 +143,26 @@ export function BuildTrainingPlanDialog({
                             <MenuItem value="6">6</MenuItem>
                             <MenuItem value="7">7</MenuItem>
                         </Select>
-                    </FormControl>
+                    </Box>
 
-                    <FormControl sx={{ marginBottom: '30px' }} component="div" >
-                        <InputLabel>Level</InputLabel>
+
+                    <Box sx={{ display: 'flex', marginTop: '20px' }}>
+
+
+                        <InputLabel
+                            id="level"
+                            sx={{
+                                marginTop: '7px',
+                                marginRight: '10px'
+
+                            }}
+                        >Level</InputLabel>
                         <Select
+                            labelId="level"
                             label="Level"
                             defaultValue="3"
-                            size="xs"
+                            size="small"
                             sx={{
-                                padding: '5px',
 
                             }}
                             onChange={(e) => setLevel(e.target.value)}
@@ -129,21 +174,46 @@ export function BuildTrainingPlanDialog({
                             <MenuItem value="4">Advanced</MenuItem>
                             <MenuItem value="5">Professional</MenuItem>
                         </Select>
-                    </FormControl>
-                    <FormControl sx={{ mb: '10px' }}>
-                        <InputLabel>Secondary Muscle</InputLabel>
+                    </Box>
+                    <Box sx={{ marginTop: '20px', mb: "20px" }}>
+                        <InputLabel
+                            id="focusMuscles"
+                            sx={{
+                                marginTop: '7px',
+                                marginRight: '10px'
+
+                            }}
+                        >Focus Muscles (Up to 3)</InputLabel>
                         <Select
                             label="Focus Muscles"
+                            labelId="focusMuscles"
                             multiple
+                            size="small"
                             value={focusMuscles}
-                            onChange={handleFocusMuscleChange}>
+                            onChange={handleFocusMuscleChange}
+                            sx={{
+                                maxWidth: '200px'
+                            }}
+                            renderValue={(selected) => (
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                    {selected.map((value) => (
+                                        <Chip key={value} label={value} />
+                                    ))}
+                                </Box>
+                            )}
+                        >
                             {
                                 getAllBodyParts().map((bodyPart, index) => (
-                                    <MenuItem key={index} value={bodyPart}>{bodyPart}</MenuItem>
+
+                                    <MenuItem key={index} value={bodyPart}>
+                                        <Checkbox checked={focusMuscles.indexOf(bodyPart) > -1} />
+                                        {bodyPart}
+
+                                    </MenuItem>
                                 ))
                             }
                         </Select>
-                    </FormControl>
+                    </Box>
 
                 </FormGroup>
                 <Button
@@ -152,10 +222,10 @@ export function BuildTrainingPlanDialog({
                 >
                     Build Training Plan
                 </Button>
-            </Box>
+            </Box >
 
 
-        </Dialog>
+        </Dialog >
     );
 
 

@@ -94,6 +94,9 @@ function AddExerciseToWorkoutDialog({ workouts, open, handleClose, onAddExercise
     const [selectedExercise, setSelectedExercise] = useState(null)
 
     const workout = workouts.find(w => w.id === workoutId)
+    if (!workout) {
+        return null
+    }
     const exericesNotInTheWorkout = exercises.filter(e => !workout.exercises.find(ex => ex.name === e.name))
     const ex = exercises.find(e => e.name === selectedExercise)
     const maxSetsInExercise = ex?.weeklySets
@@ -371,7 +374,7 @@ function SelectWorkoutDialog({
 
 export function WorkoutPlan() {
 
-    const { addExerciseToWorkout, workouts, exercises, updateExercise, numberOfWeeks, saveWorkoutAPI, deleteWorkout, editWorkout } = useExercisesAPI()
+    const { addExerciseToWorkout, workouts, exercises, updateExercise, numberOfWeeks, addWorkout, deleteWorkout, editWorkout } = useExercisesAPI()
     console.log({ workouts, exercises });
 
     const [open, setOpen] = useState(false);
@@ -423,8 +426,8 @@ export function WorkoutPlan() {
     }
 
     function saveWorkout({ workoutName }) {
-        const exercises = getExercises().map(e => createExerciseObject(e, workoutName))
-        saveWorkoutAPI({ name: workoutName, exercises })
+        const exercises = getExercises()
+        addWorkout({ name: workoutName, exercises })
         console.log('workout', workoutName, exercises);
     }
 

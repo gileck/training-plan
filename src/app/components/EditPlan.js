@@ -35,7 +35,7 @@ export function EditPlan() {
 
 export function EditTrainingPlan() {
 
-    const { editExercise, addExercise, updateExercise, exercises, deleteExercise } = useExercisesAPI()
+    const { addWorkout, editExercise, addExercise, updateExercise, exercises, deleteExercise } = useExercisesAPI()
 
     console.log({ exercises })
 
@@ -104,10 +104,22 @@ export function EditTrainingPlan() {
             </div>
         </React.Fragment >
     }
-    function onBuildTrainingPlan(newExercises) {
+    function onBuildTrainingPlan({
+        exercises,
+        workouts
+    }) {
 
-        console.log({ newExercises });
-        // exercises.forEach(exercise => addExercise(exercise));
+        setBuildTrainingPlanOpen(false);
+
+        console.log({
+            exercises,
+            workouts
+        });
+
+
+        exercises.forEach(exercise => addExercise(exercise));
+        workouts.forEach(workout => addWorkout(workout))
+
         // setBuildTrainingPlanOpen(false);
     }
 

@@ -208,11 +208,12 @@ export function useExercisesAPI() {
         setNumberOfWeeks(weeksNumber);
     }
 
-    function saveWorkoutAPI({ name, exercises }) {
+
+    function addWorkout({ name, exercises }) {
         const workout = {
-            id: Date.now(),
+            id: _.uniqueId('workout-'),
             name,
-            exercises
+            exercises: exercises.map(e => createExerciseObject(e, name))
         }
         workouts.push(workout);
         setWorkouts(workouts);
@@ -305,7 +306,7 @@ export function useExercisesAPI() {
         getExercisesByWeeks,
         changeNumberOfWeeks,
         numberOfWeeks,
-        saveWorkoutAPI,
+        addWorkout,
         workouts,
         deleteWorkout,
         editWorkout,
