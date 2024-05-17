@@ -90,10 +90,14 @@ function Exercise({ shouldShowArrows, onWorkoutArrowClicked, isSelected, selectE
                 <IconButton onClick={() => onSetDone()}>
                     <CheckCircleIcon />
                 </IconButton>
-                <IconButton onClick={() => onAddSetComplete()}>
+                <IconButton
+                    disabled={exercise.sets.done >= exercise.sets.target}
+                    onClick={() => onAddSetComplete()}>
                     <AddCircleIcon />
                 </IconButton>
-                <IconButton onClick={() => onRemoveSetComplete()}>
+                <IconButton
+                    disabled={exercise.sets.done === 0}
+                    onClick={() => onRemoveSetComplete()}>
                     <RemoveCircle />
                 </IconButton>
             </Box>
@@ -170,6 +174,7 @@ export function Workout() {
     }
 
     function onSetComplete(workoutId, exercise, sets) {
+
         updateExercise(workoutId, exercise.id, selectedWeek, {
             totalWeeklySets: Number(exercise.weeks[selectedWeek].totalWeeklySets || 0) + Number(sets)
         });
