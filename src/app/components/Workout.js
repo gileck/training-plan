@@ -33,11 +33,6 @@ function Exercise({ shouldShowArrows, onWorkoutArrowClicked, isSelected, selectE
     const weeklyTargetReached = exercise.sets.done >= exercise.sets.target;
     return (
         <ListItem
-            // onClick={() => selectExercise('runExercise', {
-            //     exerciseIds: exercise.id,
-            //     week: selectedWeek
-            // })}
-
             sx={{
 
                 flexDirection: 'column',
@@ -45,10 +40,6 @@ function Exercise({ shouldShowArrows, onWorkoutArrowClicked, isSelected, selectE
                 backgroundColor: isSelected ? colors.exerciseBackgroundSelected : colors.exerciseBackground,
             }}
         >
-
-
-
-
             <Box
                 sx={{
                     display: 'flex',
@@ -68,7 +59,6 @@ function Exercise({ shouldShowArrows, onWorkoutArrowClicked, isSelected, selectE
                         onClick={() => onWorkoutArrowClicked(exercise, 1)}
                     />
                 </div> : ''}
-
 
                 <ListItemText
                     onClick={() => selectExercise(exercise.id)}
@@ -342,7 +332,7 @@ export function Workout() {
                                             selectedWeek={selectedWeek}
                                             key={exercise.id}
                                             exercise={getExercise(exercise)}
-                                            onRemoveSetComplete={() => onSetComplete(workout.id, exercise, 1)}
+                                            onRemoveSetComplete={() => onSetComplete(workout.id, exercise, -1)}
                                             onAddSetComplete={() => onSetComplete(workout.id, exercise, 1)}
                                             onSetDone={() => onExerciseDone(workout.id, exercise)}
                                         />
