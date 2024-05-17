@@ -295,6 +295,32 @@ export function useExercisesAPI() {
         editWorkout(workout)
     }
 
+    function changeExerciseOrderInWorkout(wid, eid, value) {
+        const workout = workouts.find(w => w.id === wid)
+        console.log({ workout });
+        const index = workout.exercises.findIndex(e => e.id === eid)
+        const newIndex = index + value;
+        if (newIndex < 0 || newIndex >= workout.exercises.length) {
+            return;
+        }
+        const newExercises = [...workout.exercises];
+        const temp = newExercises[index];
+        newExercises[index] = newExercises[newIndex];
+        newExercises[newIndex] = temp;
+        const newWorkouts = workouts.map(w => {
+            if (w.id === wid) {
+                return {
+                    ...w,
+                    exercises: newExercises
+                }
+            }
+            return w;
+        })
+        setWorkoutData(newWorkouts);
+
+
+    }
+
 
     return {
         exercises,
@@ -313,7 +339,8 @@ export function useExercisesAPI() {
         calculateExerciseDone,
         addExerciseToWorkout,
         calculateTotalSetsDoneWeek,
-        calculateTotalSetsTargetWeek
+        calculateTotalSetsTargetWeek,
+        changeExerciseOrderInWorkout
 
     }
 }

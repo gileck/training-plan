@@ -8,7 +8,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { Chip, Collapse, Divider, ListItemSecondaryAction, Typography } from "@mui/material";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { getPrimaryMuscle, getSecondaryMuscles, useExercisesAPI } from "../exercisesAPI";
-import { RemoveCircle, ExpandLess, ExpandMore, Label, ExpandMoreOutlined, ExpandLessRounded, ArrowLeft, ArrowRight, NavigationOutlined } from "@mui/icons-material";
+import { RemoveCircle, ExpandLess, ExpandMore, Label, ExpandMoreOutlined, ExpandLessRounded, ArrowLeft, ArrowRight, NavigationOutlined, ArrowUpward, ArrowDownward } from "@mui/icons-material";
 import { AppContext } from "../AppContext";
 import Fab from '@mui/material/Fab';
 import { localStorageAPI } from "@/app/localStorageAPI";
@@ -25,7 +25,7 @@ const colors = {
 }
 
 
-function Exercise({ isSelected, selectExercise, selectedWeek, exercise, onRemoveSetComplete, onAddSetComplete, onSetDone }) {
+function Exercise({ shouldShowArrows, onWorkoutArrowClicked, isSelected, selectExercise, selectedWeek, exercise, onRemoveSetComplete, onAddSetComplete, onSetDone }) {
     if (!exercise) {
         return null;
     }
@@ -45,12 +45,30 @@ function Exercise({ isSelected, selectExercise, selectedWeek, exercise, onRemove
                 backgroundColor: isSelected ? colors.exerciseBackgroundSelected : colors.exerciseBackground,
             }}
         >
+
+
+
+
             <Box
                 sx={{
                     display: 'flex',
                     justifyContent: 'space-between',
                     width: '100%'
                 }}>
+
+                {isSelected ? <div style={{
+                    display: 'grid',
+                    marginRight: '15px',
+                    color: 'gray',
+                }}>
+                    <ArrowUpward
+                        onClick={() => onWorkoutArrowClicked(exercise, -1)}
+                    />
+                    <ArrowDownward
+                        onClick={() => onWorkoutArrowClicked(exercise, 1)}
+                    />
+                </div> : ''}
+
 
                 <ListItemText
                     onClick={() => selectExercise(exercise.id)}
@@ -113,7 +131,7 @@ function Exercise({ isSelected, selectExercise, selectedWeek, exercise, onRemove
 export function Workout() {
 
     const { saveData, getData } = localStorageAPI()
-    const { workouts, exercises, updateExercise, numberOfWeeks } = useExercisesAPI()
+    const { workouts, exercises, updateExercise, numberOfWeeks, changeExerciseOrderInWorkout } = useExercisesAPI()
     const firstWeekWithExercisesLeft = _.range(0, numberOfWeeks).find(week => !workouts.every(w => w.exercises.every(e => e.weeks[week].totalWeeklySets >= e.weeks[week].weeklyTarget)))
     const firstWorkoutWithExercisesLeft = workouts.find(w => w.exercises.some(e => e.weeks[firstWeekWithExercisesLeft].totalWeeklySets < e.weeks[firstWeekWithExercisesLeft].weeklyTarget))
     const [selectedExercises, setSelectedExercises] = useState(getData('selectedExercises') || [])
@@ -122,6 +140,13 @@ export function Workout() {
     const [openWorkouts, setOpenWorkouts] = useState({
         [firstWorkoutWithExercisesLeft?.id]: true
     });
+
+    //shouldShowArrows, 
+    //onWorkoutArrowClicked,
+    function onWorkoutArrowClicked(wid, eid, value) {
+        console.log({ value, wid, eid });
+        changeExerciseOrderInWorkout(wid, eid, value)
+    }
 
     function selectExercise(exerciseId) {
 
@@ -276,6 +301,8 @@ export function Workout() {
                             }}
 
                             onClick={() => openWorkout(workout.id)} key={workout.id}>
+
+
                             <ListItemText
                                 sx={{}}
                                 primary={`
@@ -308,12 +335,14 @@ export function Workout() {
                                 workout.exercises.map((exercise) => (
                                     <React.Fragment key={exercise.id}>
                                         <Exercise
+                                            shouldShowArrows={true}
+                                            onWorkoutArrowClicked={(e, v) => onWorkoutArrowClicked(workout.id, e.id, v)}
                                             isSelected={selectedExercises.includes(exercise.id)}
                                             selectExercise={selectExercise}
                                             selectedWeek={selectedWeek}
                                             key={exercise.id}
                                             exercise={getExercise(exercise)}
-                                            onRemoveSetComplete={() => onSetComplete(workout.id, exercise, -1)}
+                                            onRemoveSetComplete={() => onSetComplete(workout.id, exercise, 1)}
                                             onAddSetComplete={() => onSetComplete(workout.id, exercise, 1)}
                                             onSetDone={() => onExerciseDone(workout.id, exercise)}
                                         />
