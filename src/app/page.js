@@ -24,23 +24,7 @@ import { BuildTrainingPlan } from "./components/buildTrainingPlanLogic";
 import { getExercisesList } from "./exercisesList";
 export default function Home() {
 
-  const traininPlan = BuildTrainingPlan({
-    exerciseList: getExercisesList(),
-    weeklyExercises: 3,
-    level: 3,
-    focusMuscles: [
-      'Biceps',
-      'Shoulders',
-    ],
-    workoutType: [
-      'gym',
-    ]
-  })
-  return <pre>
-    {
-      JSON.stringify(traininPlan, null, 2)
-    }
-  </pre>
+  
 
   const routeToComp = {
     'workouts': Workout,
