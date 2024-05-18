@@ -13,7 +13,7 @@ import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import RestoreIcon from '@mui/icons-material/Restore';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import { Paper } from "@mui/material";
+import { Checkbox, Chip, FormControlLabel, FormGroup, InputLabel, ListItemText, Menu, MenuItem, Paper, Radio, Select, TextField } from "@mui/material";
 import SettingsIcon from '@mui/icons-material/Settings';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
@@ -22,9 +22,12 @@ import { RunExercise } from "./components/RunExercise";
 import { AppContext } from "./AppContext";
 import { BuildTrainingPlan } from "./components/buildTrainingPlanLogic";
 import { getExercisesList } from "./exercisesList";
+
+
 export default function Home() {
 
-  
+
+
 
   const routeToComp = {
     'workouts': Workout,

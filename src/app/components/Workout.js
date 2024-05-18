@@ -77,13 +77,15 @@ function Exercise({ shouldShowArrows, onWorkoutArrowClicked, isSelected, selectE
                                 }
                             </Typography>
                             <Typography
-                                sx={{ ml: '10px', display: !exercise.bodyWeight && exercise.numberOfReps && exercise.weight ? 'inline' : 'none' }}
-                                component="span"
+                                sx={{ ml: '0px' }}
+                                component="div"
                                 variant="body2"
                                 color="text.secondary"
 
                             >
-                                ({exercise.numberOfReps}x{exercise.weight}kg)
+
+                                {exercise.weight > 0 ? `${exercise.numberOfReps}x${exercise.weight}kg` : `${exercise.numberOfReps} reps`}
+                                {exercise.weight === 0 ? " (body weight)" : ""}
                             </Typography>
                         </React.Fragment>
                     } />
@@ -102,12 +104,12 @@ function Exercise({ shouldShowArrows, onWorkoutArrowClicked, isSelected, selectE
                 </IconButton>
             </Box>
             <Box sx={{ pt: 1 }}> {/* This Box is optional and provides padding top */}
-                <Chip
+                {getPrimaryMuscle(exercise.name) ? <Chip
                     sx={{ mr: 1 }}
                     key={getPrimaryMuscle(exercise.name)}
                     label={getPrimaryMuscle(exercise.name)}
                     size="small"
-                />
+                /> : ''}
                 {getSecondaryMuscles(exercise.name).map((bodyPart) => (
                     <Chip
                         sx={{ mr: 1 }}

@@ -103,7 +103,6 @@ export function useExercisesAPI() {
     }
 
     function calcWeekValues(range, { overloadType, overloadValue, numberOfReps, weight, weeklySets }) {
-        console.log({ overloadType })
         const calcFn = type => overloadType === "all" ? calcWeeklyAllTarget : (overloadType === type ? calcWeelklyTarget : v => v)
 
 
@@ -112,13 +111,13 @@ export function useExercisesAPI() {
             totalWeeklySets: 0,
             weeklyTarget: calcFn('sets')(weeklySets || 10, week, overloadValue, 0),
             numberOfReps: calcFn('reps')(numberOfReps || 8, week, overloadValue, 1),
-            weight: calcFn('weight')(weight || 12, week, overloadValue, 2),
+            weight: calcFn('weight')(weight || 0, week, overloadValue, 2),
         }))
     }
 
-    function addExercise({ overloadValue, overloadType, name, numberOfReps, weight, weeklySets }) {
-        exercises.push({
-            id: exercises.length,
+    function buildExerciseObject({ id, overloadValue, overloadType, name, numberOfReps, weight, weeklySets }) {
+        return {
+            id: id || exercises.length,
             name,
             totalSets: 0,
             overloadType,
@@ -127,8 +126,11 @@ export function useExercisesAPI() {
             weight,
             weeklySets,
             weeks: calcWeekValues(_.range(0, numberOfWeeks), { overloadType, overloadValue, numberOfReps, weight, weeklySets })
-        })
-        const newExerciseList = [...exercises]
+        }
+    }
+
+    function addExercise(params) {
+        const newExerciseList = [...exercises, buildExerciseObject(params)]
         setExercisesData(newExerciseList);
 
     }
@@ -208,22 +210,32 @@ export function useExercisesAPI() {
         setNumberOfWeeks(weeksNumber);
     }
 
-
-    function addWorkout({ name, exercises }) {
-        const workout = {
+    function buildWorkoutObject({ name, exercises }) {
+        return {
             id: _.uniqueId('workout-'),
             name,
             exercises: exercises.map(e => createExerciseObject(e, name))
         }
-        workouts.push(workout);
-        setWorkouts(workouts);
-        saveData('workouts', workouts);
+    }
+
+    function addWorkout({ name, exercises }) {
+        const newWorkouts = [
+            ...workouts,
+            buildWorkoutObject({ name, exercises })
+        ]
+        setWorkouts(newWorkouts);
+        saveData('workouts', newWorkouts);
     }
 
     function deleteWorkout(workoutId) {
         const newWorkouts = workouts.filter(w => w.id !== workoutId);
         setWorkouts(newWorkouts);
         saveData('workouts', newWorkouts);
+    }
+
+    function cleanAllData() {
+        setExercisesData([]);
+        setWorkoutData([]);
     }
 
     function editWorkout(workout) {
@@ -321,13 +333,20 @@ export function useExercisesAPI() {
 
     }
 
+    function createNewPlan(newExercises, newWorkouts) {
+        setExercisesData(newExercises.map((e, index) => buildExerciseObject({ ...e, id: index + 1 })))
+        setWorkoutData(newWorkouts.map(buildWorkoutObject))
+    }
+
 
     return {
+        createNewPlan,
         exercises,
         addExercise,
         deleteExercise,
         updateExercise,
         cleanData,
+        cleanAllData,
         editExercise,
         getExercisesByWeeks,
         changeNumberOfWeeks,

@@ -209,7 +209,7 @@ export function EditExerciseForm({
     const [exercise, setExercise] = useState(exerciseToEdit || exerciseOptions[0]);
     const [totalWeeklySets, setTotalWeeklySets] = useState(exerciseToEdit?.weeklySets || 5);
     const [reps, setReps] = useState(exerciseToEdit?.numberOfReps || 8);
-    const [weight, setWeight] = useState(exerciseToEdit?.weight || 12);
+    const [weight, setWeight] = useState(exerciseToEdit?.weight);
     const [overloadType, setOverloadType] = useState(exerciseToEdit?.overloadType || 'sets');
     const [overloadValue, setOverloadValue] = useState(exerciseToEdit?.overloadValue || 5);
 

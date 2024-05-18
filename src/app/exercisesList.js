@@ -54,19 +54,18 @@ const staticExercisesList = [
     { name: "Dragon Flies", primaryMuscle: "Core", secondaryMuscles: [], pullPush: null, bodyWeight: true, category: "Core" },
 ];
 
-const exercisesListFromLocalStorage = typeof localStorage !== "undefined" && JSON.parse(localStorage.getItem("exercisesList")) || [];
+const { getData } = localStorageAPI()
+export const getLocalExercises = () => getData("exercisesList") || []
 
-export const exercisesListFromLocal = exercisesListFromLocalStorage
 export const exercisesList = [
     ...staticExercisesList,
-    ...exercisesListFromLocalStorage
+    ...getLocalExercises()
 ]
-const { getData } = localStorageAPI()
+
 export const getExercisesList = () => {
-    const exercisesListFromLocalStorage = getData("exercisesList") || []
-    const exercisesListFromLocal = exercisesListFromLocalStorage
+    const exercisesListFromLocalStorage = getLocalExercises()
     return [
         ...staticExercisesList,
-        ...exercisesListFromLocal
+        ...exercisesListFromLocalStorage
     ]
 }

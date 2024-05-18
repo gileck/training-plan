@@ -7,7 +7,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
-import { AddCircle, Delete, EditLocationAlt, EditNotifications, RemoveCircle } from "@mui/icons-material";
+import { AddCircle, Delete, EditLocationAlt, EditNotifications, EditOutlined, RemoveCircle } from "@mui/icons-material";
 import { AddExerciseDialog, EditExerciseForm, CreateNewExerciseDialog } from "./AddExerciseListItem";
 import _ from 'lodash'
 import { useExercisesAPI } from "../exercisesAPI";
@@ -16,7 +16,7 @@ import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 import { isBodyWeightExercise } from "../exercisesAPI";
 import { AppTabs } from "../tabs";
 import { WorkoutPlan } from "./WorkoutPlan";
-import { exercisesList, exercisesListFromLocal, getExercisesList } from "../exercisesList";
+import { exercisesList, getLocalExercises } from "../exercisesList";
 import { localStorageAPI } from "../localStorageAPI";
 import { BodyPartsPlan } from "./BodyPartsPlan";
 import { BuildTrainingPlanDialog } from "./BuildTrainingPlanDialog";
@@ -35,9 +35,8 @@ export function EditPlan() {
 
 export function EditTrainingPlan() {
 
-    const { addWorkout, editExercise, addExercise, updateExercise, exercises, deleteExercise } = useExercisesAPI()
+    const { createNewPlan, addWorkout, editExercise, addExercise, updateExercise, exercises, deleteExercise, cleanAllData } = useExercisesAPI()
 
-    console.log({ exercises })
 
 
 
@@ -81,7 +80,7 @@ export function EditTrainingPlan() {
     }
 
     const onCreateNewExercise = (exercise) => {
-        saveData('exercisesList', [...exercisesListFromLocal, exercise]);
+        saveData('exercisesList', [...getLocalExercises(), exercise]);
         setCreateNewExerciseDialogOpen(false);
         setOpen(true);
     }
@@ -93,8 +92,8 @@ export function EditTrainingPlan() {
 
                 <div>
                     Reps: <span style={{ marginLeft: "2px" }}>
-                        {isBodyWeightExercise(exercise.name) && exercise.numberOfReps ? `${exercise.numberOfReps}` : ""}
-                        {!isBodyWeightExercise(exercise.name) && exercise.numberOfReps && exercise.weight ?
+                        {exercise.weight === 0 && exercise.numberOfReps ? `${exercise.numberOfReps} (body weight)` : ""}
+                        {exercise.weight !== 0 ?
                             exercise.numberOfReps + 'x' + exercise.weight + 'kg' : ''}
                     </span>
                 </div>
@@ -104,23 +103,49 @@ export function EditTrainingPlan() {
             </div>
         </React.Fragment >
     }
-    function onBuildTrainingPlan({
-        exercises,
-        workouts
+    async function onBuildTrainingPlan({
+        plan,
+        name,
+        replaceTrainingPlan
     }) {
+
+        const {
+            exercises: newExercisesList,
+            workouts,
+            newExercises: newExercisesToAdd,
+        } = plan;
+
+        const newWorkouts = workouts.map(workout => {
+            return {
+                exercises: workout.workoutExercises.map(({ name, sets }) => {
+                    return {
+                        ...newExercisesList.find(e => e.name === name),
+                        name,
+                        sets,
+                        weeklySets: sets,
+                    }
+                }),
+                name: workout.name
+            }
+        })
+
+        const _newExercisesList = newExercisesList.map(exercise => {
+            return {
+                ...exercise,
+                weeklySets: _.sum(newWorkouts.map(w => w.exercises.find(e => e.name === exercise.name)?.sets || 0)),
+            }
+        })
+
+        cleanAllData()
+
+        createNewPlan(_newExercisesList, newWorkouts, name)
+
+        newExercisesToAdd.forEach(newExercise => {
+            saveData('exercisesList', [...getLocalExercises(), newExercise]);
+        });
 
         setBuildTrainingPlanOpen(false);
 
-        console.log({
-            exercises,
-            workouts
-        });
-
-
-        exercises.forEach(exercise => addExercise(exercise));
-        workouts.forEach(workout => addWorkout(workout))
-
-        // setBuildTrainingPlanOpen(false);
     }
 
 
@@ -185,20 +210,23 @@ export function EditTrainingPlan() {
                                     <ListItemText primary={exercise.name}
                                         secondary={printSets(exercise)} />
                                     <IconButton onClick={() => handleEditExerciseClicked(exercise.id)}>
-                                        <EditCalendarIcon />
+                                        <EditOutlined />
                                     </IconButton>
                                     <IconButton onClick={() => onDeleteButtonClicked(exercise)}>
                                         <Delete />
                                     </IconButton>
                                 </ListItemButton>
-                                <EditExerciseDialog
-                                    exerciseList={exercisesList}
-                                    exerciseToEdit={exercise}
-                                    open={editExerciseOpened[exercise.id]}
-                                    onAddExercise={editExerciseInternal}
-                                    exercises={exercises}
-                                    onClose={() => handleEditExerciseClicked(exercise.id)}
-                                />
+                                {editExerciseOpened[exercise.id] ?
+                                    <EditExerciseDialog
+                                        exerciseList={exercisesList}
+                                        exerciseToEdit={exercise}
+                                        open={editExerciseOpened[exercise.id]}
+                                        onAddExercise={editExerciseInternal}
+                                        exercises={exercises}
+                                        onClose={() => handleEditExerciseClicked(exercise.id)}
+                                    /> : ''
+                                }
+
                             </ListItem>
                             <Divider />
                         </React.Fragment>

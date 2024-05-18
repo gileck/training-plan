@@ -186,7 +186,10 @@ export function RunExercise(props) {
                                     }}
                                 >
 
-                                    {exercise.numberOfReps}x{exercise.weight}kg
+
+
+                                    {exercise.weight > 0 ? `${exercise.numberOfReps}x${exercise.weight}kg` : `${exercise.numberOfReps} reps`}
+                                    {exercise.weight === 0 ? " (body weight)" : ""}
                                 </Typography>
                             </div>
                             <Grid

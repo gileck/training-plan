@@ -1,9 +1,148 @@
 import { FormControl } from "@mui/base";
-import { Button, Box, ButtonBase, Checkbox, Dialog, DialogTitle, FormControlLabel, FormGroup, InputLabel, MenuItem, Radio, RadioGroup, Select, Chip } from "@mui/material";
-import { useState } from "react";
+import { Button, Box, ButtonBase, Checkbox, Dialog, DialogTitle, FormControlLabel, FormGroup, InputLabel, MenuItem, Radio, RadioGroup, Select, Chip, TextField, Alert, Link, DialogActions } from "@mui/material";
+import React, { useState } from "react";
 import { getAllBodyParts } from "../exercisesAPI";
-import { CheckBox } from "@mui/icons-material";
+import { Add, AddCircle, CheckBox, CheckBoxOutlineBlankRounded, CheckBoxRounded, CheckRounded, CopyAll, Description, Error, ErrorOutline, LinkRounded, OpenInNewOutlined } from "@mui/icons-material";
 import { BuildTrainingPlan } from "./buildTrainingPlanLogic";
+import { Prompt } from "next/font/google";
+import { buildPrompt } from "../trainingPlanPrompt";
+import { FormBuilder } from "./FormBuilder";
+
+
+function PromptDialog({ prompDialogOpen, onClose, prompt, onAddTrainingPlan, trainingPlanParams }) {
+    const [isValidJson, setIsValidJson] = useState(null)
+    const [json, setJson] = useState(null)
+    const [planName, setPlanName] = useState(null)
+    const [shouldShowAlert, setShouldShowAlert] = useState(false)
+    const [replaceTrainingPlan, setReplaceTrainingPlan] = useState(false)
+
+    function onReplaceTrainingPlanCheckboxChanged(e) {
+        setReplaceTrainingPlan(e.target.checked)
+    }
+
+    function onPlanNameChanged(e) {
+        setPlanName(e.target.value)
+    }
+
+    function onCopyPromptClicked() {
+        console.log({ trainingPlanParams });
+        navigator.clipboard.writeText(buildPrompt(trainingPlanParams))
+        setShouldShowAlert(true)
+    }
+
+    function onAddTrainingPlanClicked() {
+        onAddTrainingPlan({ name: planName, plan: json, replaceTrainingPlan })
+        // onAddTrainingPlan({ name: planName, plan: JSON })
+
+
+    }
+    function onInputChanged(e) {
+        // console.log(e.target.value);
+        const cleanValue = e.target.value.replace('```', '').replace('```', '').replace('json', '').trim()
+        let json
+        try {
+            json = JSON.parse(cleanValue)
+            setJson(json)
+            setIsValidJson(true)
+        } catch (error) {
+            console.log(error);
+            setIsValidJson(false)
+        }
+    }
+    return <Dialog
+        open={prompDialogOpen}
+        onClose={onClose}
+        size="xl"
+        fullWidth={true}
+
+        sx={{
+            width: '100%',
+
+        }}
+    >
+        <DialogTitle>
+            Build Training Plan
+        </DialogTitle>
+        <Box
+            sx={{
+                padding: '20px'
+
+            }}
+        >
+
+
+            <div>
+
+                <Link
+
+                    target="_blank"
+                    href={`https://chat.openai.com/chat?model=gpt-4o&q=${buildPrompt(trainingPlanParams).replace(/\s+/g, ' ').trim()}`}>
+                    <OpenInNewOutlined />
+                    Open in openai.com
+                </Link>
+
+
+            </div>
+            OR
+            <div>
+
+                <Button onClick={onCopyPromptClicked}>
+                    <CopyAll />
+                    Copy Prompt
+                </Button>
+                {shouldShowAlert && <Alert severity="success">
+
+                    Prompt was copied to clipboard.
+                    Paste in the AI chatbot, and then paste the JSON object below.
+                </Alert>}
+            </div>
+            {/* <TextField
+                    onChange={onPlanNameChanged}
+                    sx={{ width: '80%' }}
+                    placeholder="Name"
+                /> */}
+            <div
+                style={{
+                    marginTop: '20px',
+                }}
+            >
+                <TextField
+                    onChange={onInputChanged}
+                    sx={{ width: '80%' }}
+                    placeholder="Paste JSON object here"
+                />
+                <span
+                    style={{
+                        marginTop: '15px',
+                        marginLeft: '15px',
+                        display: 'inline-block',
+                    }}
+                >
+                    {isValidJson === false && <ErrorOutline sx={{ color: 'darkred' }} />}
+
+                    {isValidJson === true && <CheckRounded sx={{ color: 'green' }} />}
+                </span>
+            </div>
+
+            {/* <Checkbox
+                onChange={onReplaceTrainingPlanCheckboxChanged}
+            /> Replace Current Plan */}
+
+
+            <Button
+                sx={{ marginTop: '20px' }}
+                variant="contained"
+                startIcon={<AddCircle />}
+                onClick={onAddTrainingPlanClicked}
+                disabled={!isValidJson}
+
+            >
+                Add Training Plan
+            </Button>
+        </Box>
+
+    </Dialog >
+}
 
 export function BuildTrainingPlanDialog({
     exercises,
@@ -13,10 +152,29 @@ export function BuildTrainingPlanDialog({
     buildTrainigPlanDialigOpen
 }) {
 
-    const [workoutType, setWorkoutType] = useState([]);
-    const [weeklyExercises, setWeeklyExercises] = useState(3);
-    const [level, setLevel] = useState(3);
-    const [focusMuscles, setFocusMuscles] = useState([])
+
+    const [prompDialogOpen, setPrompDialogOpen] = useState(false)
+    const [trainingPlanParams, setTrainingPlanParams] = useState({
+        numberOfWorkouts: 5,
+        level: 3,
+        focusMusclesVsRest: 70,
+        location: ["gym"],
+        focusMuscles: [],
+        adaptations: []
+    })
+
+    console.log({ trainingPlanParams });
+    function onFormChanged(values) {
+        console.log({ values });
+        setTrainingPlanParams(values)
+    }
+
+
+
+
+
+
+    // console.log({ workoutType });
 
     function handleFocusMuscleChange(e) {
         const value = e.target.value;
@@ -38,32 +196,8 @@ export function BuildTrainingPlanDialog({
     }
 
     function onBuildTrainingPlanInternal() {
-
-        console.log({
-
-            workoutType,
-            weeklyExercises,
-            level,
-            focusMuscles
-        });
-
-        const traininPlan = BuildTrainingPlan({
-            exerciseList,
-            weeklyExercises,
-            level,
-            focusMuscles,
-            workoutType
-        })
-
-        console.log({
-            traininPlan
-        });
-
-
-        onBuildTrainingPlan(traininPlan)
-
-
-
+        onClose()
+        setPrompDialogOpen(true)
     }
 
     function onWorkoutTypeChanged(workoutType, e) {
@@ -80,152 +214,138 @@ export function BuildTrainingPlanDialog({
         console.log({ workoutType, value });
     }
 
+    function onAddTrainingPlan(params) {
+        setPrompDialogOpen(false)
+        onBuildTrainingPlan(params)
+        onClose()
+    }
+
+
+    const formElements = {
+        numberOfWorkouts: {
+            type: 'singleSelect',
+            label: 'Weekly Workouts',
+            default: 3,
+            children: _.range(1, 8).map((value) => ({ label: value, value }))
+        },
+        level: {
+            type: 'singleSelect',
+            label: 'Level',
+            default: 3,
+            children: [
+                { label: "First Time", value: 1 },
+                { label: "Beginner", value: 2 },
+                { label: "Intermediate", value: 3 },
+                { label: "Advanced", value: 4 },
+                { label: "Professional", value: 5 }
+            ]
+        },
+        location: {
+            type: 'multiSelect',
+            label: 'Location',
+            default: ['gym'],
+            options: {
+                multiple: true,
+            },
+            children: [
+                { label: 'Gym', value: 'gym' },
+                { label: 'Outdoor', value: 'outdoor' },
+                { label: 'Studio', value: 'studio' },
+                { label: 'Home', value: 'home' }
+            ],
+        },
+        focusMuscles: {
+            validate: value => value.length < 4,
+            inline: false,
+            type: 'multiSelect',
+            label: 'Focus Muscles (3 Max)',
+            default: [],
+            options: {
+                multiple: true,
+            },
+            children: getAllBodyParts().map(part => ({
+                label: part,
+                value: part
+            })),
+        },
+        focusMusclesVsRest: {
+            type: "Slider",
+            default: '70',
+            labelFn: (value) => `Focus Muscles Ratio: ${value}% `,
+            description: 'How Focused should the training plan be on the focused muscles vs other body parts',
+            options: {
+                getAriaValueText: (value) => value,
+                valueLabelDisplay: "auto",
+                sx: { width: '80%', marginLeft: '20px' },
+                step: 10,
+                marks: true,
+                min: 0,
+                max: 100,
+                marks: [{
+                    value: 0,
+                    label: 'Diverse',
+                }, {
+                    value: 100,
+                    label: "Focused"
+                }]
+            }
+        },
+        adaptations: {
+            validate: value => value.length < 3,
+            type: 'multiSelect',
+            label: 'Training Goals (2 Max)',
+            default: [],
+            options: {
+                multiple: true,
+            },
+            children: [
+                { label: 'Muscle Size (Hypertrophy)', value: 'muscleSize' },
+                { label: 'Muscle Strength', value: 'muscleStrength' },
+                { label: 'Power / Speed', value: 'power' },
+                { label: 'Loose Fat', value: 'burnFat' },
+            ],
+        },
+    }
+
     return (
-        <Dialog
-            disableEscapeKeyDown
-            open={buildTrainigPlanDialigOpen}
-            onClose={() => onClose()}
-            fullWidth={true}
-        >
-            <DialogTitle>
-                Build Training Plan
-            </DialogTitle>
+        <>
 
-            <Box component="form" sx={{ padding: '15px' }}>
-                <FormGroup>
-                    <FormControl sx={{ marginBottom: '30px' }} component="div" >
-
-
-
-                        <InputLabel>Select</InputLabel>
-                        <RadioGroup>
-                            <FormControlLabel
-                                value="gym"
-                                control={<Checkbox onChange={(e) => onWorkoutTypeChanged('gym', e)} />}
-                                label="Gym"
-                            />
-                            <FormControlLabel
-                                value="outdoor"
-                                control={<Checkbox onChange={(e) => onWorkoutTypeChanged('outdoor', e)} />}
-                                label="Outdoor"
-                            />
-                            <FormControlLabel
-                                value="studio"
-                                control={<Checkbox onChange={(e) => onWorkoutTypeChanged('Studio', e)} />}
-                                label="Studio"
-                            />
-                        </RadioGroup>
-                    </FormControl>
-
-                    <Box sx={{ display: 'flex', }}>
-                        <InputLabel
-                            id="label_weeklyExercises"
-                            sx={{
-                                marginTop: '7px',
-                                marginRight: '10px'
-
-                            }}
-                        >Weekly exercises</InputLabel>
-                        <Select
-                            labelId="label_weeklyExercises"
-                            defaultValue="3"
-                            size="small"
-                            sx={{
-
-                            }}
-                            onChange={(e) => setWeeklyExercises(e.target.value)}
-                        >
-                            <MenuItem value="1">1</MenuItem>
-                            <MenuItem value="2">2</MenuItem>
-                            <MenuItem selected value="3">3</MenuItem>
-                            <MenuItem value="4">4</MenuItem>
-                            <MenuItem value="5">5</MenuItem>
-                            <MenuItem value="6">6</MenuItem>
-                            <MenuItem value="7">7</MenuItem>
-                        </Select>
-                    </Box>
-
-
-                    <Box sx={{ display: 'flex', marginTop: '20px' }}>
-
-
-                        <InputLabel
-                            id="level"
-                            sx={{
-                                marginTop: '7px',
-                                marginRight: '10px'
-
-                            }}
-                        >Level</InputLabel>
-                        <Select
-                            labelId="level"
-                            label="Level"
-                            defaultValue="3"
-                            size="small"
-                            sx={{
-
-                            }}
-                            onChange={(e) => setLevel(e.target.value)}
-                        >
-
-                            <MenuItem value="1">First Time</MenuItem>
-                            <MenuItem value="2">Beginner</MenuItem>
-                            <MenuItem selected value="3">Intermediate</MenuItem>
-                            <MenuItem value="4">Advanced</MenuItem>
-                            <MenuItem value="5">Professional</MenuItem>
-                        </Select>
-                    </Box>
-                    <Box sx={{ marginTop: '20px', mb: "20px" }}>
-                        <InputLabel
-                            id="focusMuscles"
-                            sx={{
-                                marginTop: '7px',
-                                marginRight: '10px'
-
-                            }}
-                        >Focus Muscles (Up to 3)</InputLabel>
-                        <Select
-                            label="Focus Muscles"
-                            labelId="focusMuscles"
-                            multiple
-                            size="small"
-                            value={focusMuscles}
-                            onChange={handleFocusMuscleChange}
-                            sx={{
-                                maxWidth: '200px'
-                            }}
-                            renderValue={(selected) => (
-                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                    {selected.map((value) => (
-                                        <Chip key={value} label={value} />
-                                    ))}
-                                </Box>
-                            )}
-                        >
-                            {
-                                getAllBodyParts().map((bodyPart, index) => (
-
-                                    <MenuItem key={index} value={bodyPart}>
-                                        <Checkbox checked={focusMuscles.indexOf(bodyPart) > -1} />
-                                        {bodyPart}
-
-                                    </MenuItem>
-                                ))
-                            }
-                        </Select>
-                    </Box>
-
-                </FormGroup>
-                <Button
-                    variant="contained"
-                    onClick={onBuildTrainingPlanInternal}
+            <PromptDialog
+                trainingPlanParams={trainingPlanParams}
+                onAddTrainingPlan={onAddTrainingPlan}
+                prompDialogOpen={prompDialogOpen}
+                onClose={() => setPrompDialogOpen(false)}
+            />
+            <Dialog
+                disableEscapeKeyDown
+                open={buildTrainigPlanDialigOpen}
+                onClose={() => onClose()}
+                fullWidth={true}
+            >
+                <DialogTitle
+                    sx={{
+                        backgroundColor: 'lightblue'
+                    }}
                 >
                     Build Training Plan
-                </Button>
-            </Box >
+                </DialogTitle>
 
+                <FormBuilder
+                    formElements={formElements}
+                    onChange={onFormChanged}
+                />
 
-        </Dialog >
+                <DialogActions>
+                    <Button
+                        variant="contained"
+                        onClick={onBuildTrainingPlanInternal}
+                    >
+                        Build Training Plan
+                    </Button>
+                </DialogActions>
+
+            </Dialog >
+        </>
     );
 
 
