@@ -10,18 +10,13 @@ import { Workout } from "./components/Workout";
 import Box from '@mui/material/Box';
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
-import RestoreIcon from '@mui/icons-material/Restore';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import { Checkbox, Chip, FormControlLabel, FormGroup, InputLabel, ListItemText, Menu, MenuItem, Paper, Radio, Select, TextField } from "@mui/material";
+import { Paper } from "@mui/material";
 import SettingsIcon from '@mui/icons-material/Settings';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import { RunExercise } from "./components/RunExercise";
 import { AppContext } from "./AppContext";
-import { BuildTrainingPlan } from "./components/buildTrainingPlanLogic";
-import { getExercisesList } from "./exercisesList";
 
 
 export default function Home() {
@@ -45,7 +40,6 @@ export default function Home() {
   ]
   const [route, setValue] = React.useState('workouts');
 
-  console.log({ route });
 
   function setInernalRoute(route, params) {
     if (typeof window === 'undefined') return;
