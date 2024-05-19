@@ -1,5 +1,11 @@
 export function localStorageAPI() {
 
+    if (typeof window === 'undefined') return {
+        getData: () => { },
+        saveData: () => { },
+        cleanData: () => { }
+    }
+
     return {
         getData: (key) => {
             return JSON.parse(localStorage.getItem(key) || null);
