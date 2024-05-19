@@ -155,7 +155,7 @@ export function BuildTrainingPlanDialog({
 
     const [prompDialogOpen, setPrompDialogOpen] = useState(false)
     const [trainingPlanParams, setTrainingPlanParams] = useState({
-        numberOfWorkouts: 5,
+        numberOfWorkouts: 3,
         level: 3,
         focusMusclesVsRest: 70,
         location: ["gym"],
