@@ -61,7 +61,7 @@ export function useExercisesAPI() {
     }
 
     function calcWeelklyTarget(weeklyTarget, week, overloadValue) {
-        const progressiveOverload = overloadValue && (overloadValue / 100) || 0.05; // 5% increase per week
+        const progressiveOverload = _.isNumber(overloadValue) ? (overloadValue / 100) : 0;
         return Math.round(weeklyTarget * Math.pow(1 + progressiveOverload, Number(week)));
     }
 
@@ -99,16 +99,30 @@ export function useExercisesAPI() {
             }
             return e;
         });
+
+        const newWorkouts = workouts.map(w => {
+            w.exercises = w.exercises.map(e => {
+                if (e.name === exercise.name) {
+
+                    return createExerciseObject(exercise, w.name, e)
+                }
+                return e;
+            })
+            return w;
+        })
+
         setExercisesData(newExercises);
+        setWorkoutData(newWorkouts);
     }
 
-    function calcWeekValues(range, { overloadType, overloadValue, numberOfReps, weight, weeklySets }) {
+    function calcWeekValues(range, { overloadType, overloadValue, numberOfReps, weight, weeklySets }, { weeks } = {}) {
         const calcFn = type => overloadType === "all" ? calcWeeklyAllTarget : (overloadType === type ? calcWeelklyTarget : v => v)
 
+        const getCurrentTotalWeeklySets = week => weeks ? weeks[week].totalWeeklySets || 0 : 0;
 
         return range.map(week => ({
             week,
-            totalWeeklySets: 0,
+            totalWeeklySets: getCurrentTotalWeeklySets(week),
             weeklyTarget: calcFn('sets')(weeklySets || 10, week, overloadValue, 0),
             numberOfReps: calcFn('reps')(numberOfReps || 8, week, overloadValue, 1),
             weight: calcFn('weight')(weight || 0, week, overloadValue, 2),
@@ -282,12 +296,12 @@ export function useExercisesAPI() {
         return calculateSetsDoneWeek(week, 'weeklyTarget');
     }
 
-    function createExerciseObject(exercise, workoutName) {
+    function createExerciseObject(exercise, workoutName, currentExercise) {
         return {
             name: exercise.name,
             sets: exercise.weeklySets,
             id: `${exercise.name}-${workoutName}`,
-            weeks: calcWeekValues(_.range(0, numberOfWeeks), exercise)
+            weeks: calcWeekValues(_.range(0, numberOfWeeks), exercise, currentExercise)
         }
     }
 

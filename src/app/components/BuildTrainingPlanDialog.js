@@ -2,12 +2,12 @@ import { FormControl } from "@mui/base";
 import { Button, Box, ButtonBase, Checkbox, Dialog, DialogTitle, FormControlLabel, FormGroup, InputLabel, MenuItem, Radio, RadioGroup, Select, Chip, TextField, Alert, Link, DialogActions } from "@mui/material";
 import React, { useState } from "react";
 import { getAllBodyParts } from "../exercisesAPI";
-import { Add, AddCircle, CheckBox, CheckBoxOutlineBlankRounded, CheckBoxRounded, CheckRounded, CopyAll, Description, Error, ErrorOutline, LinkRounded, OpenInNewOutlined } from "@mui/icons-material";
+import { Add, AddCircle, CheckBox, CheckBoxOutlineBlankRounded, CheckBoxRounded, CheckRounded, ContentPaste, CopyAll, Description, Error, ErrorOutline, LinkRounded, OpenInNewOutlined } from "@mui/icons-material";
 import { BuildTrainingPlan } from "./buildTrainingPlanLogic";
 import { Prompt } from "next/font/google";
 import { buildPrompt } from "../trainingPlanPrompt";
 import { FormBuilder } from "./FormBuilder";
-
+import ContentPasteGoRoundedIcon from '@mui/icons-material/ContentPasteGoRounded';
 
 function PromptDialog({ prompDialogOpen, onClose, prompt, onAddTrainingPlan, trainingPlanParams }) {
     const [isValidJson, setIsValidJson] = useState(null)
@@ -15,6 +15,7 @@ function PromptDialog({ prompDialogOpen, onClose, prompt, onAddTrainingPlan, tra
     const [planName, setPlanName] = useState(null)
     const [shouldShowAlert, setShouldShowAlert] = useState(false)
     const [replaceTrainingPlan, setReplaceTrainingPlan] = useState(false)
+    const [pasteJsonValue, setPasteJsonValue] = useState('')
 
     function onReplaceTrainingPlanCheckboxChanged(e) {
         setReplaceTrainingPlan(e.target.checked)
@@ -31,23 +32,41 @@ function PromptDialog({ prompDialogOpen, onClose, prompt, onAddTrainingPlan, tra
     }
 
     function onAddTrainingPlanClicked() {
+        setJson(null)
+        setIsValidJson(null)
         onAddTrainingPlan({ name: planName, plan: json, replaceTrainingPlan })
         // onAddTrainingPlan({ name: planName, plan: JSON })
 
 
     }
-    function onInputChanged(e) {
-        // console.log(e.target.value);
-        const cleanValue = e.target.value.replace('```', '').replace('```', '').replace('json', '').trim()
+    function onJsonAdded(rawJson) {
+        const cleanValue = rawJson.replace('```', '').replace('```', '').replace('json', '').trim()
         let json
         try {
             json = JSON.parse(cleanValue)
             setJson(json)
             setIsValidJson(true)
+            onAddTrainingPlan({ name: planName, plan: json, replaceTrainingPlan })
+
         } catch (error) {
             console.log(error);
             setIsValidJson(false)
         }
+        if (!pasteJsonValue) {
+            setPasteJsonValue(cleanValue)
+        }
+    }
+    function onInputChanged(e) {
+        // console.log(e.target.value);
+        setPasteJsonValue(e.target.value)
+        onJsonAdded(e.target.value)
+
+
+    }
+    async function onPasteButtonClicked() {
+        const pasteContent = await navigator.clipboard.readText()
+        onJsonAdded(pasteContent)
+
     }
     return <Dialog
         open={prompDialogOpen}
@@ -106,11 +125,22 @@ function PromptDialog({ prompDialogOpen, onClose, prompt, onAddTrainingPlan, tra
                     marginTop: '20px',
                 }}
             >
-                <TextField
+                {/* <TextField
+                    value={pasteJsonValue}
                     onChange={onInputChanged}
-                    sx={{ width: '80%' }}
+                    sx={{ width: '50%' }}
                     placeholder="Paste JSON object here"
-                />
+                /> */}
+                <Button
+                    sx={{
+                        paddingTop: '13px',
+                    }}
+                    variant="contained"
+                    onClick={() => onPasteButtonClicked()}
+                    startIcon={<ContentPasteGoRoundedIcon />}
+                >
+                    Paste JSON
+                </Button>
                 <span
                     style={{
                         marginTop: '15px',
@@ -156,11 +186,17 @@ export function BuildTrainingPlanDialog({
     const [prompDialogOpen, setPrompDialogOpen] = useState(false)
     const [trainingPlanParams, setTrainingPlanParams] = useState({
         numberOfWorkouts: 3,
+        workoutLength: 60,
         level: 3,
         focusMusclesVsRest: 70,
         location: ["gym"],
         focusMuscles: [],
-        adaptations: []
+        adaptations: [
+            'muscleSize',
+        ],
+        intensity: 'medium',
+
+
     })
 
     console.log({ trainingPlanParams });
@@ -200,21 +236,22 @@ export function BuildTrainingPlanDialog({
         setPrompDialogOpen(true)
     }
 
-    function onWorkoutTypeChanged(workoutType, e) {
-        const value = e.target.checked;
-        setWorkoutType(
-            (prev) => {
-                if (value) {
-                    return [...prev, workoutType]
-                } else {
-                    return prev.filter((wt) => wt !== workoutType)
-                }
-            }
-        )
-        console.log({ workoutType, value });
-    }
+    // function onWorkoutTypeChanged(workoutType, e) {
+    //     const value = e.target.checked;
+    //     setWorkoutType(
+    //         (prev) => {
+    //             if (value) {
+    //                 return [...prev, workoutType]
+    //             } else {
+    //                 return prev.filter((wt) => wt !== workoutType)
+    //             }
+    //         }
+    //     )
+    //     console.log({ workoutType, value });
+    // }
 
     function onAddTrainingPlan(params) {
+        // setJson(null)
         setPrompDialogOpen(false)
         onBuildTrainingPlan(params)
         onClose()
@@ -227,6 +264,24 @@ export function BuildTrainingPlanDialog({
             label: 'Weekly Workouts',
             default: 3,
             children: _.range(1, 8).map((value) => ({ label: value, value }))
+        },
+        workoutLength: {
+            type: "singleSelect",
+            label: "Workout Length (Minutes)",
+            default: 60,
+            children: _.range(10, 91, 10).map((value) => ({ label: value, value }))
+        },
+        intensity: {
+            type: 'singleSelect',
+            label: 'Intensity',
+            default: 'medium',
+            children: [
+                { label: "Very Low", value: 'veryLow' },
+                { label: "Low", value: 'low' },
+                { label: "Medium", value: 'medium' },
+                { label: "High", value: 'high' },
+                { label: "Very High", value: 'veryHigh' }
+            ]
         },
         level: {
             type: 'singleSelect',
@@ -291,10 +346,12 @@ export function BuildTrainingPlanDialog({
             }
         },
         adaptations: {
-            validate: value => value.length < 3,
+            validate: value => value.length < 4,
             type: 'multiSelect',
-            label: 'Training Goals (2 Max)',
-            default: [],
+            label: 'Training Goals (3 Max)',
+            default: [
+                'muscleSize'
+            ],
             options: {
                 multiple: true,
             },
@@ -302,7 +359,9 @@ export function BuildTrainingPlanDialog({
                 { label: 'Muscle Size (Hypertrophy)', value: 'muscleSize' },
                 { label: 'Muscle Strength', value: 'muscleStrength' },
                 { label: 'Power / Speed', value: 'power' },
-                { label: 'Loose Fat', value: 'burnFat' },
+                { label: 'Endurance', value: 'endurance' },
+                { label: 'Weight Loss', value: 'weightLoss' },
+                { label: 'General Health', value: 'generalHealth' },
             ],
         },
     }

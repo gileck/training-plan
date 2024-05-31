@@ -1,8 +1,15 @@
 export function buildPrompt(params) {
 
-    const { numberOfWorkouts, level, focusMusclesVsRest, location, focusMuscles, adaptations } = Object.assign({
-        
-    }, params)
+    const {
+        numberOfWorkouts,
+        level,
+        focusMusclesVsRest,
+        location,
+        focusMuscles,
+        adaptations,
+        workoutLength,
+        intensity
+    } = params
 
     const levelToText = {
         1: "First-Time",
@@ -62,6 +69,8 @@ ${focusMuscles.length === 0 ? "" : `The muscles to focus on the plan should be: 
 
 
 There should be ${numberOfWorkouts} weekly exercises. 
+The duration of each workout should be around ${workoutLength} minutes.
+The intensity of the workout should be around ${intensity}.
 for each workout the total amount of sets in the workout should be from ${levelToTotalWorkoutSets[level].join(" to ")} .
 
 ${workoutTypesToInclude.length === 1 ? `The exercises should be suitable only for: ${workoutTypesToInclude.join("")}.` : ""}
@@ -74,20 +83,22 @@ ${workoutTypesToInclude.map(wt => workoutTypeDescription[wt]).join("\n")}
 
 The weekly progressive overload should be around ${levelToOverloadValue[level]}% per week.
 
+${adaptations.length > 0 ? `The desired adaptations from the training plan are: ${adaptations.join(", ")}.` : ''}
+
 
 The result should be a JSON object in this format:
-{ 
-  
-  exercises: [ <Array of: {
+{
+
+    exercises: [<Array of: {
     "name": string (the name of the exercise),
-    "overloadType": <"weight"/"reps"/"sets"/"duration"> (the type of progressive overload ("weight", "reps", "sets", "duration")),
-    "overloadValue": number (the percentage of weekly progressive overload in %),
-    "numberOfReps": number (number of reps),
-    "weight": number (weight in kg),
-    "duration": number (duration in seconds - only for static exercises (e.g plank, wall sit, etc...)),
+        "overloadType": < "weight" / "reps" / "sets" / "duration" > (the type of progressive overload("weight", "reps", "sets", "duration")),
+        "overloadValue": number(the percentage of weekly progressive overload in %),
+        "numberOfReps": number(number of reps),
+        "weight": number(weight in kg),
+        "duration": number(duration in seconds - only for static exercises(e.g plank, wall sit, etc...)),
 } >],
-  
-    workouts: [ <Array of: {
+
+workouts: [ <Array of: {
         name: <the name of the workout>
         workoutExercises: [ <Array of: { 
             "name": <the name of the exercise>, 
