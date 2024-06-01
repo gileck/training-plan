@@ -220,7 +220,7 @@ export function EditExerciseForm({
             name: exercise.name,
             weeklySets: Number(totalWeeklySets),
             numberOfReps: Number(reps),
-            weight: exercise.bodyWeight ? null : Number(weight),
+            weight: exercise.bodyWeight ? 0 : Number(weight),
             overloadType,
             overloadValue: Number(overloadValue),
 
@@ -238,7 +238,11 @@ export function EditExerciseForm({
             return isStaticExercise(exercise.name) ? 'Duration' : 'Reps'
         } else if (overloadType === 'weight') {
             return 'Weight'
-        } else {
+        } else if (overloadType === 'duration') {
+            return 'Duration'
+        }
+
+        else {
             return 'All'
         }
     }
@@ -323,10 +327,11 @@ export function EditExerciseForm({
 
                 <Select
                     size='small'
-                    sx={{ width: '100px' }}
+                    sx={{ width: '150px' }}
                     value={overloadType}
-                    onChange={handleOverloadTypeChange}>   {
-                        ['sets', 'reps', 'weight'].map((overloadType, index) => (
+                    onChange={handleOverloadTypeChange}>
+                    {
+                        ['sets', 'reps', 'weight', 'duration'].map((overloadType, index) => (
                             <MenuItem key={index} value={overloadType}>
                                 {getOverloadLabel(overloadType)}
                             </MenuItem>

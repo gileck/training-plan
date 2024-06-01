@@ -69,6 +69,8 @@ export function useExercisesAPI() {
     const [exercises, setExercises] = useState(localExercises);
     const [numberOfWeeks, setWeeksValue] = useState(getData('numberOfWeeks') || 7);
     const [workouts, setWorkouts] = useState(getData('workouts') || []);
+
+
     console.log({
         workouts,
         exercises
