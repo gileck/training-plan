@@ -152,7 +152,9 @@ export function EditTrainingPlan() {
     }
 
     const onDeleteButtonClicked = (exercise) => {
-        deleteExercise(exercise);
+        if (window.confirm(`Are you sure you want to delete ${exercise.name} ?`)) {
+            deleteExercise(exercise);
+        }
     }
 
     const onCreateNewExercise = (exercise) => {
@@ -234,7 +236,7 @@ export function EditTrainingPlan() {
     function SaveTrainingPlanInternal() {
         saveTrainingPlan(previewTrainingPlan)
         setIsTrainingPlanPreviewDialogOpen(false)
-        
+
     }
 
 
