@@ -17,9 +17,22 @@ import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import { RunExercise } from "./components/RunExercise";
 import { AppContext } from "./AppContext";
+import { localStorageAPI } from "./localStorageAPI";
 
 
 export default function Home() {
+
+  const { getData } = localStorageAPI()
+  const exercises = getData('exercises')
+  const workouts = getData('workouts')
+
+
+  return <pre>
+
+    {JSON.stringify(exercises, null, 2)}
+    {JSON.stringify(workouts, null, 2)}
+
+  </pre>
 
 
 
