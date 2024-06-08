@@ -349,14 +349,26 @@ export function useExercisesAPI() {
 
     }
 
-    function createNewPlan(newExercises, newWorkouts) {
-        setExercisesData(newExercises.map((e, index) => buildExerciseObject({ ...e, id: index + 1 })))
-        setWorkoutData(newWorkouts.map(buildWorkoutObject))
+    function saveTrainingPlan({ exercises, workouts, name }) {
+        cleanAllData()
+        setExercisesData(exercises);
+        setWorkoutData(workouts);
+        
+    }
+
+
+    function createNewPlan({ exercises: newExercises, workouts: newWorkouts, name }) {
+        return {
+            exercises: newExercises.map((e, index) => buildExerciseObject({ ...e, id: index + 1 })),
+            workouts: newWorkouts.map(buildWorkoutObject),
+            name
+        }
     }
 
 
     return {
         createNewPlan,
+        saveTrainingPlan,
         exercises,
         addExercise,
         deleteExercise,

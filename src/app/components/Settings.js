@@ -20,6 +20,12 @@ export function Settings() {
         console.log('onClearDataChanged', e.target.value)
         setCleanDataOption(e.target.value)
     }
+
+    function onApiKeyChanged(e) {
+        const key = e.target.value
+        localStorageAPI().saveData('openai-api-key', { key })
+    }
+
     return (
         <List>
             <ListItem>
@@ -47,9 +53,12 @@ export function Settings() {
                 <IconButton onClick={cleanData}>
                     <Delete color="error" />
                 </IconButton>
-
-
             </ListItem>
+            {/* <ListItem>
+                <ListItemText primary="OPEN-AI API key:" />
+
+                <TextField onInput={onApiKeyChanged} label="API KEY" />
+            </ListItem> */}
         </List>
     )
 }

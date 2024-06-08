@@ -93,14 +93,11 @@ function PromptDialog({ prompDialogOpen, onClose, prompt, onAddTrainingPlan, tra
             <div>
 
                 <Link
-
                     target="_blank"
                     href={`https://chat.openai.com/chat?model=gpt-4o&q=${buildPrompt(trainingPlanParams).replace(/\s+/g, ' ').trim()}`}>
                     <OpenInNewOutlined />
                     Open in openai.com
                 </Link>
-
-
             </div>
             OR
             <div>

@@ -1,6 +1,6 @@
 "use client"
 import React from "react";
-import { Button, Card, Collapse, Dialog, DialogActions, DialogTitle, Divider, } from "@mui/material";
+import { Button, Card, Collapse, Dialog, DialogActions, DialogContent, DialogTitle, Divider, } from "@mui/material";
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -20,6 +20,7 @@ import { exercisesList, getLocalExercises } from "../exercisesList";
 import { localStorageAPI } from "../localStorageAPI";
 import { BodyPartsPlan } from "./BodyPartsPlan";
 import { BuildTrainingPlanDialog } from "./BuildTrainingPlanDialog";
+import { WorkoutList } from "./Workout";
 
 const { getData, saveData, cleanData } = localStorageAPI();
 
@@ -33,9 +34,82 @@ export function EditPlan() {
 
 }
 
+function TrainingPlanPreviewDialog({
+    SaveTrainingPlan,
+    isTrainingPlanPreviewDialogOpen,
+    onClose,
+    trainingPlan,
+}) {
+
+    console.log({
+        trainingPlan
+    });
+
+    if (!trainingPlan) return null;
+    return <Dialog
+        open={isTrainingPlanPreviewDialogOpen}
+        onClose={onClose}
+        fullWidth={true}
+        sx={{ //You can copy the code below in your theme
+            background: 'transparent',
+            '& .MuiPaper-root': {
+                background: '#4a4a73'
+            },
+            '& .MuiBackdrop-root': {
+                backgroundColor: 'transparent' // Try to remove this to see the result
+            }
+        }}
+
+    >
+
+        <DialogTitle
+            sx={{
+                color: "white"
+            }}
+        >Training Plan Preview</DialogTitle>
+        <DialogContent>
+            <Box
+
+            >
+                <WorkoutList
+                    workouts={trainingPlan.workouts}
+                    exercises={trainingPlan.exercises}
+                    numberOfWeeks={trainingPlan.numberOfWeeks || 8}
+                    isWorkoutFinished={() => false}
+                    selectedExercises={[]}
+                    selectedWeek={0}
+                    onWorkoutArrowClicked={() => { }}
+                    selectExercise={() => { }}
+                    onSetUncompleted={() => { }}
+                    onSetClicked={() => { }}
+                    onExerciseClicked={() => { }}
+                    firstWorkoutWithExercisesLeft={{}}
+                    onExerciseDone={() => { }}
+                    onSetComplete={() => { }}
+
+                />
+
+            </Box>
+        </DialogContent>
+        <DialogActions
+            sx={{
+                backgroundColor: '#59c2ff',
+                justifyContent: "space-between",
+                padding: "18px"
+            }}
+        >
+
+
+            <Button onClick={onClose} sx={{ color: 'gray' }}>Cancel</Button>
+            <Button variant="contained" sx={{ color: "007BFF" }} onClick={() => SaveTrainingPlan(trainingPlan)}>Save Training Plan</Button>
+
+        </DialogActions>
+    </Dialog>
+}
+
 export function EditTrainingPlan() {
 
-    const { createNewPlan, addWorkout, editExercise, addExercise, updateExercise, exercises, deleteExercise, cleanAllData } = useExercisesAPI()
+    const { saveTrainingPlan, createNewPlan, addWorkout, editExercise, addExercise, updateExercise, exercises, deleteExercise, cleanAllData } = useExercisesAPI()
 
 
 
@@ -46,6 +120,8 @@ export function EditTrainingPlan() {
     const [buildTrainingPlanOpen, setBuildTrainingPlanOpen] = React.useState(false);
     const [createNewExerciseDialogOpen, setCreateNewExerciseDialogOpen] = React.useState(false);
     const [editExerciseOpened, setEditExercise] = React.useState({});
+    const [isTrainingPlanPreviewDialogOpen, setIsTrainingPlanPreviewDialogOpen] = React.useState(false);
+    const [previewTrainingPlan, setPreviewTrainingPlan] = React.useState(null);
 
     function createNewExercise() {
         setOpen(false);
@@ -136,9 +212,16 @@ export function EditTrainingPlan() {
             }
         })
 
-        cleanAllData()
 
-        createNewPlan(_newExercisesList, newWorkouts, name)
+
+        const previewTrainingPlan = createNewPlan({
+            exercises: _newExercisesList,
+            workouts: newWorkouts,
+            name
+        })
+
+        setPreviewTrainingPlan(previewTrainingPlan);
+        setIsTrainingPlanPreviewDialogOpen(true);
 
         newExercisesToAdd.forEach(newExercise => {
             saveData('exercisesList', [...getLocalExercises(), newExercise]);
@@ -148,9 +231,23 @@ export function EditTrainingPlan() {
 
     }
 
+    function SaveTrainingPlanInternal() {
+        saveTrainingPlan(previewTrainingPlan)
+        setIsTrainingPlanPreviewDialogOpen(false)
+        
+    }
+
 
     return (
         <div>
+
+            <TrainingPlanPreviewDialog
+                isTrainingPlanPreviewDialogOpen={isTrainingPlanPreviewDialogOpen}
+                onClose={() => setIsTrainingPlanPreviewDialogOpen(false)}
+                trainingPlan={previewTrainingPlan}
+                SaveTrainingPlan={SaveTrainingPlanInternal}
+            />
+
             <AddExerciseDialog
                 exercises={exercises}
                 onAddExercise={onAddExercise}
