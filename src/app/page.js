@@ -26,7 +26,10 @@ export default function Home() {
   const exercises = getData('exercises')
   const workouts = getData('workouts')
 
+  return <button onClick={() => {
+    navigator.clipboard.writeText(JSON.stringify({ exercises, workouts }, null, 2))
 
+  }}>Copy local storage</button>
   return <pre>
 
     {JSON.stringify(exercises, null, 2)}
