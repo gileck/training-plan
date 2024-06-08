@@ -220,10 +220,9 @@ export function EditExerciseForm({
             name: exercise.name,
             weeklySets: Number(totalWeeklySets),
             numberOfReps: Number(reps),
-            weight: exercise.bodyWeight ? 0 : Number(weight),
+            weight: isBodyWeightExercise(exercise.name) ? 0 : Number(weight),
             overloadType,
             overloadValue: Number(overloadValue),
-
         }))
     }
 
