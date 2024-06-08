@@ -105,7 +105,7 @@ export function useExercisesAPI() {
         const newWorkouts = workouts.map(w => {
             w.exercises = w.exercises.map(e => {
                 if (e.name === exercise.name) {
-
+                    exercise.weeklySets = e.sets;
                     return createExerciseObject(exercise, w.name, e)
                 }
                 return e;
@@ -117,7 +117,7 @@ export function useExercisesAPI() {
         setWorkoutData(newWorkouts);
     }
 
-    function calcWeekValues(range, { overloadType, overloadValue, numberOfReps, weight, weeklySets }, { weeks } = {}) {
+    function calcWeekValues(range, { overloadType, overloadValue, numberOfReps, weight, weeklySets }, { weeks, sets } = {}) {
         const calcFn = type => overloadType === "all" ? calcWeeklyAllTarget : (overloadType === type ? calcWeelklyTarget : v => v)
 
         const getCurrentTotalWeeklySets = week => weeks ? weeks[week].totalWeeklySets || 0 : 0;
@@ -125,8 +125,8 @@ export function useExercisesAPI() {
         return range.map(week => ({
             week,
             totalWeeklySets: getCurrentTotalWeeklySets(week),
-            weeklyTarget: calcFn('sets')(weeklySets || 10, week, overloadValue, 0),
-            numberOfReps: calcFn('reps')(numberOfReps || 8, week, overloadValue, 1),
+            weeklyTarget: calcFn('sets')(sets || weeklySets, week, overloadValue, 0),
+            numberOfReps: calcFn('reps')(numberOfReps, week, overloadValue, 1),
             weight: calcFn('weight')(weight || 0, week, overloadValue, 2),
         }))
     }
@@ -353,7 +353,7 @@ export function useExercisesAPI() {
         cleanAllData()
         setExercisesData(exercises);
         setWorkoutData(workouts);
-        
+
     }
 
 

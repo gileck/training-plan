@@ -155,14 +155,14 @@ export function Workout() {
 
 
 
-    function onSetComplete(workoutId, exercise, sets) {
+    function onSetComplete(workoutId, exercise, sets, selectedWeek) {
 
         updateExercise(workoutId, exercise.id, selectedWeek, {
             totalWeeklySets: Number(exercise.weeks[selectedWeek].totalWeeklySets || 0) + Number(sets)
         });
     }
 
-    function onExerciseDone(workoutId, exercise) {
+    function onExerciseDone(workoutId, exercise, selectedWeek) {
         updateExercise(workoutId, exercise.id, selectedWeek, {
             totalWeeklySets: Number(exercise.weeks[selectedWeek].weeklyTarget || 0)
         });
@@ -230,8 +230,12 @@ export function WorkoutList({
     function isWorkoutFinished(workout) {
         return workout.exercises.every((exercise) => {
             const e = getExercise(exercise);
+            if (!e) {
+                return false
+            }
             return e.sets.done >= e.sets.target;
         })
+
     }
 
     const openWorkout = (workoutId) => setOpenWorkouts({ ...openWorkouts, [workoutId]: !openWorkouts[workoutId] })
@@ -388,9 +392,9 @@ export function WorkoutList({
                                                 selectedWeek={selectedWeek}
                                                 key={exercise.id}
                                                 exercise={getExercise(exercise)}
-                                                onRemoveSetComplete={() => onSetComplete(workout.id, exercise, -1)}
-                                                onAddSetComplete={() => onSetComplete(workout.id, exercise, 1)}
-                                                onSetDone={() => onExerciseDone(workout.id, exercise)}
+                                                onRemoveSetComplete={() => onSetComplete(workout.id, exercise, -1, selectedWeek)}
+                                                onAddSetComplete={() => onSetComplete(workout.id, exercise, 1, selectedWeek)}
+                                                onSetDone={() => onExerciseDone(workout.id, exercise, selectedWeek)}
                                             />
                                             <Divider />
                                         </React.Fragment>

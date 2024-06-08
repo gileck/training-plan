@@ -22,20 +22,14 @@ import { localStorageAPI } from "./localStorageAPI";
 
 export default function Home() {
 
-  const { getData } = localStorageAPI()
-  const exercises = getData('exercises')
-  const workouts = getData('workouts')
+  // const { getData } = localStorageAPI()
+  // const exercises = getData('exercises')
+  // const workouts = getData('workouts')
 
-  return <button onClick={() => {
-    navigator.clipboard.writeText(JSON.stringify({ exercises, workouts }, null, 2))
+  // return <button onClick={() => {
+  //   navigator.clipboard.writeText(JSON.stringify({ exercises, workouts }, null, 2))
 
-  }}>Copy local storage</button>
-  return <pre>
-
-    {JSON.stringify(exercises, null, 2)}
-    {JSON.stringify(workouts, null, 2)}
-
-  </pre>
+  // }}>Copy local storage</button>
 
 
 
