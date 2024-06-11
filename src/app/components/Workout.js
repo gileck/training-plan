@@ -126,7 +126,14 @@ function Exercise({ shouldShowArrows, onWorkoutArrowClicked, isSelected, selectE
 
 export function Workout() {
 
-    const { saveData, getData } = localStorageAPI()
+    const { saveData, getData, getConfig, saveConfig } = localStorageAPI()
+    const shouldKeepCurrentWeekOpened = getConfig('keep-current-week-opened') || false
+    const currentWeekOpened = getConfig('current-week-opened') || 0
+
+    console.log({
+        shouldKeepCurrentWeekOpened,
+        currentWeekOpened
+    });
     const { workouts, exercises, updateExercise, numberOfWeeks, changeExerciseOrderInWorkout } = useExercisesAPI()
 
     const [selectedExercises, setSelectedExercises] = useState(getData('selectedExercises') || [])
@@ -196,6 +203,9 @@ export function Workout() {
             onExerciseDone={onExerciseDone}
             numberOfWeeks={numberOfWeeks}
             setRoute={setRoute}
+            shouldKeepCurrentWeekOpened={shouldKeepCurrentWeekOpened}
+            currentWeekOpened={currentWeekOpened}
+            saveConfig={saveConfig}
         />
 
 
@@ -214,10 +224,15 @@ export function WorkoutList({
     onSetComplete,
     onExerciseDone,
     numberOfWeeks,
-    setRoute
+    setRoute,
+    shouldKeepCurrentWeekOpened,
+    currentWeekOpened,
+    saveConfig
 }) {
     const firstWeekWithExercisesLeft = _.range(0, numberOfWeeks).find(week => !workouts.every(w => w.exercises.every(e => e.weeks[week].totalWeeklySets >= e.weeks[week].weeklyTarget))) || 0
-    const [selectedWeek, setSelectedWeek] = useState(firstWeekWithExercisesLeft || 0)
+    const weekOpened = shouldKeepCurrentWeekOpened ? currentWeekOpened : firstWeekWithExercisesLeft
+
+    const [selectedWeek, setSelectedWeek] = useState(weekOpened || 0)
     const firstWorkoutWithExercisesLeft = workouts.find(w => w.exercises.some(e => e.weeks[firstWeekWithExercisesLeft].totalWeeklySets < e.weeks[firstWeekWithExercisesLeft].weeklyTarget))
     const totalSetsThisWeek = workouts.reduce((acc, w) => acc + w.exercises.reduce((acc, e) => acc + (e.weeks[selectedWeek].totalWeeklySets || 0), 0), 0)
     const thisWeekSetsTarget = workouts.reduce((acc, w) => acc + w.exercises.reduce((acc, e) => acc + (e.weeks[selectedWeek].weeklyTarget || 0), 0), 0)
@@ -226,6 +241,11 @@ export function WorkoutList({
     const [openWorkouts, setOpenWorkouts] = useState({
         [firstWorkoutWithExercisesLeft?.id]: true
     });
+
+    function onSelectedWeekChanges(newWeek) {
+        setSelectedWeek(newWeek)
+        saveConfig('current-week-opened', newWeek)
+    }
 
     function isWorkoutFinished(workout) {
         return workout.exercises.every((exercise) => {
@@ -307,7 +327,7 @@ export function WorkoutList({
                                     sx={{ padding: '3px', mb: '2px' }}
                                     disabled={selectedWeek === 0}
 
-                                    onClick={() => setSelectedWeek((selectedWeek - 1) % numberOfWeeks)}>
+                                    onClick={() => onSelectedWeekChanges((selectedWeek - 1) % numberOfWeeks)}>
                                     <ArrowLeft sx={{ fontSize: '15px' }} />
                                 </IconButton>
                                 {selectedWeek + 1}
@@ -320,7 +340,7 @@ export function WorkoutList({
                                     sx={{ padding: '3px' }}
                                     disabled={selectedWeek === numberOfWeeks - 1}
 
-                                    onClick={() => setSelectedWeek(selectedWeek + 1 % numberOfWeeks)}>
+                                    onClick={() => onSelectedWeekChanges(selectedWeek + 1 % numberOfWeeks)}>
                                     <ArrowRight sx={{ fontSize: '15px' }} />
                                 </IconButton>
 

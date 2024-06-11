@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, IconButton, InputLabel, List, ListItem, ListItemText, MenuItem, Select, TextField } from "@mui/material";
+import { Button, Divider, IconButton, InputLabel, List, ListItem, ListItemText, MenuItem, Select, Switch, TextField } from "@mui/material";
 import { localStorageAPI } from "../localStorageAPI";
 import { Delete, Label } from "@mui/icons-material";
 import { useExercisesAPI } from "../exercisesAPI";
@@ -8,6 +8,7 @@ export function Settings() {
     const { changeNumberOfWeeks, numberOfWeeks } = useExercisesAPI()
     const [cleanDataOption, setCleanDataOption] = useState('')
     const [localStorageDataEnter, setLocalStorageDataEnter] = useState('')
+    const [keepCurrentWeekOpened, setKeepCurrentWeekOpened] = useState(localStorageAPI().getConfig('keep-current-week-opened') || false)
 
     function cleanData() {
         const res = confirm("Are you sure you want to clear " + cleanDataOption + "?")
@@ -15,8 +16,19 @@ export function Settings() {
             localStorageAPI().cleanData(cleanDataOption)
         }
     }
+
     function onNumberOfWeeksChanged(e) {
-        changeNumberOfWeeks(e.target.value)
+        const newNumberofWeeks = Number(e.target.value)
+        if (newNumberofWeeks < numberOfWeeks) {
+            const res = confirm(`This will delete the data of the last ${numberOfWeeks - newNumberofWeeks} workouts. Are you sure you want to continue?`)
+            if (res) {
+                changeNumberOfWeeks(newNumberofWeeks)
+            } else {
+                // setSelectedNumberOfWeeks(numberOfWeeks)
+            }
+        } else {
+            changeNumberOfWeeks(newNumberofWeeks)
+        }
     }
     function onClearDataChanged(e) {
         console.log('onClearDataChanged', e.target.value)
@@ -50,14 +62,38 @@ export function Settings() {
         navigator.clipboard.writeText(JSON.stringify({ exercises, workouts }))
     }
 
+    function onKeepCurrentWeekOpenedChange(e) {
+        setKeepCurrentWeekOpened(e.target.checked)
+        localStorageAPI().saveConfig('keep-current-week-opened', e.target.checked)
+    }
+
 
     return (
         <List>
-            <ListItem>
+            <ListItem
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between'
+
+                }}
+            >
                 <ListItemText primary="Number of weeks" />
-                <TextField value={numberOfWeeks} type="number" onChange={onNumberOfWeeksChanged} />
+
+
+                <Select
+                    value={numberOfWeeks}
+                    onChange={onNumberOfWeeksChanged}
+                >
+                    {
+                        Array.from({ length: 20 }, (_, i) => i + 1).map((i) => (
+                            <MenuItem key={i} value={i}>{i}</MenuItem>
+                        ))
+                    }
+                </Select>
+
 
             </ListItem>
+            <Divider />
             <ListItem>
                 <ListItemText primary="Clear Local Storage" />
 
@@ -79,6 +115,8 @@ export function Settings() {
                     <Delete color="error" />
                 </IconButton>
             </ListItem>
+            <Divider />
+
             {/* <ListItem>
                 <ListItemText primary="OPEN-AI API key:" />
 
@@ -87,11 +125,21 @@ export function Settings() {
 
             <ListItem>
                 <ListItemText primary="Set Local Storage" />
-                <TextField onInput={onSetLocalStorageEntered} label="Paste Object" />
+                <TextField
+                    sx={{
+                        width: '300px'
+
+                    }}
+                    onInput={onSetLocalStorageEntered} label="Paste Object" />
                 <Button
+                    sx={{
+                        marginLeft: '20px'
+
+                    }}
                     variant="contained"
                     onClick={onSetLocalStorageClicked}>Set</Button>
             </ListItem>
+            <Divider />
 
             <ListItem>
                 <ListItemText primary="Copy Local Storage" />
@@ -99,6 +147,16 @@ export function Settings() {
                     variant="contained"
                     onClick={copyLocalStorage}>Copy</Button>
             </ListItem>
+
+            <ListItem>
+                <ListItemText primary="Keep Current Week Opened" />
+                <Switch
+                    checked={keepCurrentWeekOpened}
+                    onChange={onKeepCurrentWeekOpenedChange}
+                />
+            </ListItem>
+
+
 
 
 

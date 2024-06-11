@@ -44,7 +44,7 @@ export default function Home() {
 
   const Comps = [
     { label: "Workouts", route: 'workouts', icon: <FitnessCenterIcon /> },
-    { label: "Training Plan", route: 'training_plan', icon: <FormatListBulletedIcon /> },
+    // { label: "Training Plan", route: 'training_plan', icon: <FormatListBulletedIcon /> },
     { label: "Edit Plan", route: 'edit_plan', icon: <NoteAddIcon /> },
     { label: "Settings", route: 'settings', icon: <SettingsIcon /> },
   ]
