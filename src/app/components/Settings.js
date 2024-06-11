@@ -148,6 +148,8 @@ export function Settings() {
                     onClick={copyLocalStorage}>Copy</Button>
             </ListItem>
 
+            <Divider />
+
             <ListItem>
                 <ListItemText primary="Keep Current Week Opened" />
                 <Switch
