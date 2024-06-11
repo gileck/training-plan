@@ -120,7 +120,7 @@ export function useExercisesAPI() {
     function calcWeekValues(range, { overloadType, overloadValue, numberOfReps, weight, weeklySets }, { weeks, sets } = {}) {
         const calcFn = type => overloadType === "all" ? calcWeeklyAllTarget : (overloadType === type ? calcWeelklyTarget : v => v)
 
-        const getCurrentTotalWeeklySets = week => weeks ? weeks[week].totalWeeklySets || 0 : 0;
+        const getCurrentTotalWeeklySets = week => weeks ? weeks[week]?.totalWeeklySets || 0 : 0;
 
         return range.map(week => ({
             week,
@@ -222,7 +222,23 @@ export function useExercisesAPI() {
 
             }
         });
+
+        const newWorkouts = workouts.map(w => {
+            w.exercises = w.exercises.map(e => {
+                const exercise = newExerciseList.find(ex => ex.name === e.name);
+                if (!exercise) {
+                    throw new Error(`Exercise ${e.name} not found in exercises list`);
+                }
+                return {
+                    ...e,
+                    weeks: calcWeekValues(_.range(0, weeksNumber), exercise, e)
+                }
+            })
+            return w;
+        })
+
         setExercisesData(newExerciseList);
+        setWorkoutData(newWorkouts);
         setNumberOfWeeks(weeksNumber);
     }
 
