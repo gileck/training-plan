@@ -1,5 +1,5 @@
 import { FormControl } from "@mui/base";
-import { Button, Box, ButtonBase, Checkbox, Dialog, DialogTitle, FormControlLabel, FormGroup, InputLabel, MenuItem, Radio, RadioGroup, Select, Chip, TextField, Alert, Link, DialogActions } from "@mui/material";
+import { Button, Box, ButtonBase, Checkbox, Dialog, DialogTitle, FormControlLabel, FormGroup, InputLabel, MenuItem, Radio, RadioGroup, Select, Chip, TextField, Alert, Link, DialogActions, Divider } from "@mui/material";
 import React, { useState } from "react";
 import { getAllBodyParts } from "../exercisesAPI";
 import { Add, AddCircle, CheckBox, CheckBoxOutlineBlankRounded, CheckBoxRounded, CheckRounded, ContentPaste, CopyAll, Description, Error, ErrorOutline, LinkRounded, OpenInNewOutlined } from "@mui/icons-material";
@@ -72,25 +72,40 @@ function PromptDialog({ prompDialogOpen, onClose, prompt, onAddTrainingPlan, tra
         open={prompDialogOpen}
         onClose={onClose}
         size="xl"
-        fullWidth={true}
-
         sx={{
             width: '100%',
 
         }}
     >
-        <DialogTitle>
-            Build Training Plan
+        <DialogTitle
+            sx={{
+                backgroundColor: 'lightblue'
+
+            }}
+        >
+            Build Training Plan with AI
         </DialogTitle>
         <Box
             sx={{
-                padding: '20px'
+                padding: '20px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 2,
 
             }}
         >
 
+            <TextField
+                onChange={onPlanNameChanged}
+                sx={{ width: '60%' }}
+                placeholder="Name"
+            />
+
 
             <div>
+
 
                 <Link
                     target="_blank"
@@ -99,7 +114,6 @@ function PromptDialog({ prompDialogOpen, onClose, prompt, onAddTrainingPlan, tra
                     Open in openai.com
                 </Link>
             </div>
-            OR
             <div>
 
                 <Button onClick={onCopyPromptClicked}>
@@ -112,22 +126,14 @@ function PromptDialog({ prompDialogOpen, onClose, prompt, onAddTrainingPlan, tra
                     Paste in the AI chatbot, and then paste the JSON object below.
                 </Alert>}
             </div>
+
             {/* <TextField
-                    onChange={onPlanNameChanged}
-                    sx={{ width: '80%' }}
-                    placeholder="Name"
-                /> */}
-            <div
-                style={{
-                    marginTop: '20px',
-                }}
-            >
-                {/* <TextField
                     value={pasteJsonValue}
                     onChange={onInputChanged}
                     sx={{ width: '50%' }}
                     placeholder="Paste JSON object here"
                 /> */}
+            <div>
                 <Button
                     sx={{
                         paddingTop: '13px',
@@ -145,18 +151,21 @@ function PromptDialog({ prompDialogOpen, onClose, prompt, onAddTrainingPlan, tra
                         display: 'inline-block',
                     }}
                 >
-                    {isValidJson === false && <ErrorOutline sx={{ color: 'darkred' }} />}
-
                     {isValidJson === true && <CheckRounded sx={{ color: 'green' }} />}
                 </span>
             </div>
+            {isValidJson === false && <Alert severity="error"> Invalid JSON object </Alert>}
+            <Alert severity="info">
+                Copy the prompt above or open the link with the prompt in the AI chatbot.
+                Paste the result JSON object here.
+            </Alert>
 
             {/* <Checkbox
                 onChange={onReplaceTrainingPlanCheckboxChanged}
             /> Replace Current Plan */}
 
 
-            <Button
+            {/* <Button
                 sx={{ marginTop: '20px' }}
                 variant="contained"
                 startIcon={<AddCircle />}
@@ -165,17 +174,28 @@ function PromptDialog({ prompDialogOpen, onClose, prompt, onAddTrainingPlan, tra
 
             >
                 Add Training Plan
-            </Button>
+            </Button> */}
+
         </Box>
+        <DialogActions>
+            <Button
+                onClick={() => {
+                    onClose()
+                    setJson(null)
+                    setIsValidJson(null)
+
+                }}
+            >
+                Cancel
+            </Button>
+        </DialogActions>
 
     </Dialog >
 }
 
 export function BuildTrainingPlanDialog({
-    exercises,
     onBuildTrainingPlan,
     onClose,
-    exerciseList,
     buildTrainigPlanDialigOpen
 }) {
 
@@ -383,7 +403,7 @@ export function BuildTrainingPlanDialog({
                         backgroundColor: 'lightblue'
                     }}
                 >
-                    Build Training Plan
+                    Build Training Plan With AI
                 </DialogTitle>
 
                 <FormBuilder
@@ -392,6 +412,12 @@ export function BuildTrainingPlanDialog({
                 />
 
                 <DialogActions>
+                    <Button
+                        variant="outlined"
+                        onClick={onClose}
+                    >
+                        Cancel
+                    </Button>
                     <Button
                         variant="contained"
                         onClick={onBuildTrainingPlanInternal}

@@ -354,7 +354,9 @@ export function EditExerciseForm({
                     onClick={onAddButtonClicked}
                     variant="contained"
                     color="primary"
-                >Add</Button>
+                >
+                    {exerciseToEdit ? 'Update' : 'Add'}
+                </Button>
                 <Button
                     onClick={onCancel}
                     sx={{ marginLeft: '10px' }}

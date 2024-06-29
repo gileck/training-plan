@@ -5,7 +5,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { Chip, Collapse, Divider, ListItemSecondaryAction, Typography } from "@mui/material";
+import { Button, Chip, Collapse, Divider, ListItemSecondaryAction, Typography } from "@mui/material";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { getPrimaryMuscle, getSecondaryMuscles, useExercisesAPI } from "../exercisesAPI";
 import { RemoveCircle, ExpandLess, ExpandMore, Label, ExpandMoreOutlined, ExpandLessRounded, ArrowLeft, ArrowRight, NavigationOutlined, ArrowUpward, ArrowDownward } from "@mui/icons-material";
@@ -25,7 +25,18 @@ const colors = {
 }
 
 
-function Exercise({ shouldShowArrows, onWorkoutArrowClicked, isSelected, selectExercise, selectedWeek, exercise, onRemoveSetComplete, onAddSetComplete, onSetDone }) {
+function Exercise({
+    shouldShowArrows,
+    onWorkoutArrowClicked,
+    isSelected,
+    selectExercise,
+    selectedWeek,
+    exercise,
+    onRemoveSetComplete,
+    onAddSetComplete,
+    onSetDone,
+    disableEdit
+}) {
     if (!exercise) {
         return null;
     }
@@ -89,16 +100,18 @@ function Exercise({ shouldShowArrows, onWorkoutArrowClicked, isSelected, selectE
                             </Typography>
                         </React.Fragment>
                     } />
-                <IconButton onClick={() => onSetDone()}>
+                <IconButton
+                    disabled={disableEdit || exercise.sets.done === exercise.sets.target}
+                    onClick={() => onSetDone()}>
                     <CheckCircleIcon />
                 </IconButton>
                 <IconButton
-                    disabled={exercise.sets.done >= exercise.sets.target}
+                    disabled={disableEdit || exercise.sets.done >= exercise.sets.target}
                     onClick={() => onAddSetComplete()}>
                     <AddCircleIcon />
                 </IconButton>
                 <IconButton
-                    disabled={exercise.sets.done === 0}
+                    disabled={disableEdit || exercise.sets.done === 0}
                     onClick={() => onRemoveSetComplete()}>
                     <RemoveCircle />
                 </IconButton>
@@ -126,15 +139,20 @@ function Exercise({ shouldShowArrows, onWorkoutArrowClicked, isSelected, selectE
 
 export function Workout() {
 
+
+
     const { saveData, getData, getConfig, saveConfig } = localStorageAPI()
     const shouldKeepCurrentWeekOpened = getConfig('keep-current-week-opened') || false
     const currentWeekOpened = getConfig('current-week-opened') || 0
 
-    console.log({
-        shouldKeepCurrentWeekOpened,
-        currentWeekOpened
-    });
-    const { workouts, exercises, updateExercise, numberOfWeeks, changeExerciseOrderInWorkout } = useExercisesAPI()
+
+    // const { workouts, exercises, updateExercise, numberOfWeeks, changeExerciseOrderInWorkout } = useExercisesAPI()
+    const { currentTrainingPlan, createTrainingPlanActions, findTrainingPlanByName } = useExercisesAPI()
+    const trainingPlan = findTrainingPlanByName(currentTrainingPlan)
+    if (!trainingPlan) {
+        return <div></div>
+    }
+    const { workouts, exercises, updateExercise, numberOfWeeks, changeExerciseOrderInWorkout } = createTrainingPlanActions(trainingPlan)
 
     const [selectedExercises, setSelectedExercises] = useState(getData('selectedExercises') || [])
 
@@ -206,6 +224,7 @@ export function Workout() {
             shouldKeepCurrentWeekOpened={shouldKeepCurrentWeekOpened}
             currentWeekOpened={currentWeekOpened}
             saveConfig={saveConfig}
+
         />
 
 
@@ -227,7 +246,8 @@ export function WorkoutList({
     setRoute,
     shouldKeepCurrentWeekOpened,
     currentWeekOpened,
-    saveConfig
+    saveConfig,
+    disableEdit
 }) {
     const firstWeekWithExercisesLeft = _.range(0, numberOfWeeks).find(week => !workouts.every(w => w.exercises.every(e => e.weeks[week].totalWeeklySets >= e.weeks[week].weeklyTarget))) || 0
     const weekOpened = shouldKeepCurrentWeekOpened ? currentWeekOpened : firstWeekWithExercisesLeft
@@ -417,6 +437,7 @@ export function WorkoutList({
                                                 onRemoveSetComplete={() => onSetComplete(workout.id, exercise, -1, selectedWeek)}
                                                 onAddSetComplete={() => onSetComplete(workout.id, exercise, 1, selectedWeek)}
                                                 onSetDone={() => onExerciseDone(workout.id, exercise, selectedWeek)}
+                                                disableEdit={disableEdit}
                                             />
                                             <Divider />
                                         </React.Fragment>

@@ -44,16 +44,66 @@ export function isStaticExercise(name) {
 export function useExercisesAPI() {
 
     const { getData, saveData, cleanData } = localStorageAPI();
+    const [trainingPlans, setTrainingPlans] = useState(getData('trainingPlans') || []);
+    console.log({ trainingPlans });
+    const savedTrainingPlanName = getData('currentTrainingPlan') || trainingPlans[0]?.name;
+    const savedTrainingPlan = trainingPlans.find(tp => tp.name === savedTrainingPlanName) || trainingPlans[0]
+    const [currentTrainingPlan, setCurrentTrainingPlan] = useState(savedTrainingPlan?.name || null);
+
+    function selectTrainingPlan(name) {
+        setCurrentTrainingPlan(name);
+        saveData('currentTrainingPlan', name);
+    }
+
+
+    function saveTrainingPlan(trainingPlan) {
+        const newTrainingPlans = trainingPlans.map(tp => {
+            if (tp.name === trainingPlan.name) {
+                return trainingPlan;
+            }
+            return tp;
+        })
+        setTrainingPlans(newTrainingPlans);
+        saveData('trainingPlans', newTrainingPlans);
+    }
+
+    function createTrainingPlanFromObject({ tpObject, name }) {
+        return {
+            name,
+            exercises: tpObject.exercises,
+            workouts: tpObject.workouts
+        }
+    }
+
+    function saveNewTraininPlan({ newTrainingPlan }) {
+        const newTrainingPlans = [
+            ...trainingPlans,
+            newTrainingPlan
+        ]
+        setTrainingPlans(newTrainingPlans);
+        saveData('trainingPlans', newTrainingPlans);
+    }
+
+
+    function addTrainingPlan({ name, numberOfWeeks }) {
+        const newTrainingPlan = createNewPlan({ exercises: [], workouts: [], name, numberOfWeeks });
+        saveNewTraininPlan({ newTrainingPlan });
+    }
+
+    function addTrainingPlanFromObject({ name, tpObject }) {
+        const newTrainingPlan = createTrainingPlanFromObject({ tpObject, name })
+        saveNewTraininPlan({ newTrainingPlan });
+    }
+
+    function addTrainingPlanFromPlan({ name, plan }) {
+        const newTrainingPlan = createNewPlan({ exercises: plan.exercises, workouts: plan.workouts, name, numberOfWeeks: plan.numberOfWeeks });
+        saveNewTraininPlan({ newTrainingPlan });
+    }
+
+
 
     function calcWeeklyAllTarget(weeklyTarget, week, overloadValue, index) {
         const progressiveOverload = overloadValue && (overloadValue / 100) || 0.05; // 5% increase per week
-        console.log({
-            week,
-            index,
-            value: week % 2 === index,
-            weeklyTarget,
-            progressiveOverload: Math.round(weeklyTarget * Math.pow(1 + progressiveOverload, Number(week)))
-        })
         if (week % 2 === index) {
             return Math.round(weeklyTarget * Math.pow(1 + progressiveOverload, Number(week)));
         }
@@ -65,57 +115,31 @@ export function useExercisesAPI() {
         return Math.round(weeklyTarget * Math.pow(1 + progressiveOverload, Number(week)));
     }
 
-    const localExercises = getData('exercises') || [];
-    const [exercises, setExercises] = useState(localExercises);
-    const [numberOfWeeks, setWeeksValue] = useState(getData('numberOfWeeks') || 7);
-    const [workouts, setWorkouts] = useState(getData('workouts') || []);
 
+    // function editExercise(exercise) {
+    //     const newExercises = exercises.map((e) => {
+    //         if (e.id === exercise.id) {
+    //             return Object.assign(e, exercise, {
+    //                 weeks: calcWeekValues(_.range(0, numberOfWeeks), exercise)
+    //             })
+    //         }
+    //         return e;
+    //     });
 
-    console.log({
-        workouts,
-        exercises
-    });
+    //     const newWorkouts = workouts.map(w => {
+    //         w.exercises = w.exercises.map(e => {
+    //             if (e.name === exercise.name) {
+    //                 exercise.weeklySets = e.sets;
+    //                 return createExerciseObject(exercise, w.name, e)
+    //             }
+    //             return e;
+    //         })
+    //         return w;
+    //     })
 
-    function setNumberOfWeeks(_numberOfWeeks) {
-        setWeeksValue(_numberOfWeeks);
-        saveData('numberOfWeeks', _numberOfWeeks);
-
-    }
-    function setExercisesData(data) {
-        setExercises(data);
-        saveData('exercises', data);
-    }
-
-    function setWorkoutData(data) {
-        setWorkouts(data);
-        saveData('workouts', data);
-    }
-
-
-    function editExercise(exercise) {
-        const newExercises = exercises.map((e) => {
-            if (e.id === exercise.id) {
-                return Object.assign(e, exercise, {
-                    weeks: calcWeekValues(_.range(0, numberOfWeeks), exercise)
-                })
-            }
-            return e;
-        });
-
-        const newWorkouts = workouts.map(w => {
-            w.exercises = w.exercises.map(e => {
-                if (e.name === exercise.name) {
-                    exercise.weeklySets = e.sets;
-                    return createExerciseObject(exercise, w.name, e)
-                }
-                return e;
-            })
-            return w;
-        })
-
-        setExercisesData(newExercises);
-        setWorkoutData(newWorkouts);
-    }
+    //     setExercisesData(newExercises);
+    //     setWorkoutData(newWorkouts);
+    // }
 
     function calcWeekValues(range, { overloadType, overloadValue, numberOfReps, weight, weeklySets }, { weeks, sets } = {}) {
         const calcFn = type => overloadType === "all" ? calcWeeklyAllTarget : (overloadType === type ? calcWeelklyTarget : v => v)
@@ -131,9 +155,9 @@ export function useExercisesAPI() {
         }))
     }
 
-    function buildExerciseObject({ id, overloadValue, overloadType, name, numberOfReps, weight, weeklySets }) {
+    function buildExerciseObject(plan, { id, overloadValue, overloadType, name, numberOfReps, weight, weeklySets }) {
         return {
-            id: id || exercises.length,
+            id: id || plan.exercises.length,
             name,
             totalSets: 0,
             overloadType,
@@ -141,180 +165,60 @@ export function useExercisesAPI() {
             numberOfReps,
             weight,
             weeklySets,
-            weeks: calcWeekValues(_.range(0, numberOfWeeks), { overloadType, overloadValue, numberOfReps, weight, weeklySets })
+            weeks: calcWeekValues(_.range(0, plan.numberOfWeeks), { overloadType, overloadValue, numberOfReps, weight, weeklySets })
         }
     }
 
-    function addExercise(params) {
-        const newExerciseList = [...exercises, buildExerciseObject(params)]
-        setExercisesData(newExerciseList);
-
-    }
-    const deleteExercise = (exercise) => {
-        const newExercises = exercises.filter(e => e.name !== exercise.name);
-        setExercisesData(newExercises);
-        const newWorkouts = workouts.map(w => {
-            w.exercises = w.exercises.filter(e => e.name !== exercise.name);
-            return w;
-        })
-        setWorkoutData(newWorkouts);
-
-    }
-
-    const updateExercise = (workoutId, exerciseId, weekIndex, partialUpdate) => {
-        console.log({ workoutId, exerciseId, weekIndex, partialUpdate });
-        const workout = workouts.find(w => w.id === workoutId);
-        const exercise = workout.exercises.find(e => e.id === exerciseId);
-        const newWorkouts = workouts.map(w => {
-            if (w.id === workoutId) {
-                return {
-                    ...w,
-                    exercises: workout.exercises.map(e => {
-                        if (e.id === exerciseId) {
-                            return {
-                                ...exercise,
-                                weeks: exercise.weeks.map(w => {
-                                    if (w.week === weekIndex) {
-                                        return {
-                                            ...w,
-                                            ...partialUpdate
-                                        }
-                                    }
-                                    return w;
-                                })
-                            }
-                        }
-                        return e;
-                    })
-                }
-            }
-            return w;
-        })
 
 
-        setWorkoutData(newWorkouts);
-
-    }
 
 
-    function getExercisesByWeeks() {
-        const flat = _.flatMap(exercises, exercise => exercise.weeks.map((week) => ({ ...exercise, ...week, weeks: undefined })))
-        const groupByWeek = _.groupBy(flat, 'week');
-        return groupByWeek;
-    }
 
-    function changeNumberOfWeeks(weeksNumber) {
-        const newExerciseList = exercises.map((exercise) => {
-            return {
-                ...exercise,
-                weeks: Number(weeksNumber) <= exercise.weeks.length ?
-                    exercise.weeks.slice(0, Number(weeksNumber)) :
-                    [
-                        ...exercise.weeks,
-                        ...calcWeekValues(
-                            _.range(exercise.weeks.length + 1, Number(weeksNumber) + 1),
-                            {
-                                ...exercise,
-                                ...(exercise.weeks[0] || {})
-                            }
-                        )
-                    ]
 
-            }
-        });
 
-        const newWorkouts = workouts.map(w => {
-            w.exercises = w.exercises.map(e => {
-                const exercise = newExerciseList.find(ex => ex.name === e.name);
-                if (!exercise) {
-                    throw new Error(`Exercise ${e.name} not found in exercises list`);
-                }
-                return {
-                    ...e,
-                    weeks: calcWeekValues(_.range(0, weeksNumber), exercise, e)
-                }
-            })
-            return w;
-        })
+    // function addExerciseToWorkout({
+    //     workoutId,
+    //     exerciseName,
+    //     sets
+    // }) {
+    //     console.log({ workoutId, exerciseName, sets });
 
-        setExercisesData(newExerciseList);
-        setWorkoutData(newWorkouts);
-        setNumberOfWeeks(weeksNumber);
-    }
+    //     const workout = workouts.find(w => w.id === workoutId)
+    //     const exercise = exercises.find(e => e.name === exerciseName)
+    //     exercise.weeklySets = sets
+    //     const exerciseWorkoutObject = createExerciseObject(exercise, workout.name)
+    //     console.log({ exerciseWorkoutObject });
+    //     workout.exercises.push(exerciseWorkoutObject)
+    //     editWorkout(workout)
+    // }
 
-    function buildWorkoutObject({ name, exercises }) {
-        return {
-            id: _.uniqueId('workout-'),
-            name,
-            exercises: exercises.map(e => createExerciseObject(e, name))
-        }
-    }
+    // function changeExerciseOrderInWorkout(wid, eid, value) {
+    //     const workout = workouts.find(w => w.id === wid)
+    //     console.log({ workout });
+    //     const index = workout.exercises.findIndex(e => e.id === eid)
+    //     const newIndex = index + value;
+    //     if (newIndex < 0 || newIndex >= workout.exercises.length) {
+    //         return;
+    //     }
+    //     const newExercises = [...workout.exercises];
+    //     const temp = newExercises[index];
+    //     newExercises[index] = newExercises[newIndex];
+    //     newExercises[newIndex] = temp;
+    //     const newWorkouts = workouts.map(w => {
+    //         if (w.id === wid) {
+    //             return {
+    //                 ...w,
+    //                 exercises: newExercises
+    //             }
+    //         }
+    //         return w;
+    //     })
+    //     setWorkoutData(newWorkouts);
 
-    function addWorkout({ name, exercises }) {
-        const newWorkouts = [
-            ...workouts,
-            buildWorkoutObject({ name, exercises })
-        ]
-        setWorkouts(newWorkouts);
-        saveData('workouts', newWorkouts);
-    }
 
-    function deleteWorkout(workoutId) {
-        const newWorkouts = workouts.filter(w => w.id !== workoutId);
-        setWorkouts(newWorkouts);
-        saveData('workouts', newWorkouts);
-    }
+    // }
 
-    function cleanAllData() {
-        setExercisesData([]);
-        setWorkoutData([]);
-    }
-
-    function editWorkout(workout) {
-        const newWorkouts = workouts.map(w => {
-            if (w.id === workout.id) {
-                return workout;
-            }
-            return w;
-        });
-        setWorkouts(newWorkouts);
-        saveData('workouts', newWorkouts);
-    }
-
-    function calculateExerciseDone(exercise, week) {
-        const result1 = workouts.map(w => {
-            const ex = w.exercises.find(e => e.name === exercise.name);
-            if (ex) {
-                return ex.weeks[week].totalWeeklySets;
-            } else {
-                return 0
-            }
-        })
-        const sum = result1.reduce((acc, val) => acc + val, 0);
-        return sum;
-
-    }
-
-    function calculateSetsDoneWeek(week, field) {
-        const result1 = workouts.map(w => {
-            return w.exercises.reduce((acc, ex) => {
-                return acc + ex.weeks[week][field];
-            }, 0)
-        })
-        const sum = result1.reduce((acc, val) => acc + val, 0);
-        return sum;
-    }
-
-    function calculateTotalSetsDoneWeek(week) {
-        return calculateSetsDoneWeek(week, 'totalWeeklySets');
-
-    }
-
-    function calculateTotalSetsTargetWeek(week) {
-        return calculateSetsDoneWeek(week, 'weeklyTarget');
-    }
-
-    function createExerciseObject(exercise, workoutName, currentExercise) {
+    function createExerciseObject({ numberOfWeeks }, exercise, workoutName, currentExercise) {
         return {
             name: exercise.name,
             sets: exercise.weeklySets,
@@ -323,87 +227,268 @@ export function useExercisesAPI() {
         }
     }
 
-    function addExerciseToWorkout({
-        workoutId,
-        exerciseName,
-        sets
-    }) {
-        console.log({ workoutId, exerciseName, sets });
-
-        const workout = workouts.find(w => w.id === workoutId)
-        const exercise = exercises.find(e => e.name === exerciseName)
-        exercise.weeklySets = sets
-        const exerciseWorkoutObject = createExerciseObject(exercise, workout.name)
-        console.log({ exerciseWorkoutObject });
-        workout.exercises.push(exerciseWorkoutObject)
-        editWorkout(workout)
-    }
-
-    function changeExerciseOrderInWorkout(wid, eid, value) {
-        const workout = workouts.find(w => w.id === wid)
-        console.log({ workout });
-        const index = workout.exercises.findIndex(e => e.id === eid)
-        const newIndex = index + value;
-        if (newIndex < 0 || newIndex >= workout.exercises.length) {
-            return;
-        }
-        const newExercises = [...workout.exercises];
-        const temp = newExercises[index];
-        newExercises[index] = newExercises[newIndex];
-        newExercises[newIndex] = temp;
-        const newWorkouts = workouts.map(w => {
-            if (w.id === wid) {
-                return {
-                    ...w,
-                    exercises: newExercises
-                }
-            }
-            return w;
-        })
-        setWorkoutData(newWorkouts);
-
-
-    }
-
-    function saveTrainingPlan({ exercises, workouts, name }) {
-        cleanAllData()
-        setExercisesData(exercises);
-        setWorkoutData(workouts);
-
-    }
-
-
-    function createNewPlan({ exercises: newExercises, workouts: newWorkouts, name }) {
+    function buildWorkoutObject({ numberOfWeeks }, { name, exercises }) {
         return {
-            exercises: newExercises.map((e, index) => buildExerciseObject({ ...e, id: index + 1 })),
-            workouts: newWorkouts.map(buildWorkoutObject),
-            name
+            id: _.uniqueId('workout-'),
+            name,
+            exercises: exercises.map(e => createExerciseObject({ numberOfWeeks }, e, name))
         }
+    }
+
+
+
+
+    function createNewPlan({ exercises: newExercises, workouts: newWorkouts, name, numberOfWeeks }) {
+        return {
+            exercises: newExercises.map((e, index) => buildExerciseObject({ name, numberOfWeeks }, { ...e, id: index + 1 })),
+            workouts: newWorkouts.map(w => buildWorkoutObject({ numberOfWeeks }, w)),
+            name: name || `Training Plan ${trainingPlans.length + 1}`,
+            numberOfWeeks: numberOfWeeks || 8
+        }
+    }
+
+    function createTrainingPlanActions(trainingPlan) {
+        if (!trainingPlan) {
+            return null
+        }
+        const { exercises, workouts, numberOfWeeks } = trainingPlan;
+
+        function addExercise(exercise) {
+            trainingPlan.exercises.push(buildExerciseObject(trainingPlan, exercise))
+            saveTrainingPlan(trainingPlan);
+        }
+        function editExercise(exercise) {
+            const index = trainingPlan.exercises.findIndex(e => e.id === exercise.id);
+            trainingPlan.exercises[index] = buildExerciseObject(trainingPlan, exercise);
+            saveTrainingPlan(trainingPlan);
+        }
+        function deleteExercise(exercise) {
+            trainingPlan.exercises = trainingPlan.exercises.filter(e => e.id !== exercise.id);
+            saveTrainingPlan(trainingPlan);
+        }
+        function addWorkout(workout) {
+            trainingPlan.workouts.push(buildWorkoutObject(trainingPlan, workout))
+            saveTrainingPlan(trainingPlan);
+        }
+        function editWorkout(workout) {
+            const index = trainingPlan.workouts.findIndex(w => w.id === workout.id);
+            trainingPlan.workouts[index] = workout;
+            saveTrainingPlan(trainingPlan);
+        }
+        function deleteWorkout(workout) {
+            trainingPlan.workouts = trainingPlan.workouts.filter(w => w.id !== workout.id);
+            saveTrainingPlan(trainingPlan);
+        }
+        function calculateExerciseDoneForTrainingPlan(exercise, week) {
+            const result1 = trainingPlan.workouts.map(w => {
+                const ex = w.exercises.find(e => e.name === exercise.name);
+                if (ex) {
+                    return ex.weeks[week].totalWeeklySets;
+                } else {
+                    return 0
+                }
+            })
+            const sum = result1.reduce((acc, val) => acc + val, 0);
+            return sum;
+
+        }
+        function addExerciseToWorkoutForTrainingPlan({ workoutId, exerciseName, sets }) {
+            const workout = trainingPlan.workouts.find(w => w.id === workoutId)
+            const exercise = trainingPlan.exercises.find(e => e.name === exerciseName)
+            exercise.weeklySets = sets
+            const exerciseWorkoutObject = createExerciseObject(trainingPlan, exercise, workout.name)
+            workout.exercises.push(exerciseWorkoutObject)
+            editWorkout(workout)
+        }
+        function changeExerciseOrderInWorkoutForTrainingPlan(wid, eid, value) {
+            const workout = trainingPlan.workouts.find(w => w.id === wid)
+            const index = workout.exercises.findIndex(e => e.id === eid)
+            const newIndex = index + value;
+            if (newIndex < 0 || newIndex >= workout.exercises.length) {
+                return;
+            }
+            const newExercises = [...workout.exercises];
+            const temp = newExercises[index];
+            newExercises[index] = newExercises[newIndex];
+            newExercises[newIndex] = temp;
+            const newWorkouts = trainingPlan.workouts.map(w => {
+                if (w.id === wid) {
+                    return {
+                        ...w,
+                        exercises: newExercises
+                    }
+                }
+                return w;
+            })
+            trainingPlan.workouts = newWorkouts;
+            saveTrainingPlan(trainingPlan);
+        }
+
+        function setNumberOfWeeks(numberOfWeeks) {
+            trainingPlan.exercises = trainingPlan.exercises.map(e => {
+                return {
+                    ...e,
+                    weeks: calcWeekValues(_.range(0, numberOfWeeks), e)
+                }
+            })
+            trainingPlan.workouts = trainingPlan.workouts.map(w => {
+                w.exercises = w.exercises.map(e => {
+                    const exercise = trainingPlan.exercises.find(ex => ex.name === e.name);
+                    if (!exercise) {
+                        throw new Error(`Exercise ${e.name} not found in exercises list`);
+                    }
+                    return {
+                        ...e,
+                        weeks: calcWeekValues(_.range(0, numberOfWeeks), exercise, e)
+                    }
+                })
+                return w;
+            })
+            trainingPlan.numberOfWeeks = numberOfWeeks;
+            saveTrainingPlan(trainingPlan);
+        }
+
+        const updateExercise = (workoutId, exerciseId, weekIndex, partialUpdate) => {
+
+            const { workouts } = trainingPlan;
+
+            const workout = workouts.find(w => w.id === workoutId);
+            const exercise = workout.exercises.find(e => e.id === exerciseId);
+            const newWorkouts = workouts.map(w => {
+                if (w.id === workoutId) {
+                    return {
+                        ...w,
+                        exercises: workout.exercises.map(e => {
+                            if (e.id === exerciseId) {
+                                return {
+                                    ...exercise,
+                                    weeks: exercise.weeks.map(w => {
+                                        if (w.week === weekIndex) {
+                                            return {
+                                                ...w,
+                                                ...partialUpdate
+                                            }
+                                        }
+                                        return w;
+                                    })
+                                }
+                            }
+                            return e;
+                        })
+                    }
+                }
+                return w;
+            })
+
+            trainingPlan.workouts = newWorkouts;
+            saveTrainingPlan(trainingPlan);
+
+        }
+
+        function getExercisesByWeeks() {
+            const { exercises } = trainingPlan;
+            const flat = _.flatMap(exercises, exercise => exercise.weeks.map((week) => ({ ...exercise, ...week, weeks: undefined })))
+            const groupByWeek = _.groupBy(flat, 'week');
+            return groupByWeek;
+        }
+
+        function calculateSetsDoneWeek(week, field) {
+            const result1 = workouts.map(w => {
+                return w.exercises.reduce((acc, ex) => {
+                    return acc + ex.weeks[week][field];
+                }, 0)
+            })
+            const sum = result1.reduce((acc, val) => acc + val, 0);
+            return sum;
+        }
+
+        function calculateTotalSetsDoneWeek(week) {
+            return calculateSetsDoneWeek(week, 'totalWeeklySets');
+
+        }
+
+        function calculateTotalSetsTargetWeek(week) {
+            return calculateSetsDoneWeek(week, 'weeklyTarget');
+        }
+
+        function getWeeksDone() {
+            return _.range(0, trainingPlan.numberOfWeeks).map(week => {
+                return {
+                    week,
+                    totalSetsDone: calculateTotalSetsDoneWeek(week),
+                    totalSetsTarget: calculateTotalSetsTargetWeek(week),
+                    isDone: calculateTotalSetsDoneWeek(week) >= calculateTotalSetsTargetWeek(week)
+                }
+            })
+        }
+
+        function getTotalSets() {
+            const totalSets = workouts.map(w => {
+                return w.exercises.reduce((acc, ex) => {
+                    return acc + ex.weeks.reduce((acc2, week) => acc2 + week.weeklyTarget, 0);
+                }, 0)
+            })
+            const sum = totalSets.reduce((acc, val) => acc + val, 0);
+            const totalSetsDone = workouts.map(w => {
+                return w.exercises.reduce((acc, ex) => {
+                    return acc + ex.weeks.reduce((acc2, week) => acc2 + week.totalWeeklySets, 0);
+                }, 0)
+            })
+            const setsDone = totalSetsDone.reduce((acc, val) => acc + val, 0);
+            return {
+                totalSets: sum,
+                totalSetsDone: setsDone
+            }
+        }
+
+
+
+        return {
+            exercises: trainingPlan.exercises,
+            workouts: trainingPlan.workouts,
+            numberOfWeeks: trainingPlan.numberOfWeeks,
+            addWorkout,
+            editExercise,
+            addExercise,
+            updateExercise,
+            deleteWorkout,
+            deleteExercise,
+            editWorkout,
+            calculateExerciseDone: calculateExerciseDoneForTrainingPlan,
+            addExerciseToWorkout: addExerciseToWorkoutForTrainingPlan,
+            changeExerciseOrderInWorkout: changeExerciseOrderInWorkoutForTrainingPlan,
+            setNumberOfWeeks,
+            getExercisesByWeeks,
+            calculateTotalSetsDoneWeek,
+            calculateTotalSetsTargetWeek,
+            getTotalSets,
+            getWeeksDone
+        }
+    }
+
+    function deleteTrainingPlan(name) {
+        const newTrainingPlans = trainingPlans.filter(tp => tp.name !== name);
+        setTrainingPlans(newTrainingPlans);
+        saveData('trainingPlans', newTrainingPlans);
+    }
+
+    function findTrainingPlanByName(name) {
+        return trainingPlans.find(tp => tp.name === name);
     }
 
 
     return {
         createNewPlan,
         saveTrainingPlan,
-        exercises,
-        addExercise,
-        deleteExercise,
-        updateExercise,
         cleanData,
-        cleanAllData,
-        editExercise,
-        getExercisesByWeeks,
-        changeNumberOfWeeks,
-        numberOfWeeks,
-        addWorkout,
-        workouts,
-        deleteWorkout,
-        editWorkout,
-        calculateExerciseDone,
-        addExerciseToWorkout,
-        calculateTotalSetsDoneWeek,
-        calculateTotalSetsTargetWeek,
-        changeExerciseOrderInWorkout
-
+        addTrainingPlan,
+        deleteTrainingPlan,
+        trainingPlans,
+        createTrainingPlanActions,
+        findTrainingPlanByName,
+        selectTrainingPlan,
+        currentTrainingPlan,
+        addTrainingPlanFromPlan,
+        addTrainingPlanFromObject,
     }
 }

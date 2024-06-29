@@ -1,13 +1,13 @@
 "use client"
-import React from "react";
-import { Button, Card, Collapse, Dialog, DialogActions, DialogContent, DialogTitle, Divider, } from "@mui/material";
+import React, { useContext, useState } from "react";
+import { Button, Card, Collapse, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControl, FormGroup, InputLabel, MenuItem, Select, TextField, } from "@mui/material";
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
-import { AddCircle, Delete, EditLocationAlt, EditNotifications, EditOutlined, RemoveCircle } from "@mui/icons-material";
+import { AddCircle, Delete, EditLocationAlt, EditNotifications, EditOutlined, Label, RemoveCircle } from "@mui/icons-material";
 import { AddExerciseDialog, EditExerciseForm, CreateNewExerciseDialog } from "./AddExerciseListItem";
 import _ from 'lodash'
 import { useExercisesAPI } from "../exercisesAPI";
@@ -21,17 +21,88 @@ import { localStorageAPI } from "../localStorageAPI";
 import { BodyPartsPlan } from "./BodyPartsPlan";
 import { BuildTrainingPlanDialog } from "./BuildTrainingPlanDialog";
 import { WorkoutList } from "./Workout";
+import { AppContext } from "../AppContext";
 
 const { getData, saveData, cleanData } = localStorageAPI();
 
-export function EditPlan() {
+
+function PlanSettings({ trainingPlan, setNumberOfWeeks }) {
+
+    const { updateTrainingPlan } = useExercisesAPI()
+
+    function saveTrainingPlan({ numberOfWeeks }) {
+        updateTrainingPlan({ numberOfWeeks })
+    }
+
+    function onNumberOfWeeksChange(numberOfWeeks) {
+        const newNumberofWeeks = Number(numberOfWeeks)
+        if (newNumberofWeeks < trainingPlan.numberOfWeeks) {
+            const res = confirm(`
+            This will delete the data of the last ${trainingPlan.numberOfWeeks - newNumberofWeeks} weeks of workouts. 
+            Are you sure you want to continue?`)
+            if (res) {
+                setNumberOfWeeks(newNumberofWeeks)
+            }
+        } else {
+            setNumberOfWeeks(newNumberofWeeks)
+        }
+    }
+
+    return <Box>
+        <FormGroup sx={{
+
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '20px',
+            padding: '10px'
+        }}>
+
+            <FormControl>
+
+                <TextField
+                    label="Plan Name"
+                    defaultValue={trainingPlan.name}
+                    fullWidth
+                />
+            </FormControl>
+
+
+            <FormControl>
+                <InputLabel>Number of Weeks</InputLabel>
+
+                <Select
+                    label="Number of Weeks"
+
+                    value={trainingPlan.numberOfWeeks}
+                    onChange={(e) => onNumberOfWeeksChange(e.target.value)}
+                >
+                    {_.range(1, 16).map((week) => (
+                        <MenuItem key={week} value={week}>
+                            {week}
+                        </MenuItem>
+                    ))}
+                </Select>
+            </FormControl>
+        </FormGroup>
+    </Box>
+}
+
+
+export function EditPlan({ }) {
+    const { createTrainingPlanActions, findTrainingPlanByName, currentTrainingPlan } = useExercisesAPI()
+    const { params: { trainingPlan: name } } = useContext(AppContext);
+
+    const trainingPlan = findTrainingPlanByName(name || currentTrainingPlan)
+    if (!trainingPlan) return null;
+    const actions = createTrainingPlanActions(trainingPlan)
+
+
     return <AppTabs noCard={true} Comps={[
-        { label: 'Training Plan', Comp: <EditTrainingPlan /> },
-        { label: 'Workout Plan', Comp: <WorkoutPlan /> },
-        { label: 'Body Parts', Comp: <BodyPartsPlan /> },
+        { label: 'Training Plan', Comp: <EditTrainingPlan trainingPlan={trainingPlan} {...actions} /> },
+        { label: 'Workout Plan', Comp: <WorkoutPlan trainingPlan={trainingPlan} {...actions} /> },
+        // { label: 'Body Parts', Comp: <BodyPartsPlan trainingPlan={trainingPlan} {...actions} /> },
+        { label: 'Plan Settings', Comp: <PlanSettings trainingPlan={trainingPlan} {...actions} /> },
     ]} />
-
-
 }
 
 function TrainingPlanPreviewDialog({
@@ -107,21 +178,24 @@ function TrainingPlanPreviewDialog({
     </Dialog>
 }
 
-export function EditTrainingPlan() {
-
-    const { saveTrainingPlan, createNewPlan, addWorkout, editExercise, addExercise, updateExercise, exercises, deleteExercise, cleanAllData } = useExercisesAPI()
-
-
+function EditTrainingPlan({
+    saveTrainingPlan,
+    createNewPlan,
+    addWorkout,
+    editExercise,
+    addExercise,
+    updateExercise,
+    exercises,
+    deleteExercise,
+    cleanAllData
+}) {
 
 
     const exerciseToShow = exercises.map(e => ({ ...e, ...e.weeks[0] }))
 
     const [addExerciseDialogOpen, setOpen] = React.useState(false);
-    const [buildTrainingPlanOpen, setBuildTrainingPlanOpen] = React.useState(false);
     const [createNewExerciseDialogOpen, setCreateNewExerciseDialogOpen] = React.useState(false);
     const [editExerciseOpened, setEditExercise] = React.useState({});
-    const [isTrainingPlanPreviewDialogOpen, setIsTrainingPlanPreviewDialogOpen] = React.useState(false);
-    const [previewTrainingPlan, setPreviewTrainingPlan] = React.useState(null);
 
     function createNewExercise() {
         setOpen(false);
@@ -138,13 +212,7 @@ export function EditTrainingPlan() {
         setOpen(false)
     }
 
-    const onAddButtonClicked = (exercise) => {
-        updateExercise(exercise, { weeklyTarget: Number(exercise.weeklyTarget) + 1 });
-    }
 
-    const onRemoveButtonClicked = (exercise) => {
-        updateExercise(exercise, { weeklyTarget: Number(exercise.weeklyTarget) - 1 });
-    }
 
     const editExerciseInternal = (exercise) => {
         editExercise(exercise);
@@ -181,74 +249,15 @@ export function EditTrainingPlan() {
             </div>
         </React.Fragment >
     }
-    async function onBuildTrainingPlan({
-        plan,
-        name,
-        replaceTrainingPlan
-    }) {
-
-        const {
-            exercises: newExercisesList,
-            workouts,
-            newExercises: newExercisesToAdd,
-        } = plan;
-
-        const newWorkouts = workouts.map(workout => {
-            return {
-                exercises: workout.workoutExercises.map(({ name, sets }) => {
-                    return {
-                        ...newExercisesList.find(e => e.name === name),
-                        name,
-                        sets,
-                        weeklySets: sets,
-                    }
-                }),
-                name: workout.name
-            }
-        })
-
-        const _newExercisesList = newExercisesList.map(exercise => {
-            return {
-                ...exercise,
-                weeklySets: _.sum(newWorkouts.map(w => w.exercises.find(e => e.name === exercise.name)?.sets || 0)),
-            }
-        })
 
 
 
-        const previewTrainingPlan = createNewPlan({
-            exercises: _newExercisesList,
-            workouts: newWorkouts,
-            name
-        })
-
-        setPreviewTrainingPlan(previewTrainingPlan);
-        setIsTrainingPlanPreviewDialogOpen(true);
-
-        newExercisesToAdd.forEach(newExercise => {
-            saveData('exercisesList', [...getLocalExercises(), newExercise]);
-        });
-
-        setBuildTrainingPlanOpen(false);
-
-    }
-
-    function SaveTrainingPlanInternal() {
-        saveTrainingPlan(previewTrainingPlan)
-        setIsTrainingPlanPreviewDialogOpen(false)
-
-    }
 
 
     return (
         <div>
 
-            <TrainingPlanPreviewDialog
-                isTrainingPlanPreviewDialogOpen={isTrainingPlanPreviewDialogOpen}
-                onClose={() => setIsTrainingPlanPreviewDialogOpen(false)}
-                trainingPlan={previewTrainingPlan}
-                SaveTrainingPlan={SaveTrainingPlanInternal}
-            />
+
 
             <AddExerciseDialog
                 exercises={exercises}
@@ -260,14 +269,6 @@ export function EditTrainingPlan() {
 
             />
 
-            <BuildTrainingPlanDialog
-                buildTrainigPlanDialigOpen={buildTrainingPlanOpen}
-                exercises={exercises}
-                onBuildTrainingPlan={onBuildTrainingPlan}
-                onClose={() => setBuildTrainingPlanOpen(false)}
-                exerciseList={exercisesList}
-
-            />
 
             <CreateNewExerciseDialog
                 exercises={exercises}
@@ -290,14 +291,14 @@ export function EditTrainingPlan() {
                     Add Exercise
 
                 </Button>
-                <Button
+                {/* <Button
                     sx={{ fontSize: '13px', float: 'right' }}
                     startIcon={<AddCircle />}
                     variant="contained"
                     onClick={() => setBuildTrainingPlanOpen(true)}>
                     Training Plan
 
-                </Button>
+                </Button> */}
             </div>
             <Divider sx={{ marginTop: '15px' }} />
             <List>

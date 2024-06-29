@@ -3,8 +3,8 @@ import { getAllBodyParts, getBodyParts, getPrimaryMuscle, getSecondaryMuscles, u
 import React from "react"
 import { ExpandLess, ExpandMore } from "@mui/icons-material"
 
-export function BodyPartsPlan() {
-    const { exercises } = useExercisesAPI()
+export function BodyPartsPlan({ exercises }) {
+    // const { exercises } = useExercisesAPI()
     const bodyParts = getAllBodyParts()
     const [bodyPartsOpen, setBodyPartsOpen] = React.useState({})
     console.log({ bodyParts })

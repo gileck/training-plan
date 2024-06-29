@@ -372,9 +372,17 @@ function SelectWorkoutDialog({
 
 
 
-export function WorkoutPlan() {
+export function WorkoutPlan({
+    addExerciseToWorkout,
+    workouts,
+    exercises,
+    numberOfWeeks,
+    addWorkout,
+    deleteWorkout,
+    editWorkout
+}) {
 
-    const { addExerciseToWorkout, workouts, exercises, updateExercise, numberOfWeeks, addWorkout, deleteWorkout, editWorkout } = useExercisesAPI()
+    // const { addExerciseToWorkout, workouts, exercises, updateExercise, numberOfWeeks, addWorkout, deleteWorkout, editWorkout } = useExercisesAPI()
     console.log({ workouts, exercises });
 
     const [open, setOpen] = useState(false);

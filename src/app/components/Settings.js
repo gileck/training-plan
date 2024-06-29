@@ -70,30 +70,7 @@ export function Settings() {
 
     return (
         <List>
-            <ListItem
-                sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between'
 
-                }}
-            >
-                <ListItemText primary="Number of weeks" />
-
-
-                <Select
-                    value={numberOfWeeks}
-                    onChange={onNumberOfWeeksChanged}
-                >
-                    {
-                        Array.from({ length: 20 }, (_, i) => i + 1).map((i) => (
-                            <MenuItem key={i} value={i}>{i}</MenuItem>
-                        ))
-                    }
-                </Select>
-
-
-            </ListItem>
-            <Divider />
             <ListItem>
                 <ListItemText primary="Clear Local Storage" />
 
@@ -101,7 +78,6 @@ export function Settings() {
                     onChange={onClearDataChanged}
                     value={cleanDataOption}
                     placeholder="Select option"
-
                 >
 
                     {
