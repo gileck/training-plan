@@ -45,7 +45,6 @@ export function useExercisesAPI() {
 
     const { getData, saveData, cleanData } = localStorageAPI();
     const [trainingPlans, setTrainingPlans] = useState(getData('trainingPlans') || []);
-    console.log({ trainingPlans });
     const savedTrainingPlanName = getData('currentTrainingPlan') || trainingPlans[0]?.name;
     const savedTrainingPlan = trainingPlans.find(tp => tp.name === savedTrainingPlanName) || trainingPlans[0]
     const [currentTrainingPlan, setCurrentTrainingPlan] = useState(savedTrainingPlan?.name || null);
@@ -69,9 +68,10 @@ export function useExercisesAPI() {
 
     function createTrainingPlanFromObject({ tpObject, name }) {
         return {
-            name,
+            name: name || `Training Plan ${trainingPlans.length + 1}`,
             exercises: tpObject.exercises,
-            workouts: tpObject.workouts
+            workouts: tpObject.workouts,
+            numberOfWeeks: tpObject.numberOfWeeks || 8
         }
     }
 

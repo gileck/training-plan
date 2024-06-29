@@ -202,8 +202,6 @@ export function TrainingPlans() {
             }
         })
 
-
-
         addTrainingPlanFromPlan({
             plan: {
                 exercises: _newExercisesList,
@@ -221,7 +219,7 @@ export function TrainingPlans() {
 
     return <Box
         sx={{
-            padding: 2
+            padding: 1
         }}
     >
         <Button
@@ -294,7 +292,7 @@ export function TrainingPlans() {
                         <ListItemSecondaryAction
                             sx={{
                                 display: 'flex',
-                                gap: 2
+                                gap: 1
 
                             }}
                         >
