@@ -26,7 +26,7 @@ function fixLocalStorage() {
   const exercises = getData('exercises')
   const workouts = getData('workouts')
   const trainingPlans = getData('trainingPlans')
-  const numberOfWeeks = getData('numberOfWeeks')
+  const numberOfWeeks = getData('numberOfWeeks') || 8
   console.log({
     exercises,
     workouts,
