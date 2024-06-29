@@ -147,8 +147,7 @@ export function Workout() {
 
 
     // const { workouts, exercises, updateExercise, numberOfWeeks, changeExerciseOrderInWorkout } = useExercisesAPI()
-    const { currentTrainingPlan, createTrainingPlanActions, findTrainingPlanByName } = useExercisesAPI()
-    const trainingPlan = findTrainingPlanByName(currentTrainingPlan)
+    const { currentTrainingPlan: trainingPlan, createTrainingPlanActions } = useExercisesAPI()
     if (!trainingPlan) {
         return <div></div>
     }

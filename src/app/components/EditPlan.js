@@ -26,13 +26,7 @@ import { AppContext } from "../AppContext";
 const { getData, saveData, cleanData } = localStorageAPI();
 
 
-function PlanSettings({ trainingPlan, setNumberOfWeeks }) {
-
-    const { updateTrainingPlan } = useExercisesAPI()
-
-    function saveTrainingPlan({ numberOfWeeks }) {
-        updateTrainingPlan({ numberOfWeeks })
-    }
+function PlanSettings({ trainingPlan, setNumberOfWeeks, updateName }) {
 
     function onNumberOfWeeksChange(numberOfWeeks) {
         const newNumberofWeeks = Number(numberOfWeeks)
@@ -45,6 +39,12 @@ function PlanSettings({ trainingPlan, setNumberOfWeeks }) {
             }
         } else {
             setNumberOfWeeks(newNumberofWeeks)
+        }
+    }
+
+    function onTrainingPlanNameChange(name) {
+        if (name) {
+            updateName(name)
         }
     }
 
@@ -63,6 +63,7 @@ function PlanSettings({ trainingPlan, setNumberOfWeeks }) {
                     label="Plan Name"
                     defaultValue={trainingPlan.name}
                     fullWidth
+                    onChange={(e) => onTrainingPlanNameChange(e.target.value)}
                 />
             </FormControl>
 
@@ -89,10 +90,9 @@ function PlanSettings({ trainingPlan, setNumberOfWeeks }) {
 
 
 export function EditPlan({ }) {
-    const { createTrainingPlanActions, findTrainingPlanByName, currentTrainingPlan } = useExercisesAPI()
-    const { params: { trainingPlan: name } } = useContext(AppContext);
-
-    const trainingPlan = findTrainingPlanByName(name || currentTrainingPlan)
+    const { createTrainingPlanActions, findTrainingPlanById, currentTrainingPlan } = useExercisesAPI()
+    const { params: { trainingPlan: planId } } = useContext(AppContext);
+    const trainingPlan = planId ? findTrainingPlanById(planId) : currentTrainingPlan
     if (!trainingPlan) return null;
     const actions = createTrainingPlanActions(trainingPlan)
 

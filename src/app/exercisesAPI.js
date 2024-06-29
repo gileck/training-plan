@@ -45,19 +45,20 @@ export function useExercisesAPI() {
 
     const { getData, saveData, cleanData } = localStorageAPI();
     const [trainingPlans, setTrainingPlans] = useState(getData('trainingPlans') || []);
-    const savedTrainingPlanName = getData('currentTrainingPlan') || trainingPlans[0]?.name;
-    const savedTrainingPlan = trainingPlans.find(tp => tp.name === savedTrainingPlanName) || trainingPlans[0]
-    const [currentTrainingPlan, setCurrentTrainingPlan] = useState(savedTrainingPlan?.name || null);
+    const savedTrainingPlanId = getData('currentTrainingPlanId') || trainingPlans[0]?.id;
+    const savedTrainingPlan = trainingPlans.find(tp => tp.id === savedTrainingPlanId) || trainingPlans[0]
+    const [currentTrainingPlanId, setCurrentTrainingPlanId] = useState(savedTrainingPlan?.id || null);
+    const currentTrainingPlan = trainingPlans.find(tp => tp.id === currentTrainingPlanId) || trainingPlans[0];
 
-    function selectTrainingPlan(name) {
-        setCurrentTrainingPlan(name);
-        saveData('currentTrainingPlan', name);
+    function selectTrainingPlan(planId) {
+        setCurrentTrainingPlanId(planId);
+        saveData('currentTrainingPlanId', planId);
     }
 
 
     function saveTrainingPlan(trainingPlan) {
         const newTrainingPlans = trainingPlans.map(tp => {
-            if (tp.name === trainingPlan.name) {
+            if (tp.id === trainingPlan.id) {
                 return trainingPlan;
             }
             return tp;
@@ -76,6 +77,7 @@ export function useExercisesAPI() {
     }
 
     function saveNewTraininPlan({ newTrainingPlan }) {
+        newTrainingPlan.id = newTrainingPlan.id || `plan_${trainingPlans.length + 1}`
         const newTrainingPlans = [
             ...trainingPlans,
             newTrainingPlan
@@ -441,7 +443,10 @@ export function useExercisesAPI() {
             }
         }
 
-
+        function updateName(name) {
+            trainingPlan.name = name;
+            saveTrainingPlan(trainingPlan);
+        }
 
         return {
             exercises: trainingPlan.exercises,
@@ -462,7 +467,8 @@ export function useExercisesAPI() {
             calculateTotalSetsDoneWeek,
             calculateTotalSetsTargetWeek,
             getTotalSets,
-            getWeeksDone
+            getWeeksDone,
+            updateName
         }
     }
 
@@ -472,8 +478,8 @@ export function useExercisesAPI() {
         saveData('trainingPlans', newTrainingPlans);
     }
 
-    function findTrainingPlanByName(name) {
-        return trainingPlans.find(tp => tp.name === name);
+    function findTrainingPlanById(planId) {
+        return trainingPlans.find(tp => tp.planId === planId);
     }
 
 
@@ -485,10 +491,11 @@ export function useExercisesAPI() {
         deleteTrainingPlan,
         trainingPlans,
         createTrainingPlanActions,
-        findTrainingPlanByName,
+        findTrainingPlanById,
         selectTrainingPlan,
         currentTrainingPlan,
         addTrainingPlanFromPlan,
         addTrainingPlanFromObject,
+
     }
 }

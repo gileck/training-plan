@@ -138,8 +138,8 @@ export function TrainingPlans() {
     const [trainingPlansOpen, setTrainingPlansOpen] = useState({})
     const { setRoute } = useContext(AppContext);
 
-    function selectTrainingPlanClicked(name) {
-        selectTrainingPlan(name)
+    function selectTrainingPlanClicked(planId) {
+        selectTrainingPlan(planId)
     }
 
     function toggleTrainingPlan(name) {
@@ -252,19 +252,15 @@ export function TrainingPlans() {
                 return <>
                     <ListItem key={index}
                         sx={{
-                            backgroundColor: currentTrainingPlan === plan.name ? '#dcecf5' : 'white'
-
-
-
+                            backgroundColor: currentTrainingPlan.id === plan.id ? '#dcecf5' : 'white'
                         }}
-
                     >
                         <ListItemIcon
-                            onClick={() => selectTrainingPlanClicked(plan.name)}
+                            onClick={() => selectTrainingPlanClicked(plan.id)}
                         >
                             <Label
                                 sx={{
-                                    color: currentTrainingPlan === plan.name ? 'green' : 'gray'
+                                    color: currentTrainingPlan.id === plan.id ? 'green' : 'gray'
                                 }}
                             />
                         </ListItemIcon>
@@ -296,26 +292,20 @@ export function TrainingPlans() {
 
                             }}
                         >
-
-
                             <IconButton
                                 onClick={() => onEditTrainingPlanClicked(plan.name)}
                                 edge="end" aria-label="edit">
                                 <Edit />
                             </IconButton>
-
                             <IconButton
                                 onClick={() => onDeleteTrainingPlanClicked(plan.name)}
                                 edge="end" aria-label="delete">
                                 <Delete />
                             </IconButton>
-
                             <IconButton onClick={() => toggleTrainingPlan(plan.name)}>
                                 {trainingPlansOpen[plan.name] ? <ExpandLess /> : <ExpandMore />}
                             </IconButton>
-
                         </ListItemSecondaryAction>
-
                     </ListItem>
                     <Collapse in={trainingPlansOpen[plan.name]} timeout="auto" unmountOnExit>
                         <>

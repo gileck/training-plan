@@ -32,17 +32,24 @@ function fixLocalStorage() {
     workouts,
     trainingPlans,
     numberOfWeeks
-
   });
   if (!trainingPlans && exercises && workouts) {
-    saveData('trainingPlans', [
-      {
-        exercises,
-        workouts,
-        name: 'Training Plan 1',
-        numberOfWeeks
-      }
+    saveData('trainingPlans', [{
+      exercises,
+      workouts,
+      name: 'Training Plan 1',
+      numberOfWeeks,
+    }
     ])
+  }
+  if (trainingPlans && trainingPlans.length > 0) {
+    const updatedTraininPlans = trainingPlans.map((tp, index) => {
+      if (!tp.id) {
+        tp.id = `plan_${index + 1}`
+      }
+      return tp
+    })
+    saveData('trainingPlans', updatedTraininPlans)
   }
 }
 export default function Home() {
