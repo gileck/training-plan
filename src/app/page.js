@@ -178,7 +178,11 @@ export default function Home() {
           >
             {
               Comps.map(({ label, icon }, index) => (
-                <BottomNavigationAction key={index} label={label} icon={icon} />
+                <BottomNavigationAction
+                  sx={{
+                    padding: '0px'
+                  }}
+                  key={index} label={label} icon={icon} />
               ))
             }
           </BottomNavigation>
