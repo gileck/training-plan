@@ -134,7 +134,8 @@ export default function Home() {
     if (routeParam) {
       return setValue(routeParam);
     } else {
-      const isTrainingPlanExist = localStorageAPI().getData('trainingPlans').length > 0
+      const trainingPlans = localStorageAPI().getData('trainingPlans')
+      const isTrainingPlanExist = trainingPlans && trainingPlans.length > 0
       if (isTrainingPlanExist) {
         return setValue('workouts')
       } else {

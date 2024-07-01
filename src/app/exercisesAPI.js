@@ -77,7 +77,7 @@ export function useExercisesAPI() {
     }
 
     function saveNewTraininPlan({ newTrainingPlan }) {
-        newTrainingPlan.id = newTrainingPlan.id || `plan_${trainingPlans.length + 1}`
+        newTrainingPlan.id = newTrainingPlan.id || _.uniqueId("plan_")
         const newTrainingPlans = [
             ...trainingPlans,
             newTrainingPlan
@@ -472,14 +472,14 @@ export function useExercisesAPI() {
         }
     }
 
-    function deleteTrainingPlan(name) {
-        const newTrainingPlans = trainingPlans.filter(tp => tp.name !== name);
+    function deleteTrainingPlan(id) {
+        const newTrainingPlans = trainingPlans.filter(tp => tp.id !== id);
         setTrainingPlans(newTrainingPlans);
         saveData('trainingPlans', newTrainingPlans);
     }
 
     function findTrainingPlanById(planId) {
-        return trainingPlans.find(tp => tp.planId === planId);
+        return trainingPlans.find(tp => tp.id === planId);
     }
 
 

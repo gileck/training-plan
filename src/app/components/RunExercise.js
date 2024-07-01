@@ -112,8 +112,11 @@ function TimerClock({ seconds }) {
 const { getData, saveData } = localStorageAPI()
 export function RunExercise(props) {
 
-    const { updateExercise, workouts, exercises } = useExercisesAPI()
+    const { createTrainingPlanActions, currentTrainingPlan } = useExercisesAPI()
+
     const { params: { week } } = useContext(AppContext);
+
+    const { exercises, workouts, updateExercise } = createTrainingPlanActions(currentTrainingPlan)
 
     const selectedExercisesFromLocal = getData('selectedExercises') || [];
 

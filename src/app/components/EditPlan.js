@@ -92,7 +92,9 @@ function PlanSettings({ trainingPlan, setNumberOfWeeks, updateName }) {
 export function EditPlan({ }) {
     const { createTrainingPlanActions, findTrainingPlanById, currentTrainingPlan } = useExercisesAPI()
     const { params: { trainingPlan: planId } } = useContext(AppContext);
+    console.log({ planId });
     const trainingPlan = planId ? findTrainingPlanById(planId) : currentTrainingPlan
+    console.log({ trainingPlan });
     if (!trainingPlan) return null;
     const actions = createTrainingPlanActions(trainingPlan)
 

@@ -142,8 +142,8 @@ export function TrainingPlans() {
         selectTrainingPlan(planId)
     }
 
-    function toggleTrainingPlan(name) {
-        setTrainingPlansOpen({ ...trainingPlansOpen, [name]: !trainingPlansOpen[name] })
+    function toggleTrainingPlan(id) {
+        setTrainingPlansOpen({ ...trainingPlansOpen, [id]: !trainingPlansOpen[id] })
     }
 
     function onCreateTrainingPlanClicked({ name, tpObject, plan, numberOfWeeks }) {
@@ -156,17 +156,17 @@ export function TrainingPlans() {
         }
     }
 
-    function onEditTrainingPlanClicked(name) {
-        console.log('onEditTrainingPlanClicked', name)
+    function onEditTrainingPlanClicked(id) {
+        console.log('onEditTrainingPlanClicked', id)
         setRoute('edit_plan', {
-            trainingPlan: name
+            trainingPlan: id
         })
     }
 
-    function onDeleteTrainingPlanClicked(name) {
+    function onDeleteTrainingPlanClicked(id) {
         const res = confirm(`Are you sure you want to delete ${name}?`)
         if (res) {
-            deleteTrainingPlan(name)
+            deleteTrainingPlan(id)
         }
     }
 
@@ -293,17 +293,17 @@ export function TrainingPlans() {
                             }}
                         >
                             <IconButton
-                                onClick={() => onEditTrainingPlanClicked(plan.name)}
+                                onClick={() => onEditTrainingPlanClicked(plan.id)}
                                 edge="end" aria-label="edit">
                                 <Edit />
                             </IconButton>
                             <IconButton
-                                onClick={() => onDeleteTrainingPlanClicked(plan.name)}
+                                onClick={() => onDeleteTrainingPlanClicked(plan.id)}
                                 edge="end" aria-label="delete">
                                 <Delete />
                             </IconButton>
-                            <IconButton onClick={() => toggleTrainingPlan(plan.name)}>
-                                {trainingPlansOpen[plan.name] ? <ExpandLess /> : <ExpandMore />}
+                            <IconButton onClick={() => toggleTrainingPlan(plan.id)}>
+                                {trainingPlansOpen[plan.id] ? <ExpandLess /> : <ExpandMore />}
                             </IconButton>
                         </ListItemSecondaryAction>
                     </ListItem>
