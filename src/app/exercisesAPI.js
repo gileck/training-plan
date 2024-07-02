@@ -3,6 +3,12 @@ import _ from 'lodash';
 import { localStorageAPI } from "./localStorageAPI";
 import { getExercisesList } from "./exercisesList";
 
+function randomNum(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min);
+}
+function uniqueId(prefix) {
+    return `${prefix}${randomNum(0, 99999)}`
+}
 export function getPrimaryMuscle(name) {
     return getExercisesList().find(e => e.name === name)?.primaryMuscle;
 }
@@ -77,7 +83,7 @@ export function useExercisesAPI() {
     }
 
     function saveNewTraininPlan({ newTrainingPlan }) {
-        newTrainingPlan.id = newTrainingPlan.id || _.uniqueId("plan_")
+        newTrainingPlan.id = newTrainingPlan.id || uniqueId("plan_")
         const newTrainingPlans = [
             ...trainingPlans,
             newTrainingPlan
@@ -231,7 +237,7 @@ export function useExercisesAPI() {
 
     function buildWorkoutObject({ numberOfWeeks }, { name, exercises }) {
         return {
-            id: _.uniqueId('workout-'),
+            id: uniqueId('workout-'),
             name,
             exercises: exercises.map(e => createExerciseObject({ numberOfWeeks }, e, name))
         }
@@ -277,8 +283,8 @@ export function useExercisesAPI() {
             trainingPlan.workouts[index] = workout;
             saveTrainingPlan(trainingPlan);
         }
-        function deleteWorkout(workout) {
-            trainingPlan.workouts = trainingPlan.workouts.filter(w => w.id !== workout.id);
+        function deleteWorkout(workoutId) {
+            trainingPlan.workouts = trainingPlan.workouts.filter(w => w.id !== workoutId);
             saveTrainingPlan(trainingPlan);
         }
         function calculateExerciseDoneForTrainingPlan(exercise, week) {
@@ -297,8 +303,9 @@ export function useExercisesAPI() {
         function addExerciseToWorkoutForTrainingPlan({ workoutId, exerciseName, sets }) {
             const workout = trainingPlan.workouts.find(w => w.id === workoutId)
             const exercise = trainingPlan.exercises.find(e => e.name === exerciseName)
-            exercise.weeklySets = sets
-            const exerciseWorkoutObject = createExerciseObject(trainingPlan, exercise, workout.name)
+            const exerciseWorkoutObject = createExerciseObject(
+                trainingPlan, { ...exercise, weeklySets: sets }, workout.name
+            )
             workout.exercises.push(exerciseWorkoutObject)
             editWorkout(workout)
         }

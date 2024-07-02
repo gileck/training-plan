@@ -88,6 +88,10 @@ function WorkoutExercise({ totalWeeklySetsInAllWorkouts, totalWeeklySets, exerci
 
 function AddExerciseToWorkoutDialog({ workouts, open, handleClose, onAddExercise, exercises, workoutId }) {
 
+    console.log({
+        workouts, open, handleClose, onAddExercise, exercises, workoutId
+    });
+
     if (!workoutId) {
         return null
     }
@@ -105,6 +109,7 @@ function AddExerciseToWorkoutDialog({ workouts, open, handleClose, onAddExercise
     console.log({
         workoutId,
         workouts,
+        ex
     });
 
     const totalSetsCountInExercise = workouts.map(w => w.exercises.find(e => e.name === selectedExercise)).filter(e => e).reduce((acc, e) => acc + e.sets, 0)
@@ -497,6 +502,7 @@ export function WorkoutPlan({
             .map(e => ({ ...e, sets: 0 }))
     }
     const exercisesNotInsideWorkouts = getExercisesNotInsideWorkouts()
+    console.log({ exercisesNotInsideWorkouts, exercises });
 
     function getExercisesLeft() {
         return exercises.map(e => {
@@ -526,6 +532,10 @@ export function WorkoutPlan({
     }
     function getTotalWeeklySetsInAllWorkouts(exerciseName) {
         return workouts.map(w => w.exercises.find(e => e.name === exerciseName)).filter(e => e).reduce((acc, e) => acc + e.sets, 0)
+    }
+    function isWorkoutIncludesAllExercises(workout) {
+        return exercises.every(e => workout.exercises.find(ex => ex.name === e.name))
+
     }
     return (
         <div>
@@ -588,7 +598,7 @@ export function WorkoutPlan({
                                         {openWorkouts[workout.id] ? <ExpandLess /> : <ExpandMore />}
                                     </IconButton>
                                     <IconButton
-                                        disabled={workout.exercises.length === exercises.length}
+                                        disabled={isWorkoutIncludesAllExercises(workout)}
                                         onClick={() => onAddIconClicked(workout.id)} >
                                         <AddCircle />
                                     </IconButton>
