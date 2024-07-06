@@ -19,7 +19,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import AssistantIcon from '@mui/icons-material/Assistant';
 
-import { Delete, ExpandCircleDown, ExpandCircleUp, ExpandMore, ExpandLess, Label, Edit, ArrowDropDown, ContentPaste, AirTwoTone, Computer, RadioButtonUncheckedRounded, } from "@mui/icons-material";
+import { Delete, ExpandCircleDown, ExpandCircleUp, ExpandMore, ExpandLess, Label, Edit, ArrowDropDown, ContentPaste, AirTwoTone, Computer, RadioButtonUncheckedRounded, CopyAll, Copyright, CopyAllTwoTone, } from "@mui/icons-material";
 import { Dialog } from '@mui/material';
 import { EditPlan, EditTrainingPlan, EditTrainingPlanInternal } from './EditPlan';
 import { AppContext } from '../AppContext';
@@ -132,7 +132,7 @@ function AddTrainingPlanDialog({ open, onClose: closeDialog, onCreateTrainingPla
 
 export function TrainingPlans() {
 
-    const { createTrainingPlanActions, deleteTrainingPlan, addTrainingPlan, trainingPlans, selectTrainingPlan, currentTrainingPlan, addTrainingPlanFromObject, addTrainingPlanFromPlan } = useExercisesAPI()
+    const { duplicateTrainingPlan, createTrainingPlanActions, deleteTrainingPlan, addTrainingPlan, trainingPlans, selectTrainingPlan, currentTrainingPlan, addTrainingPlanFromObject, addTrainingPlanFromPlan } = useExercisesAPI()
     const [buildAiTrainingPlanOpen, setBuildAiTrainingPlanOpen] = useState(false);
     const [isTrainingPlanModalOpen, setIsTrainingPlanModalOpen] = useState(false)
     const [trainingPlansOpen, setTrainingPlansOpen] = useState({})
@@ -168,6 +168,10 @@ export function TrainingPlans() {
         if (res) {
             deleteTrainingPlan(id)
         }
+    }
+
+    function onDuplicateTrainingPlanClicked(id) {
+        duplicateTrainingPlan(id)
     }
 
     async function onBuildAiTrainingPlan({
@@ -298,13 +302,18 @@ export function TrainingPlans() {
                                 <Edit />
                             </IconButton>
                             <IconButton
+                                onClick={() => onDuplicateTrainingPlanClicked(plan.id)}
+                                edge="end" aria-label="duplicate">
+                                <CopyAllTwoTone />
+                            </IconButton>
+                            <IconButton
                                 onClick={() => onDeleteTrainingPlanClicked(plan.id)}
                                 edge="end" aria-label="delete">
                                 <Delete />
                             </IconButton>
-                            <IconButton onClick={() => toggleTrainingPlan(plan.id)}>
+                            {/* <IconButton onClick={() => toggleTrainingPlan(plan.id)}>
                                 {trainingPlansOpen[plan.id] ? <ExpandLess /> : <ExpandMore />}
-                            </IconButton>
+                            </IconButton> */}
                         </ListItemSecondaryAction>
                     </ListItem>
                     <Collapse in={trainingPlansOpen[plan.name]} timeout="auto" unmountOnExit>

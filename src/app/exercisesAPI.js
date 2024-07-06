@@ -103,6 +103,38 @@ export function useExercisesAPI() {
         saveNewTraininPlan({ newTrainingPlan });
     }
 
+    function resetTrainingPlan(plan) {
+        plan.exercises = plan.exercises.map(e => {
+            e.id = uniqueId("exercise_");
+            e.weeks = e.weeks.map(w => {
+                w.totalWeeklySets = 0;
+                return w;
+            })
+            return e;
+        })
+        plan.workouts = plan.workouts.map(w => {
+            w.id = uniqueId("workout_");
+            w.exercises = w.exercises.map(e => {
+                e.id = uniqueId("exercise_");
+                e.weeks = e.weeks.map(w => {
+                    w.totalWeeklySets = 0;
+                    return w;
+                })
+                return e;
+            })
+            return w;
+        })
+
+    }
+
+    function duplicateTrainingPlan(planId) {
+        const plan = trainingPlans.find(tp => tp.id === planId);
+        const newTrainingPlan = createTrainingPlanFromObject({ tpObject: plan, name: plan.name + ' - Copy' })
+        resetTrainingPlan(newTrainingPlan);
+        saveNewTraininPlan({ newTrainingPlan });
+
+    }
+
     function addTrainingPlanFromPlan({ name, plan }) {
         const newTrainingPlan = createNewPlan({ exercises: plan.exercises, workouts: plan.workouts, name, numberOfWeeks: plan.numberOfWeeks });
         saveNewTraininPlan({ newTrainingPlan });
@@ -268,6 +300,15 @@ export function useExercisesAPI() {
         function editExercise(exercise) {
             const index = trainingPlan.exercises.findIndex(e => e.id === exercise.id);
             trainingPlan.exercises[index] = buildExerciseObject(trainingPlan, exercise);
+            trainingPlan.workouts = trainingPlan.workouts.map(w => {
+                w.exercises = w.exercises.map(e => {
+                    if (e.name === exercise.name) {
+                        return createExerciseObject(trainingPlan, exercise, w.name, e)
+                    }
+                    return e;
+                })
+                return w;
+            })
             saveTrainingPlan(trainingPlan);
         }
         function deleteExercise(exercise) {
@@ -404,6 +445,9 @@ export function useExercisesAPI() {
         function calculateSetsDoneWeek(week, field) {
             const result1 = workouts.map(w => {
                 return w.exercises.reduce((acc, ex) => {
+                    if (!ex.weeks[week]) {
+                        return acc;
+                    }
                     return acc + ex.weeks[week][field];
                 }, 0)
             })
@@ -503,6 +547,7 @@ export function useExercisesAPI() {
         currentTrainingPlan,
         addTrainingPlanFromPlan,
         addTrainingPlanFromObject,
+        duplicateTrainingPlan
 
     }
 }
