@@ -4,8 +4,15 @@ import OpenAI from "openai";
 import fs from 'fs'
 import path from 'path'
 
-// const model = 'gpt-3.5-turbo';
-const { parsed: { OPENAI_API_KEY } } = dotenv.config()
+let OPENAI_API_KEY = null
+if (process.env.NODE_ENV === 'development') {
+    const { parsed } = dotenv.config()
+    OPENAI_API_KEY = parsed.OPENAI_API_KEY
+} else {
+    OPENAI_API_KEY = process.env.OPENAI_API_KEY
+}
+
+// const { parsed: { OPENAI_API_KEY } } = dotenv.config()
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
 const MILLION = 1000000
