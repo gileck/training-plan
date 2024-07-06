@@ -57,9 +57,8 @@ export function Settings() {
 
     function copyLocalStorage() {
         const { getData } = localStorageAPI()
-        const exercises = getData('exercises')
-        const workouts = getData('workouts')
-        navigator.clipboard.writeText(JSON.stringify({ exercises, workouts }))
+        const trainingPlans = getData('trainingPlans')
+        navigator.clipboard.writeText(JSON.stringify({ trainingPlans }))
     }
 
     function onKeepCurrentWeekOpenedChange(e) {
