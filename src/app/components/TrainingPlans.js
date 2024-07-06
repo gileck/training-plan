@@ -25,11 +25,15 @@ import { EditPlan, EditTrainingPlan, EditTrainingPlanInternal } from './EditPlan
 import { AppContext } from '../AppContext';
 import { WorkoutList } from './Workout';
 import { BuildTrainingPlanDialog } from './BuildTrainingPlanDialog';
-
-function TrainingPlanMenuDialog({ open, onClose, planId }) {
-    const { deleteTrainingPlan, duplicateTrainingPlan, selectTrainingPlan, trainingPlans } = useExercisesAPI()
+import { getLocalExercises } from '../exercisesList'
+function TrainingPlanMenuDialog({ open, onClose, planId, trainingPlans, deleteTrainingPlan, duplicateTrainingPlan }) {
     const { setRoute } = useContext(AppContext);
     const plan = trainingPlans.find(p => p.id === planId)
+    console.log({
+        plan,
+        trainingPlans,
+        planId
+    });
     if (!plan) {
         onClose()
         return null
@@ -208,12 +212,18 @@ function AddTrainingPlanDialog({ open, onClose: closeDialog, onCreateTrainingPla
 
 export function TrainingPlans() {
 
+
     const { duplicateTrainingPlan, createTrainingPlanActions, deleteTrainingPlan, addTrainingPlan, trainingPlans, selectTrainingPlan, currentTrainingPlan, addTrainingPlanFromObject, addTrainingPlanFromPlan } = useExercisesAPI()
+    console.log({
+        trainingPlans
+    });
     const [buildAiTrainingPlanOpen, setBuildAiTrainingPlanOpen] = useState(false);
     const [isTrainingPlanModalOpen, setIsTrainingPlanModalOpen] = useState(false)
     const [trainingPlanMenuOpenId, setTrainingPlanMenuOpenId] = useState(null)
     const [trainingPlansOpen, setTrainingPlansOpen] = useState({})
     const { setRoute } = useContext(AppContext);
+    const { saveData } = localStorageAPI()
+
 
     function selectTrainingPlanClicked(planId) {
         selectTrainingPlan(planId)
@@ -328,61 +338,65 @@ export function TrainingPlans() {
             onCreateTrainingPlanClicked={onCreateTrainingPlanClicked}
             openBuilTrainingPlanWithAI={() => setBuildAiTrainingPlanOpen(true)}
         />
-        <TrainingPlanMenuDialog
+        {trainingPlanMenuOpenId ? <TrainingPlanMenuDialog
+            deleteTrainingPlan={deleteTrainingPlan}
+            duplicateTrainingPlan={duplicateTrainingPlan}
+            trainingPlans={trainingPlans}
             open={trainingPlanMenuOpenId !== null}
             planId={trainingPlanMenuOpenId}
             onClose={() => setTrainingPlanMenuOpenId(null)}
-        />
-        <List>
-            {trainingPlans.map((plan, index) => {
-                const { getTotalSets, getWeeksDone } = createTrainingPlanActions(plan)
+        /> : null}
+        < List >
+            {
+                trainingPlans.map((plan, index) => {
+                    const { getTotalSets, getWeeksDone } = createTrainingPlanActions(plan)
 
-                const { totalSets, totalSetsDone } = getTotalSets()
-                const weeksDone = getWeeksDone().filter(w => w.isDone).length
-                return <>
-                    <ListItem key={index}
-                        sx={{
-                            backgroundColor: currentTrainingPlan.id === plan.id ? '#dcecf5' : 'white'
-                        }}
-                    >
-                        <ListItemIcon
-                            onClick={() => selectTrainingPlanClicked(plan.id)}
-                        >
-                            <Label
-                                sx={{
-                                    color: currentTrainingPlan.id === plan.id ? 'green' : 'gray'
-                                }}
-                            />
-                        </ListItemIcon>
-                        <ListItemText
-                            primary={<span style={{}}>{plan.name}
-                                <span style={{ marginLeft: "10px" }}>
-                                    {weeksDone === plan.numberOfWeeks && '✅'}
-                                </span>
-
-                            </span>}
-
-                            secondary={<>
-                                <div>
-                                    {weeksDone} / {plan.numberOfWeeks} weeks
-
-                                </div>
-                                {/* <div>
-                                    {totalSetsDone} / {totalSets} sets
-                                </div> */}
-                            </>}
-                            onClick={() => toggleTrainingPlan(plan.name)}
-
-
-                        />
-                        <ListItemSecondaryAction
+                    const { totalSets, totalSetsDone } = getTotalSets()
+                    const weeksDone = getWeeksDone().filter(w => w.isDone).length
+                    return <>
+                        <ListItem key={index}
                             sx={{
-                                display: 'flex',
-                                gap: 1
-
+                                backgroundColor: currentTrainingPlan.id === plan.id ? '#dcecf5' : 'white'
                             }}
                         >
-                            {/* <IconButton
+                            <ListItemIcon
+                                onClick={() => selectTrainingPlanClicked(plan.id)}
+                            >
+                                <Label
+                                    sx={{
+                                        color: currentTrainingPlan.id === plan.id ? 'green' : 'gray'
+                                    }}
+                                />
+                            </ListItemIcon>
+                            <ListItemText
+                                primary={<span style={{}}>{plan.name}
+                                    <span style={{ marginLeft: "10px" }}>
+                                        {weeksDone === plan.numberOfWeeks && '✅'}
+                                    </span>
+
+                                </span>}
+
+                                secondary={<>
+                                    <div>
+                                        {weeksDone} / {plan.numberOfWeeks} weeks
+
+                                    </div>
+                                    {/* <div>
+                                    {totalSetsDone} / {totalSets} sets
+                                </div> */}
+                                </>}
+                                onClick={() => toggleTrainingPlan(plan.name)}
+
+
+                            />
+                            <ListItemSecondaryAction
+                                sx={{
+                                    display: 'flex',
+                                    gap: 1
+
+                                }}
+                            >
+                                {/* <IconButton
                                 onClick={() => onEditTrainingPlanClicked(plan.id)}
                                 edge="end" aria-label="edit">
                                 <Edit />
@@ -397,48 +411,49 @@ export function TrainingPlans() {
                                 edge="end" aria-label="delete">
                                 <Delete />
                             </IconButton> */}
-                            <IconButton
-                                onClick={() => onTrainingPlanMenuOpenClicked(plan.id)}
-                                edge="end" aria-label="menu">
-                                <MoreHorizIcon />
-                            </IconButton>
-                            {/* <IconButton onClick={() => toggleTrainingPlan(plan.id)}>
+                                <IconButton
+                                    onClick={() => onTrainingPlanMenuOpenClicked(plan.id)}
+                                    edge="end" aria-label="menu">
+                                    <MoreHorizIcon />
+                                </IconButton>
+                                {/* <IconButton onClick={() => toggleTrainingPlan(plan.id)}>
                                 {trainingPlansOpen[plan.id] ? <ExpandLess /> : <ExpandMore />}
                             </IconButton> */}
-                        </ListItemSecondaryAction>
-                    </ListItem>
-                    <Collapse in={trainingPlansOpen[plan.name]} timeout="auto" unmountOnExit>
-                        <>
-                            <Box sx={{
-                                padding: 2,
-                                backgroundColor: 'white'
-                            }}>
-                                <WorkoutList
-                                    workouts={plan.workouts}
-                                    exercises={plan.exercises}
-                                    numberOfWeeks={plan.numberOfWeeks || 8}
-                                    isWorkoutFinished={() => false}
-                                    selectedExercises={[]}
-                                    selectedWeek={0}
-                                    onWorkoutArrowClicked={() => { }}
-                                    selectExercise={() => { }}
-                                    onSetUncompleted={() => { }}
-                                    onSetClicked={() => { }}
-                                    onExerciseClicked={() => { }}
-                                    firstWorkoutWithExercisesLeft={{}}
-                                    onExerciseDone={() => { }}
-                                    onSetComplete={() => { }}
-                                    saveConfig={() => { }}
-                                    disableEdit={true}
+                            </ListItemSecondaryAction>
+                        </ListItem>
+                        <Collapse in={trainingPlansOpen[plan.name]} timeout="auto" unmountOnExit>
+                            <>
+                                <Box sx={{
+                                    padding: 2,
+                                    backgroundColor: 'white'
+                                }}>
+                                    <WorkoutList
+                                        workouts={plan.workouts}
+                                        exercises={plan.exercises}
+                                        numberOfWeeks={plan.numberOfWeeks || 8}
+                                        isWorkoutFinished={() => false}
+                                        selectedExercises={[]}
+                                        selectedWeek={0}
+                                        onWorkoutArrowClicked={() => { }}
+                                        selectExercise={() => { }}
+                                        onSetUncompleted={() => { }}
+                                        onSetClicked={() => { }}
+                                        onExerciseClicked={() => { }}
+                                        firstWorkoutWithExercisesLeft={{}}
+                                        onExerciseDone={() => { }}
+                                        onSetComplete={() => { }}
+                                        saveConfig={() => { }}
+                                        disableEdit={true}
 
-                                />
-                            </Box>
+                                    />
+                                </Box>
 
-                        </>
-                    </Collapse >
-                    <Divider />
-                </>
-            })}
+                            </>
+                        </Collapse >
+                        <Divider />
+                    </>
+                })
+            }
         </List>
 
 

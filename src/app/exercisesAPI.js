@@ -48,9 +48,9 @@ export function isStaticExercise(name) {
 }
 
 export function useExercisesAPI() {
-
     const { getData, saveData, cleanData } = localStorageAPI();
     const [trainingPlans, setTrainingPlans] = useState(getData('trainingPlans') || []);
+    console.log("useExercisesAPI: trainingPlans", trainingPlans)
     const savedTrainingPlanId = getData('currentTrainingPlanId') || trainingPlans[0]?.id;
     const savedTrainingPlan = trainingPlans.find(tp => tp.id === savedTrainingPlanId) || trainingPlans[0]
     const [currentTrainingPlanId, setCurrentTrainingPlanId] = useState(savedTrainingPlan?.id || null);
@@ -69,8 +69,9 @@ export function useExercisesAPI() {
             }
             return tp;
         })
-        setTrainingPlans(newTrainingPlans);
         saveData('trainingPlans', newTrainingPlans);
+        setTrainingPlans(_.cloneDeep(newTrainingPlans))
+
     }
 
     function createTrainingPlanFromObject({ tpObject, name }) {
@@ -88,8 +89,9 @@ export function useExercisesAPI() {
             ...trainingPlans,
             newTrainingPlan
         ]
-        setTrainingPlans(newTrainingPlans);
         saveData('trainingPlans', newTrainingPlans);
+        setTrainingPlans(newTrainingPlans);
+
     }
 
 
@@ -136,7 +138,7 @@ export function useExercisesAPI() {
     }
 
     function addTrainingPlanFromPlan({ name, plan }) {
-        const newTrainingPlan = createNewPlan({ exercises: plan.exercises, workouts: plan.workouts, name, numberOfWeeks: plan.numberOfWeeks });
+        const newTrainingPlan = createNewPlan({ exercises: plan.exercises, workouts: plan.workouts, name, numberOfWeeks: plan.numberOfWeeks || 8 });
         saveNewTraininPlan({ newTrainingPlan });
     }
 
@@ -278,12 +280,18 @@ export function useExercisesAPI() {
 
 
 
-    function createNewPlan({ exercises: newExercises, workouts: newWorkouts, name, numberOfWeeks }) {
+    function createNewPlan({
+        exercises: newExercises,
+        workouts: newWorkouts,
+        name,
+        numberOfWeeks
+    }) {
+        let weeksNumber = numberOfWeeks || 8;
         return {
-            exercises: newExercises.map((e, index) => buildExerciseObject({ name, numberOfWeeks }, { ...e, id: index + 1 })),
-            workouts: newWorkouts.map(w => buildWorkoutObject({ numberOfWeeks }, w)),
+            exercises: newExercises.map((e, index) => buildExerciseObject({ name, numberOfWeeks: weeksNumber }, { ...e, id: index + 1 })),
+            workouts: newWorkouts.map(w => buildWorkoutObject({ numberOfWeeks: weeksNumber }, w)),
             name: name || `Training Plan ${trainingPlans.length + 1}`,
-            numberOfWeeks: numberOfWeeks || 8
+            numberOfWeeks: weeksNumber
         }
     }
 
@@ -525,8 +533,9 @@ export function useExercisesAPI() {
 
     function deleteTrainingPlan(id) {
         const newTrainingPlans = trainingPlans.filter(tp => tp.id !== id);
-        setTrainingPlans(newTrainingPlans);
         saveData('trainingPlans', newTrainingPlans);
+        setTrainingPlans(_.cloneDeep(newTrainingPlans))
+
     }
 
     function findTrainingPlanById(planId) {

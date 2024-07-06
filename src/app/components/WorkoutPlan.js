@@ -387,7 +387,6 @@ export function WorkoutPlan({
     editWorkout
 }) {
 
-    // const { addExerciseToWorkout, workouts, exercises, updateExercise, numberOfWeeks, addWorkout, deleteWorkout, editWorkout } = useExercisesAPI()
     console.log({ workouts, exercises });
 
     const [open, setOpen] = useState(false);

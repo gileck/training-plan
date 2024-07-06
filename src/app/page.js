@@ -10,7 +10,7 @@ import { Workout } from "./components/Workout";
 import Box from '@mui/material/Box';
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
-import { Paper } from "@mui/material";
+import { Alert, IconButton, Paper, Snackbar } from "@mui/material";
 import SettingsIcon from '@mui/icons-material/Settings';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
@@ -19,6 +19,7 @@ import { RunExercise } from "./components/RunExercise";
 import { AppContext } from "./AppContext";
 import { localStorageAPI } from "./localStorageAPI";
 import { TrainingPlans } from "./components/TrainingPlans";
+import { Close } from "@mui/icons-material";
 
 
 function fixLocalStorage() {
@@ -52,6 +53,60 @@ function fixLocalStorage() {
     saveData('trainingPlans', updatedTraininPlans)
   }
 }
+
+function useAlert() {
+  const [isAlertOpen, setIsAlertOpen] = React.useState(false)
+  const [alertMessage, setAlertMessage] = React.useState('')
+  return {
+    isAlertOpen,
+    setIsAlertOpen,
+    alertMessage,
+    setAlertMessage
+
+  }
+}
+
+function AppProvider({ children, setRoute, params, }) {
+  const alert = useAlert()
+  const contextValue = {
+    params,
+    setRoute,
+    isAlertOpen: alert.isAlertOpen,
+    alertMessage: alert.alertMessage,
+    setIsAlertOpen: alert.setIsAlertOpen,
+    openAlert: message => {
+      alert.setAlertMessage(message)
+      alert.setIsAlertOpen(true)
+    }
+  }
+  return <AppContext.Provider value={contextValue}>
+    {children}
+  </AppContext.Provider>
+}
+
+
+function FloaingAlert() {
+  const { isAlertOpen, setIsAlertOpen, alertMessage } = React.useContext(AppContext)
+
+  console.log({ isAlertOpen });
+
+  return <Snackbar
+    open={isAlertOpen}
+    autoHideDuration={6000}
+    onClose={() => setIsAlertOpen(false)}
+
+  >
+    <Alert
+      onClose={() => setIsAlertOpen(false)}
+      severity="success"
+      variant="filled"
+      sx={{ width: '100%' }}
+    >
+      {alertMessage}
+    </Alert>
+  </Snackbar>
+
+}
 export default function Home() {
 
   fixLocalStorage()
@@ -64,6 +119,8 @@ export default function Home() {
   //   navigator.clipboard.writeText(JSON.stringify({ exercises, workouts }, null, 2))
 
   // }}>Copy local storage</button>
+
+
 
 
 
@@ -151,47 +208,51 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
-      <div>
-        <AppContext.Provider value={{
-          setRoute: setInernalRoute,
-          params: getParams()
-        }}>
-          <CompToRender
-          />
-        </AppContext.Provider>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '60px',
-        }}>
+
+      <AppProvider
+        setRoute={setInernalRoute}
+        params={getParams()}
+      >
+        <div>
+
+          <CompToRender />
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '60px',
+          }}>
+          </div>
         </div>
-      </div>
 
 
-      <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
+        <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
 
-        <Box sx={{ minWidth: 380 }}>
-          <BottomNavigation
-            showLabels
-            value={Comps.findIndex(({ route: r }) => r === route)}
-            onChange={(event, newValue) => setRoute(newValue)}
-          >
-            {
-              Comps.map(({ label, icon }, index) => (
-                <BottomNavigationAction
-                  sx={{
-                    padding: '0px'
-                  }}
-                  key={index} label={label} icon={icon} />
-              ))
-            }
-          </BottomNavigation>
-        </Box>
+          <Box sx={{ minWidth: 380 }}>
+            <BottomNavigation
+              showLabels
+              value={Comps.findIndex(({ route: r }) => r === route)}
+              onChange={(event, newValue) => setRoute(newValue)}
+            >
+              {
+                Comps.map(({ label, icon }, index) => (
+                  <BottomNavigationAction
+                    sx={{
+                      padding: '0px'
+                    }}
+                    key={index} label={label} icon={icon} />
+                ))
+              }
+            </BottomNavigation>
+          </Box>
 
 
-      </Paper>
+        </Paper>
 
-    </main>
+        <FloaingAlert />
+
+      </AppProvider>
+
+    </main >
   );
 }

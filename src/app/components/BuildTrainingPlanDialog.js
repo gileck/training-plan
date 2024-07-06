@@ -1,5 +1,5 @@
 import { FormControl } from "@mui/base";
-import { Button, Box, ButtonBase, Checkbox, Dialog, DialogTitle, FormControlLabel, FormGroup, InputLabel, MenuItem, Radio, RadioGroup, Select, Chip, TextField, Alert, Link, DialogActions, Divider } from "@mui/material";
+import { Button, Box, ButtonBase, Checkbox, Dialog, DialogTitle, FormControlLabel, FormGroup, InputLabel, MenuItem, Radio, RadioGroup, Select, Chip, TextField, Alert, Link, DialogActions, Divider, CircularProgress } from "@mui/material";
 import React, { useState } from "react";
 import { getAllBodyParts } from "../exercisesAPI";
 import { Add, AddCircle, CheckBox, CheckBoxOutlineBlankRounded, CheckBoxRounded, CheckRounded, ContentPaste, CopyAll, Description, Error, ErrorOutline, LinkRounded, OpenInNewOutlined } from "@mui/icons-material";
@@ -8,6 +8,7 @@ import { Prompt } from "next/font/google";
 import { buildPrompt } from "../trainingPlanPrompt";
 import { FormBuilder } from "./FormBuilder";
 import ContentPasteGoRoundedIcon from '@mui/icons-material/ContentPasteGoRounded';
+import { AppContext } from "../AppContext";
 
 function PromptDialog({ prompDialogOpen, onClose, prompt, onAddTrainingPlan, trainingPlanParams }) {
     const [isValidJson, setIsValidJson] = useState(null)
@@ -198,9 +199,11 @@ export function BuildTrainingPlanDialog({
     onClose,
     buildTrainigPlanDialigOpen
 }) {
+    const [loading, setLoading] = useState(false)
 
+    const { openAlert } = React.useContext(AppContext)
 
-    const [prompDialogOpen, setPrompDialogOpen] = useState(false)
+    // const [prompDialogOpen, setPrompDialogOpen] = useState(false)
     const [trainingPlanParams, setTrainingPlanParams] = useState({
         numberOfWorkouts: 3,
         workoutLength: 60,
@@ -248,9 +251,26 @@ export function BuildTrainingPlanDialog({
         // });
     }
 
-    function onBuildTrainingPlanInternal() {
-        onClose()
-        setPrompDialogOpen(true)
+    async function onBuildTrainingPlanInternal() {
+        setLoading(true)
+        const response = await fetch('/api/buildTrainingPlan', {
+            method: 'POST',
+            body: JSON.stringify({ trainingPlanParams }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(res => res.json())
+        const { result, apiPrice } = response
+
+        onBuildTrainingPlan({ plan: result, name: `AI Plan ${new Date().toLocaleDateString()}` })
+
+        console.log({ result });
+        setLoading(false)
+
+        openAlert(`Success (price: ${apiPrice})`)
+
+        // onClose()
+        // setPrompDialogOpen(true)
     }
 
     // function onWorkoutTypeChanged(workoutType, e) {
@@ -386,12 +406,12 @@ export function BuildTrainingPlanDialog({
     return (
         <>
 
-            <PromptDialog
+            {/* <PromptDialog
                 trainingPlanParams={trainingPlanParams}
                 onAddTrainingPlan={onAddTrainingPlan}
                 prompDialogOpen={prompDialogOpen}
                 onClose={() => setPrompDialogOpen(false)}
-            />
+            /> */}
             <Dialog
                 disableEscapeKeyDown
                 open={buildTrainigPlanDialigOpen}
@@ -421,8 +441,10 @@ export function BuildTrainingPlanDialog({
                     <Button
                         variant="contained"
                         onClick={onBuildTrainingPlanInternal}
+                        disabled={loading}
                     >
-                        Build Training Plan
+                        {loading && <CircularProgress size={20} />}
+                        {!loading && 'Build Training Plan'}
                     </Button>
                 </DialogActions>
 
