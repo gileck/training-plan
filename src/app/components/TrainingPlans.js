@@ -14,18 +14,94 @@ import Button from '@mui/material/Button';
 import { useExercisesAPI } from '../exercisesAPI';
 import { localStorageAPI } from '../localStorageAPI';
 import { TrainingPlan } from './TrainingPlan';
-import { Alert, DialogActions, LinearProgress, ListItemSecondaryAction, MenuItem, Select, TextField } from '@mui/material';
+import { Alert, DialogActions, Icon, LinearProgress, ListItemSecondaryAction, MenuItem, MenuList, Select, TextField, Typography } from '@mui/material';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import AssistantIcon from '@mui/icons-material/Assistant';
-
-import { Delete, ExpandCircleDown, ExpandCircleUp, ExpandMore, ExpandLess, Label, Edit, ArrowDropDown, ContentPaste, AirTwoTone, Computer, RadioButtonUncheckedRounded, CopyAll, Copyright, CopyAllTwoTone, } from "@mui/icons-material";
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { Delete, ExpandCircleDown, ExpandCircleUp, ExpandMore, ExpandLess, Label, Edit, ArrowDropDown, ContentPaste, AirTwoTone, Computer, RadioButtonUncheckedRounded, CopyAll, Copyright, CopyAllTwoTone, Menu, } from "@mui/icons-material";
 import { Dialog } from '@mui/material';
 import { EditPlan, EditTrainingPlan, EditTrainingPlanInternal } from './EditPlan';
 import { AppContext } from '../AppContext';
 import { WorkoutList } from './Workout';
 import { BuildTrainingPlanDialog } from './BuildTrainingPlanDialog';
 
+function TrainingPlanMenuDialog({ open, onClose, planId }) {
+    const { deleteTrainingPlan, duplicateTrainingPlan, selectTrainingPlan, trainingPlans } = useExercisesAPI()
+    const { setRoute } = useContext(AppContext);
+    const plan = trainingPlans.find(p => p.id === planId)
+    if (!plan) {
+        onClose()
+        return null
+    }
+    return (
+        <Dialog open={open} onClose={onClose}>
+            <DialogTitle
+                sx={{
+                    backgroundColor: 'lightblue'
+                }}
+            >
+                {plan.name}
+            </DialogTitle>
+            <DialogContent>
+                <MenuList>
+                    <MenuItem
+                        onClick={() => {
+                            setRoute('edit_plan', {
+                                trainingPlan: planId
+                            });
+                            onClose();
+                        }}
+                    >
+                        <IconButton>
+                            <Edit />
+                        </IconButton>
+                        Edit
+                    </MenuItem>
+                    <Divider />
+                    <MenuItem
+                        onClick={() => {
+                            duplicateTrainingPlan(planId);
+                            onClose();
+                        }}
+                    >
+                        <IconButton>
+                            <CopyAll />
+                        </IconButton>
+                        Duplicate
+                    </MenuItem>
+                    <Divider />
+                    <MenuItem
+                        onClick={() => {
+                            navigator.clipboard.writeText(JSON.stringify(plan));
+                            onClose();
+                        }}
+                    >
+                        <IconButton>
+                            <ContentPaste />
+                        </IconButton>
+                        Copy
+                    </MenuItem>
+                    <Divider />
+                    <MenuItem
+                        onClick={() => {
+                            const res = confirm(`Are you sure you want to delete ${plan.name}?`);
+                            if (res) {
+                                deleteTrainingPlan(planId);
+                            }
+                            onClose();
+                        }}
+                    >
+                        <IconButton>
+                            <Delete />
+                        </IconButton>
+                        Delete
+                    </MenuItem>
+                </MenuList>
+            </DialogContent>
+        </Dialog>
+    );
+}
 function AddTrainingPlanDialog({ open, onClose: closeDialog, onCreateTrainingPlanClicked, openBuilTrainingPlanWithAI }) {
     const [name, setName] = useState('')
     const [numberOfWeeks, setNumberOfWeeks] = useState(8)
@@ -135,6 +211,7 @@ export function TrainingPlans() {
     const { duplicateTrainingPlan, createTrainingPlanActions, deleteTrainingPlan, addTrainingPlan, trainingPlans, selectTrainingPlan, currentTrainingPlan, addTrainingPlanFromObject, addTrainingPlanFromPlan } = useExercisesAPI()
     const [buildAiTrainingPlanOpen, setBuildAiTrainingPlanOpen] = useState(false);
     const [isTrainingPlanModalOpen, setIsTrainingPlanModalOpen] = useState(false)
+    const [trainingPlanMenuOpenId, setTrainingPlanMenuOpenId] = useState(null)
     const [trainingPlansOpen, setTrainingPlansOpen] = useState({})
     const { setRoute } = useContext(AppContext);
 
@@ -221,6 +298,10 @@ export function TrainingPlans() {
         setBuildAiTrainingPlanOpen(false);
     }
 
+    function onTrainingPlanMenuOpenClicked(id) {
+        setTrainingPlanMenuOpenId(id)
+    }
+
     return <Box
         sx={{
             padding: 1
@@ -246,6 +327,11 @@ export function TrainingPlans() {
             onClose={() => setIsTrainingPlanModalOpen(false)}
             onCreateTrainingPlanClicked={onCreateTrainingPlanClicked}
             openBuilTrainingPlanWithAI={() => setBuildAiTrainingPlanOpen(true)}
+        />
+        <TrainingPlanMenuDialog
+            open={trainingPlanMenuOpenId !== null}
+            planId={trainingPlanMenuOpenId}
+            onClose={() => setTrainingPlanMenuOpenId(null)}
         />
         <List>
             {trainingPlans.map((plan, index) => {
@@ -296,7 +382,7 @@ export function TrainingPlans() {
 
                             }}
                         >
-                            <IconButton
+                            {/* <IconButton
                                 onClick={() => onEditTrainingPlanClicked(plan.id)}
                                 edge="end" aria-label="edit">
                                 <Edit />
@@ -310,6 +396,11 @@ export function TrainingPlans() {
                                 onClick={() => onDeleteTrainingPlanClicked(plan.id)}
                                 edge="end" aria-label="delete">
                                 <Delete />
+                            </IconButton> */}
+                            <IconButton
+                                onClick={() => onTrainingPlanMenuOpenClicked(plan.id)}
+                                edge="end" aria-label="menu">
+                                <MoreHorizIcon />
                             </IconButton>
                             {/* <IconButton onClick={() => toggleTrainingPlan(plan.id)}>
                                 {trainingPlansOpen[plan.id] ? <ExpandLess /> : <ExpandMore />}
