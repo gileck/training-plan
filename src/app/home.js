@@ -124,7 +124,7 @@ export function Home({ user, trainingPlans }) {
     const { getData, saveData } = localStorageAPI()
     const trainingPlansFromLocalStorate = getData('trainingPlans')
 
-    if ((!trainingPlans || trainingPlans.length === 0) && trainingPlansFromLocalStorate) {
+    if (trainingPlansFromLocalStorate) {
       fetch('/api/updateTrainingPlans', {
         method: 'POST',
         headers: {
