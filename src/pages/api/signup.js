@@ -25,7 +25,12 @@ export default async function handler(req, res) {
     const hashedUsername = encryptData(username);
 
 
+    const cookieOptions = {
+        expires: calculateExpires(),
+        path: '/',
 
-    res.setHeader('Set-Cookie', `key=${hashedUsername};Max-Age=365*24*60*60;Path=/;`);
+    };
+    const serializedCookie = cookie.serialize('key', hashedUsername, cookieOptions);
+    res.setHeader('Set-Cookie', serializedCookie);
     res.status(200).json({ message: 'User created' })
 }

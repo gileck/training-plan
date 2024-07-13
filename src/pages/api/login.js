@@ -1,5 +1,11 @@
 import { encryptData } from '@/crypto.js';
 import clientPromise from '../../mongo.js';
+const cookie = require('cookie');
+const calculateExpires = () => {
+    const oneYearFromNow = new Date();
+    oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
+    return oneYearFromNow
+};
 
 export default async function POST(req, res) {
     const client = await clientPromise;
@@ -19,8 +25,13 @@ export default async function POST(req, res) {
     }
     const hashedUsername = encryptData(username);
 
+    const cookieOptions = {
+        expires: calculateExpires(),
+        path: '/',
 
-    res.setHeader('Set-Cookie', `key=${hashedUsername};Max-Age=365*24*60*60;Path=/;`);
+    };
+    const serializedCookie = cookie.serialize('key', hashedUsername, cookieOptions);
+    res.setHeader('Set-Cookie', serializedCookie);
     res.status(200).json({ message: 'User logged in' });
 
 }
