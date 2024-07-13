@@ -132,13 +132,38 @@ export function Settings() {
                     onChange={onKeepCurrentWeekOpenedChange}
                 />
             </ListItem>
-            <Button
-                onClick={() => {
-                    window.location.href = '/logout'
-                }}
-            >
-                Logout
-            </Button>
+            <Divider />
+
+            <ListItem>
+                <ListItemText primary="Logout" />
+                <Button
+                    variant="contained"
+                    onClick={() => {
+                        window.location.href = '/logout'
+                    }}
+                >
+                    Logout
+                </Button>
+            </ListItem>
+            <Divider />
+
+            <ListItem>
+                <ListItemText primary="Uploade Training plans from storage" />
+                <Button
+                    variant="contained"
+                    onClick={() => {
+                        fetch('/api/updateTrainingPlans', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ trainingPlansFromLocalStorate: localStorageAPI().getData('trainingPlans') })
+                        })
+                    }}
+                >
+                    Upload
+                </Button>
+            </ListItem>
 
 
 
