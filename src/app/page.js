@@ -19,15 +19,28 @@ export default async function () {
       headers: {
         cookie: `key=${key}`
       }
-    }).then(res => res.json()),
+    })
+      .then(res => res.json())
+      .catch((e) => {
+        console.error('Error fetching data', e.message)
+        return { user: null }
+      })
+
+    ,
     fetch(`${baseUrl}/api/trainingPlans/`, {
       headers: {
         cookie: `key=${key}`
       }
-    }).then(res => res.json())
+    })
+      .then(res => res.json())
+      .catch((e) => {
+        console.error('Error fetching data', e.message)
+        return { plans: [] }
+      })
+
   ]).catch((e) => {
     console.error('Error fetching data', e.message)
-    [{ user: null }, { plans: [] }]
+    return [{ user: null }, { plans: [] }]
   })
 
 
