@@ -132,6 +132,13 @@ export function Settings() {
                     onChange={onKeepCurrentWeekOpenedChange}
                 />
             </ListItem>
+            <Button
+                onClick={() => {
+                    window.location.href = '/logout'
+                }}
+            >
+                Logout
+            </Button>
 
 
 

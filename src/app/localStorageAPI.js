@@ -23,7 +23,13 @@ export function localStorageAPI() {
 
         },
         getData: (key) => {
-            return JSON.parse(localStorage.getItem(key) || null);
+            try {
+                return JSON.parse(localStorage.getItem(key) || null);
+            } catch (e) {
+                console.log('Error getting data from local storage: ' + key, e.message);
+                return null;
+            }
+
         },
         saveData: (key, data) => {
             localStorage.setItem(key, JSON.stringify(data));

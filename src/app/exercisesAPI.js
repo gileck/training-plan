@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import _ from 'lodash';
 import { localStorageAPI } from "./localStorageAPI";
 import { getExercisesList } from "./exercisesList";
+import { AppContext } from './AppContext';
 
 function randomNum(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
@@ -48,8 +49,11 @@ export function isStaticExercise(name) {
 }
 
 export function useExercisesAPI() {
+    const context = useContext(AppContext)
+
+    const { trainingPlans, setTrainingPlans } = context
+
     const { getData, saveData, cleanData } = localStorageAPI();
-    const [trainingPlans, setTrainingPlans] = useState(getData('trainingPlans') || []);
     console.log("useExercisesAPI: trainingPlans", trainingPlans)
     const savedTrainingPlanId = getData('currentTrainingPlanId') || trainingPlans[0]?.id;
     const savedTrainingPlan = trainingPlans.find(tp => tp.id === savedTrainingPlanId) || trainingPlans[0]
@@ -69,8 +73,23 @@ export function useExercisesAPI() {
             }
             return tp;
         })
-        saveData('trainingPlans', newTrainingPlans);
+        // saveData('trainingPlans', newTrainingPlans);
+
         setTrainingPlans(_.cloneDeep(newTrainingPlans))
+        fetch('/api/saveTrainingPlan', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ trainingPlan })
+        }).then(res => res.json()).then(data => {
+            if (data.error || data.result.modifiedCount === 0) {
+                context.openAlert('Error saving Training Plan')
+                return;
+            } else {
+                context.openAlert('Training Plan saved successfully')
+            }
+        })
 
     }
 
@@ -84,13 +103,36 @@ export function useExercisesAPI() {
     }
 
     function saveNewTraininPlan({ newTrainingPlan }) {
-        newTrainingPlan.id = newTrainingPlan.id || uniqueId("plan_")
-        const newTrainingPlans = [
-            ...trainingPlans,
-            newTrainingPlan
-        ]
-        saveData('trainingPlans', newTrainingPlans);
-        setTrainingPlans(newTrainingPlans);
+
+
+        fetch('/api/addTrainingPlan', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ trainingPlan: newTrainingPlan })
+        }).then(res => res.json()).then(data => {
+            console.log({
+                data
+            })
+            if (data.error || !data.id) {
+                context.openAlert('Error saving Training Plan')
+                return;
+            } else {
+
+                newTrainingPlan.id = data.id
+                const newTrainingPlans = [
+                    ...trainingPlans,
+                    newTrainingPlan
+                ]
+                setTrainingPlans(newTrainingPlans);
+                context.openAlert('Training Plan saved successfully')
+                selectTrainingPlan(data.id);
+            }
+
+        })
+
+
 
     }
 
@@ -507,6 +549,10 @@ export function useExercisesAPI() {
             saveTrainingPlan(trainingPlan);
         }
 
+        function isEmptyPlan() {
+            return trainingPlan.exercises.length === 0 && trainingPlan.workouts.length === 0;
+        }
+
         return {
             exercises: trainingPlan.exercises,
             workouts: trainingPlan.workouts,
@@ -527,14 +573,29 @@ export function useExercisesAPI() {
             calculateTotalSetsTargetWeek,
             getTotalSets,
             getWeeksDone,
-            updateName
+            updateName,
+            isEmptyPlan
         }
     }
 
     function deleteTrainingPlan(id) {
         const newTrainingPlans = trainingPlans.filter(tp => tp.id !== id);
-        saveData('trainingPlans', newTrainingPlans);
+        // saveData('trainingPlans', newTrainingPlans);
         setTrainingPlans(_.cloneDeep(newTrainingPlans))
+        fetch('/api/deleteTrainingPlan', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id })
+        }).then(res => res.json()).then(data => {
+            if (data.error || data.result.deletedCount === 0) {
+                context.openAlert('Error deleting Training Plan')
+                return;
+            } else {
+                context.openAlert('Training Plan deleted successfully')
+            }
+        })
 
     }
 

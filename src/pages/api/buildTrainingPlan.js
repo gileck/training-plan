@@ -5,7 +5,7 @@ export default async function handler(req, res) {
     // const inputText = req.inputText
     const trainingPlanParams = req.body.trainingPlanParams
     console.log({
-        trainingPlanParams
+        trainingPlanParams  
     });
     const prompt = buildPrompt(trainingPlanParams)
     // const prompt = buildPrompt({

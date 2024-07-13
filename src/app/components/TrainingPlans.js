@@ -349,7 +349,7 @@ export function TrainingPlans() {
         < List >
             {
                 trainingPlans.map((plan, index) => {
-                    const { getTotalSets, getWeeksDone } = createTrainingPlanActions(plan)
+                    const { getTotalSets, getWeeksDone, isEmptyPlan } = createTrainingPlanActions(plan)
 
                     const { totalSets, totalSetsDone } = getTotalSets()
                     const weeksDone = getWeeksDone().filter(w => w.isDone).length
@@ -371,14 +371,14 @@ export function TrainingPlans() {
                             <ListItemText
                                 primary={<span style={{}}>{plan.name}
                                     <span style={{ marginLeft: "10px" }}>
-                                        {weeksDone === plan.numberOfWeeks && '✅'}
+                                        {!isEmptyPlan() && weeksDone === plan.numberOfWeeks && '✅'}
                                     </span>
 
                                 </span>}
 
                                 secondary={<>
                                     <div>
-                                        {weeksDone} / {plan.numberOfWeeks} weeks
+                                        {isEmptyPlan() ? 0 : weeksDone} / {plan.numberOfWeeks} weeks
 
                                     </div>
                                     {/* <div>
