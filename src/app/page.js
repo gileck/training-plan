@@ -24,7 +24,10 @@ export default async function () {
         cookie: `key=${key}`
       }
     }).then(res => res.json())
-  ])
+  ]).catch((e) => {
+    console.error('Error fetching data', e.message)
+    [{ user: null }, { plans: [] }]
+  })
 
 
   if (user) {
