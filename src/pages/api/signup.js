@@ -12,7 +12,7 @@ export default async function handler(req, res) {
 
     const users = await db.collection('users').find({ username }).toArray();
     if (users.length > 0) {
-        res.status(400).json({ message: 'User already exists' });
+        res.status(400).json({ error: 'User already exists' });
         return;
     }
 

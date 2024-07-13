@@ -3,6 +3,7 @@ import _ from 'lodash';
 import { localStorageAPI } from "./localStorageAPI";
 import { getExercisesList } from "./exercisesList";
 import { AppContext } from './AppContext';
+import { toBase64 } from 'openai/core';
 
 function randomNum(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
@@ -603,6 +604,30 @@ export function useExercisesAPI() {
         return trainingPlans.find(tp => tp.id === planId);
     }
 
+    function markTrainingPlanAsDone(planId) {
+        const tp = trainingPlans.find(tp => tp.id === planId);
+        tp.exercises = tp.exercises.map(e => {
+            e.weeks = e.weeks.map(w => {
+                w.totalWeeklySets = w.weeklyTarget;
+                return w;
+            })
+            return e;
+        })
+        tp.workouts = tp.workouts.map(w => {
+            w.exercises = w.exercises.map(e => {
+                e.weeks = e.weeks.map(w => {
+                    w.totalWeeklySets = w.weeklyTarget;
+                    return w;
+                })
+                return e;
+            })
+            return w;
+        })
+        saveTrainingPlan(tp);
+
+
+    }
+
 
     return {
         createNewPlan,
@@ -617,7 +642,8 @@ export function useExercisesAPI() {
         currentTrainingPlan,
         addTrainingPlanFromPlan,
         addTrainingPlanFromObject,
-        duplicateTrainingPlan
+        duplicateTrainingPlan,
+        markTrainingPlanAsDone
 
     }
 }

@@ -19,14 +19,14 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import AssistantIcon from '@mui/icons-material/Assistant';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Delete, ExpandCircleDown, ExpandCircleUp, ExpandMore, ExpandLess, Label, Edit, ArrowDropDown, ContentPaste, AirTwoTone, Computer, RadioButtonUncheckedRounded, CopyAll, Copyright, CopyAllTwoTone, Menu, } from "@mui/icons-material";
+import { Delete, ExpandCircleDown, ExpandCircleUp, ExpandMore, ExpandLess, Label, Edit, ArrowDropDown, ContentPaste, AirTwoTone, Computer, RadioButtonUncheckedRounded, CopyAll, Copyright, CopyAllTwoTone, Menu, Done, DoneAllOutlined, DoneOutlineRounded, DoneAllRounded, } from "@mui/icons-material";
 import { Dialog } from '@mui/material';
 import { EditPlan, EditTrainingPlan, EditTrainingPlanInternal } from './EditPlan';
 import { AppContext } from '../AppContext';
 import { WorkoutList } from './Workout';
 import { BuildTrainingPlanDialog } from './BuildTrainingPlanDialog';
 import { getLocalExercises } from '../exercisesList'
-function TrainingPlanMenuDialog({ open, onClose, planId, trainingPlans, deleteTrainingPlan, duplicateTrainingPlan }) {
+function TrainingPlanMenuDialog({ open, onClose, planId, trainingPlans, deleteTrainingPlan, duplicateTrainingPlan, markTrainingPlanAsDone }) {
     const { setRoute } = useContext(AppContext);
     const plan = trainingPlans.find(p => p.id === planId)
     console.log({
@@ -85,6 +85,18 @@ function TrainingPlanMenuDialog({ open, onClose, planId, trainingPlans, deleteTr
                             <ContentPaste />
                         </IconButton>
                         Copy
+                    </MenuItem>
+                    <Divider />
+                    <MenuItem
+                        onClick={() => {
+                            markTrainingPlanAsDone(planId);
+                            onClose();
+                        }}
+                    >
+                        <IconButton>
+                            <DoneAllRounded />
+                        </IconButton>
+                        Mark as done
                     </MenuItem>
                     <Divider />
                     <MenuItem
@@ -213,7 +225,7 @@ function AddTrainingPlanDialog({ open, onClose: closeDialog, onCreateTrainingPla
 export function TrainingPlans() {
 
 
-    const { duplicateTrainingPlan, createTrainingPlanActions, deleteTrainingPlan, addTrainingPlan, trainingPlans, selectTrainingPlan, currentTrainingPlan, addTrainingPlanFromObject, addTrainingPlanFromPlan } = useExercisesAPI()
+    const { markTrainingPlanAsDone, duplicateTrainingPlan, createTrainingPlanActions, deleteTrainingPlan, addTrainingPlan, trainingPlans, selectTrainingPlan, currentTrainingPlan, addTrainingPlanFromObject, addTrainingPlanFromPlan } = useExercisesAPI()
     console.log({
         trainingPlans
     });
@@ -339,6 +351,7 @@ export function TrainingPlans() {
             openBuilTrainingPlanWithAI={() => setBuildAiTrainingPlanOpen(true)}
         />
         {trainingPlanMenuOpenId ? <TrainingPlanMenuDialog
+            markTrainingPlanAsDone={markTrainingPlanAsDone}
             deleteTrainingPlan={deleteTrainingPlan}
             duplicateTrainingPlan={duplicateTrainingPlan}
             trainingPlans={trainingPlans}

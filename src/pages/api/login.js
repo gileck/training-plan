@@ -9,12 +9,12 @@ export default async function POST(req, res) {
 
     const users = await db.collection('users').find({ username }).toArray();
     if (users.length === 0) {
-        res.status(400).json({ message: 'User does not exist' });
+        res.status(400).json({ error: 'User does not exist' });
         return;
     }
     const user = users[0];
     if (user.password !== password) {
-        res.status(400).json({ message: 'Password is incorrect' });
+        res.status(400).json({ error: 'Password is incorrect' });
         return;
     }
     const hashedUsername = encryptData(username);

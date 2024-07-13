@@ -20,7 +20,7 @@ const Login = () => {
         });
 
         if (res.ok) {
-            setSuccess('User created successfully!');
+            setSuccess('Logged in successfully!');
             window.location.href = '/';
         } else {
             const data = await res.json();

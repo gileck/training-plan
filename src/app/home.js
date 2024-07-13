@@ -118,22 +118,22 @@ export function Home({ user, trainingPlans }) {
     trainingPlans
   });
 
-  fixLocalStorage()
+  // fixLocalStorage()
 
-  useEffect(() => {
-    const { getData, saveData } = localStorageAPI()
-    const trainingPlansFromLocalStorate = getData('trainingPlans')
+  // useEffect(() => {
+  //   const { getData, saveData } = localStorageAPI()
+  //   const trainingPlansFromLocalStorate = getData('trainingPlans')
 
-    if (trainingPlansFromLocalStorate) {
-      fetch('/api/updateTrainingPlans', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ trainingPlansFromLocalStorate })
-      })
-    }
-  }, [])
+  //   if (trainingPlansFromLocalStorate) {
+  //     fetch('/api/updateTrainingPlans', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json'
+  //       },
+  //       body: JSON.stringify({ trainingPlansFromLocalStorate })
+  //     })
+  //   }
+  // }, [])
 
 
 
