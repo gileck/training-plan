@@ -1,5 +1,5 @@
 import { decryptData } from '@/crypto';
-import { Home } from '../pages/home';
+import { Home } from './home';
 import { Client } from './client';
 import { cookies } from 'next/headers'
 

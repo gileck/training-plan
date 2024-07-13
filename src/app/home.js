@@ -1,12 +1,12 @@
 "use client"
 import React, { useEffect, useState } from "react";
 import styles from "../app/page.module.css";
-import { AppTabs } from '../app/tabs.js';
-import { EditPlan } from '../app/components/EditPlan.js';
+import { AppTabs } from './tabs.js';
+import { EditPlan } from './components/EditPlan.js';
 import dynamic from 'next/dynamic'
-import { TrainingPlan } from "../app/components/TrainingPlan.js";
-import { Settings } from "../app/components/Settings.js";
-import { Workout } from "../app/components/Workout.js";
+import { TrainingPlan } from "./components/TrainingPlan.js";
+import { Settings } from "./components/Settings.js";
+import { Workout } from "./components/Workout.js";
 import Box from '@mui/material/Box';
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
@@ -15,10 +15,10 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
-import { RunExercise } from "../app/components/RunExercise.js";
-import { AppContext } from "../app/AppContext.js";
-import { localStorageAPI } from "../app/localStorageAPI.js";
-import { TrainingPlans } from "../app/components/TrainingPlans.js";
+import { RunExercise } from "./components/RunExercise.js";
+import { AppContext } from "./AppContext.js";
+import { localStorageAPI } from "./localStorageAPI.js";
+import { TrainingPlans } from "./components/TrainingPlans.js";
 
 
 function fixLocalStorage() {
