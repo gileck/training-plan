@@ -303,10 +303,10 @@ export function useExercisesAPI() {
 
     // }
 
-    function createExerciseObject({ numberOfWeeks }, exercise, workoutName, currentExercise) {
+    function createExerciseObject({ numberOfWeeks }, exercise, workoutName, currentExercise = {}) {
         return {
             name: exercise.name,
-            sets: exercise.weeklySets,
+            sets: currentExercise.sets || exercise.weeklySets,
             id: `${exercise.name}-${workoutName}`,
             weeks: calcWeekValues(_.range(0, numberOfWeeks), exercise, currentExercise)
         }
