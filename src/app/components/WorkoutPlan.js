@@ -4,7 +4,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
+import { AddCircle as AddCircleIcon } from '@mui/icons-material';
 import { Alert, CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormGroup, InputLabel, MenuItem, Select, Slider, SliderMarkLabel, Stack, TextField } from "@mui/material";
 import { Card, Button, Chip, Collapse, Divider, ListItemSecondaryAction, Typography } from "@mui/material";
 import { Checkbox, ListItemIcon } from "@mui/material";

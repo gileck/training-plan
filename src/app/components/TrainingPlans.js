@@ -9,7 +9,7 @@ import Divider from '@mui/material/Divider';
 import Collapse from '@mui/material/Collapse';
 import AddIcon from '@mui/icons-material/Add';
 import IconButton from '@mui/material/IconButton';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
+import { AddCircle as AddCircleIcon } from '@mui/icons-material';
 import Button from '@mui/material/Button';
 import { useExercisesAPI } from '../exercisesAPI';
 import { localStorageAPI } from '../localStorageAPI';
@@ -17,8 +17,8 @@ import { TrainingPlan } from './TrainingPlan';
 import { Alert, DialogActions, Icon, LinearProgress, ListItemSecondaryAction, MenuItem, MenuList, Select, TextField, Typography } from '@mui/material';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import AssistantIcon from '@mui/icons-material/Assistant';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { Assistant as AssistantIcon } from '@mui/icons-material';
+import { MoreHoriz as MoreHorizIcon } from '@mui/icons-material';
 import { Delete, ExpandCircleDown, ExpandCircleUp, ExpandMore, ExpandLess, Label, Edit, ArrowDropDown, ContentPaste, AirTwoTone, Computer, RadioButtonUncheckedRounded, CopyAll, Copyright, CopyAllTwoTone, Menu, Done, DoneAllOutlined, DoneOutlineRounded, DoneAllRounded, } from "@mui/icons-material";
 import { Dialog } from '@mui/material';
 import { EditPlan, EditTrainingPlan, EditTrainingPlanInternal } from './EditPlan';
@@ -222,6 +222,129 @@ function AddTrainingPlanDialog({ open, onClose: closeDialog, onCreateTrainingPla
 }
 
 
+export function TrainingPlansList({
+    trainingPlans,
+    currentTrainingPlan,
+    createTrainingPlanActions,
+    onTrainingPlanMenuOpenClicked,
+    selectTrainingPlanClicked
+
+}) {
+
+    const [trainingPlansOpen, setTrainingPlansOpen] = useState({})
+    function toggleTrainingPlan(id) {
+        setTrainingPlansOpen({ ...trainingPlansOpen, [id]: !trainingPlansOpen[id] })
+    }
+
+    return <List >{
+        trainingPlans.map((plan, index) => {
+            const { getTotalSets, getWeeksDone, isEmptyPlan } = createTrainingPlanActions(plan)
+
+            const { totalSets, totalSetsDone } = getTotalSets()
+            const weeksDone = getWeeksDone().filter(w => w.isDone).length
+            return <>
+                <ListItem key={index}
+                    sx={{
+                        backgroundColor: currentTrainingPlan?.id === plan.id ? '#dcecf5' : 'white'
+                    }}
+                >
+                    <ListItemIcon
+                        onClick={() => selectTrainingPlanClicked(plan.id)}
+                    >
+                        <Label
+                            sx={{
+                                color: currentTrainingPlan?.id === plan.id ? 'green' : 'gray'
+                            }}
+                        />
+                    </ListItemIcon>
+                    <ListItemText
+                        primary={<span style={{}}>{plan.name}
+                            <span style={{ marginLeft: "10px" }}>
+                                {!isEmptyPlan() && weeksDone === plan.numberOfWeeks && '✅'}
+                            </span>
+
+                        </span>}
+
+                        secondary={<>
+                            <div>
+                                {isEmptyPlan() ? 0 : weeksDone} / {plan.numberOfWeeks} weeks
+
+                            </div>
+                            {/* <div>
+                                    {totalSetsDone} / {totalSets} sets
+                                </div> */}
+                        </>}
+                        onClick={() => toggleTrainingPlan(plan.name)}
+
+
+                    />
+                    <ListItemSecondaryAction
+                        sx={{
+                            display: 'flex',
+                            gap: 1
+
+                        }}
+                    >
+                        {/* <IconButton
+                                onClick={() => onEditTrainingPlanClicked(plan.id)}
+                                edge="end" aria-label="edit">
+                                <Edit />
+                            </IconButton>
+                            <IconButton
+                                onClick={() => onDuplicateTrainingPlanClicked(plan.id)}
+                                edge="end" aria-label="duplicate">
+                                <CopyAllTwoTone />
+                            </IconButton>
+                            <IconButton
+                                onClick={() => onDeleteTrainingPlanClicked(plan.id)}
+                                edge="end" aria-label="delete">
+                                <Delete />
+                            </IconButton> */}
+                        <IconButton
+                            onClick={() => onTrainingPlanMenuOpenClicked(plan.id)}
+                            edge="end" aria-label="menu">
+                            <MoreHorizIcon />
+                        </IconButton>
+                        {/* <IconButton onClick={() => toggleTrainingPlan(plan.id)}>
+                                {trainingPlansOpen[plan.id] ? <ExpandLess /> : <ExpandMore />}
+                            </IconButton> */}
+                    </ListItemSecondaryAction>
+                </ListItem>
+                <Collapse in={trainingPlansOpen[plan.name]} timeout="auto" unmountOnExit>
+                    <>
+                        <Box sx={{
+                            padding: 2,
+                            backgroundColor: 'white'
+                        }}>
+                            <WorkoutList
+                                workouts={plan.workouts}
+                                exercises={plan.exercises}
+                                numberOfWeeks={plan.numberOfWeeks || 8}
+                                isWorkoutFinished={() => false}
+                                selectedExercises={[]}
+                                selectedWeek={0}
+                                onWorkoutArrowClicked={() => { }}
+                                selectExercise={() => { }}
+                                onSetUncompleted={() => { }}
+                                onSetClicked={() => { }}
+                                onExerciseClicked={() => { }}
+                                firstWorkoutWithExercisesLeft={{}}
+                                onExerciseDone={() => { }}
+                                onSetComplete={() => { }}
+                                saveConfig={() => { }}
+                                disableEdit={true}
+
+                            />
+                        </Box>
+
+                    </>
+                </Collapse >
+                <Divider />
+            </>
+        })
+    }
+    </List >
+}
 export function TrainingPlans() {
 
 
@@ -255,23 +378,6 @@ export function TrainingPlans() {
         }
     }
 
-    function onEditTrainingPlanClicked(id) {
-        console.log('onEditTrainingPlanClicked', id)
-        setRoute('edit_plan', {
-            trainingPlan: id
-        })
-    }
-
-    function onDeleteTrainingPlanClicked(id) {
-        const res = confirm(`Are you sure you want to delete ${name}?`)
-        if (res) {
-            deleteTrainingPlan(id)
-        }
-    }
-
-    function onDuplicateTrainingPlanClicked(id) {
-        duplicateTrainingPlan(id)
-    }
 
     async function onBuildAiTrainingPlan({
         plan,
@@ -324,151 +430,57 @@ export function TrainingPlans() {
         setTrainingPlanMenuOpenId(id)
     }
 
-    return <Box
-        sx={{
-            padding: 1
-        }}
-    >
-        <Button
+    return (
+        <Box
             sx={{
-                marginBottom: 2
-
+                padding: 1
             }}
-            startIcon={<AddCircleIcon />}
-            variant='contained'
-            onClick={() => setIsTrainingPlanModalOpen(true)}>Add Training Plan</Button>
+        >
+            <Button
+                sx={{
+                    marginBottom: 2
 
-        <BuildTrainingPlanDialog
-            buildTrainigPlanDialigOpen={buildAiTrainingPlanOpen}
-            onBuildTrainingPlan={onBuildAiTrainingPlan}
-            onClose={() => setBuildAiTrainingPlanOpen(false)}
-        />
+                }}
+                startIcon={<AddCircleIcon />}
+                variant='contained'
+                onClick={() => setIsTrainingPlanModalOpen(true)}>Add Training Plan</Button>
 
-        <AddTrainingPlanDialog
-            open={isTrainingPlanModalOpen}
-            onClose={() => setIsTrainingPlanModalOpen(false)}
-            onCreateTrainingPlanClicked={onCreateTrainingPlanClicked}
-            openBuilTrainingPlanWithAI={() => setBuildAiTrainingPlanOpen(true)}
-        />
-        {trainingPlanMenuOpenId ? <TrainingPlanMenuDialog
-            markTrainingPlanAsDone={markTrainingPlanAsDone}
-            deleteTrainingPlan={deleteTrainingPlan}
-            duplicateTrainingPlan={duplicateTrainingPlan}
-            trainingPlans={trainingPlans}
-            open={trainingPlanMenuOpenId !== null}
-            planId={trainingPlanMenuOpenId}
-            onClose={() => setTrainingPlanMenuOpenId(null)}
-        /> : null}
-        < List >
-            {
-                trainingPlans.map((plan, index) => {
-                    const { getTotalSets, getWeeksDone, isEmptyPlan } = createTrainingPlanActions(plan)
+            <BuildTrainingPlanDialog
+                buildTrainigPlanDialigOpen={buildAiTrainingPlanOpen}
+                onBuildTrainingPlan={onBuildAiTrainingPlan}
+                onClose={() => setBuildAiTrainingPlanOpen(false)}
+            />
 
-                    const { totalSets, totalSetsDone } = getTotalSets()
-                    const weeksDone = getWeeksDone().filter(w => w.isDone).length
-                    return <>
-                        <ListItem key={index}
-                            sx={{
-                                backgroundColor: currentTrainingPlan.id === plan.id ? '#dcecf5' : 'white'
-                            }}
-                        >
-                            <ListItemIcon
-                                onClick={() => selectTrainingPlanClicked(plan.id)}
-                            >
-                                <Label
-                                    sx={{
-                                        color: currentTrainingPlan.id === plan.id ? 'green' : 'gray'
-                                    }}
-                                />
-                            </ListItemIcon>
-                            <ListItemText
-                                primary={<span style={{}}>{plan.name}
-                                    <span style={{ marginLeft: "10px" }}>
-                                        {!isEmptyPlan() && weeksDone === plan.numberOfWeeks && '✅'}
-                                    </span>
+            <AddTrainingPlanDialog
+                open={isTrainingPlanModalOpen}
+                onClose={() => setIsTrainingPlanModalOpen(false)}
+                onCreateTrainingPlanClicked={onCreateTrainingPlanClicked}
+                openBuilTrainingPlanWithAI={() => setBuildAiTrainingPlanOpen(true)}
+            />
+            {trainingPlanMenuOpenId ? <TrainingPlanMenuDialog
+                markTrainingPlanAsDone={markTrainingPlanAsDone}
+                deleteTrainingPlan={deleteTrainingPlan}
+                duplicateTrainingPlan={duplicateTrainingPlan}
+                trainingPlans={trainingPlans}
+                open={trainingPlanMenuOpenId !== null}
+                planId={trainingPlanMenuOpenId}
+                onClose={() => setTrainingPlanMenuOpenId(null)}
+            /> : null}
 
-                                </span>}
+            <TrainingPlansList
+                trainingPlans={trainingPlans}
+                currentTrainingPlan={currentTrainingPlan}
+                createTrainingPlanActions={createTrainingPlanActions}
+                onTrainingPlanMenuOpenClicked={onTrainingPlanMenuOpenClicked}
+                selectTrainingPlanClicked={selectTrainingPlanClicked}
+            />
 
-                                secondary={<>
-                                    <div>
-                                        {isEmptyPlan() ? 0 : weeksDone} / {plan.numberOfWeeks} weeks
-
-                                    </div>
-                                    {/* <div>
-                                    {totalSetsDone} / {totalSets} sets
-                                </div> */}
-                                </>}
-                                onClick={() => toggleTrainingPlan(plan.name)}
+        </Box>
+    )
 
 
-                            />
-                            <ListItemSecondaryAction
-                                sx={{
-                                    display: 'flex',
-                                    gap: 1
-
-                                }}
-                            >
-                                {/* <IconButton
-                                onClick={() => onEditTrainingPlanClicked(plan.id)}
-                                edge="end" aria-label="edit">
-                                <Edit />
-                            </IconButton>
-                            <IconButton
-                                onClick={() => onDuplicateTrainingPlanClicked(plan.id)}
-                                edge="end" aria-label="duplicate">
-                                <CopyAllTwoTone />
-                            </IconButton>
-                            <IconButton
-                                onClick={() => onDeleteTrainingPlanClicked(plan.id)}
-                                edge="end" aria-label="delete">
-                                <Delete />
-                            </IconButton> */}
-                                <IconButton
-                                    onClick={() => onTrainingPlanMenuOpenClicked(plan.id)}
-                                    edge="end" aria-label="menu">
-                                    <MoreHorizIcon />
-                                </IconButton>
-                                {/* <IconButton onClick={() => toggleTrainingPlan(plan.id)}>
-                                {trainingPlansOpen[plan.id] ? <ExpandLess /> : <ExpandMore />}
-                            </IconButton> */}
-                            </ListItemSecondaryAction>
-                        </ListItem>
-                        <Collapse in={trainingPlansOpen[plan.name]} timeout="auto" unmountOnExit>
-                            <>
-                                <Box sx={{
-                                    padding: 2,
-                                    backgroundColor: 'white'
-                                }}>
-                                    <WorkoutList
-                                        workouts={plan.workouts}
-                                        exercises={plan.exercises}
-                                        numberOfWeeks={plan.numberOfWeeks || 8}
-                                        isWorkoutFinished={() => false}
-                                        selectedExercises={[]}
-                                        selectedWeek={0}
-                                        onWorkoutArrowClicked={() => { }}
-                                        selectExercise={() => { }}
-                                        onSetUncompleted={() => { }}
-                                        onSetClicked={() => { }}
-                                        onExerciseClicked={() => { }}
-                                        firstWorkoutWithExercisesLeft={{}}
-                                        onExerciseDone={() => { }}
-                                        onSetComplete={() => { }}
-                                        saveConfig={() => { }}
-                                        disableEdit={true}
-
-                                    />
-                                </Box>
-
-                            </>
-                        </Collapse >
-                        <Divider />
-                    </>
-                })
-            }
-        </List>
 
 
-    </Box >
+
+
 }

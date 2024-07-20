@@ -10,15 +10,20 @@ import { Workout } from "./components/Workout.js";
 import Box from '@mui/material/Box';
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
-import { Alert, IconButton, Paper, Snackbar } from "@mui/material";
-import SettingsIcon from '@mui/icons-material/Settings';
-import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
-import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
-import NoteAddIcon from '@mui/icons-material/NoteAdd';
+import { Alert, Paper, Snackbar } from "@mui/material";
+import { Settings as SettingsIcon } from '@mui/icons-material';
+import { FormatListBulleted as FormatListBulletedIcon } from '@mui/icons-material';
+import { FitnessCenter as FitnessCenterIcon } from '@mui/icons-material';
+import { NoteAdd as NoteAddIcon } from '@mui/icons-material';
 import { RunExercise } from "./components/RunExercise.js";
 import { AppContext } from "./AppContext.js";
 import { localStorageAPI } from "./localStorageAPI.js";
 import { TrainingPlans } from "./components/TrainingPlans.js";
+import { Menu } from "./components/Menu";
+import ResponsiveAppBar from "./components/AppBar";
+import { Users } from "./components/Users";
+import { User } from "./components/User";
+import { AskAI } from "./components/askAI";
 
 
 function fixLocalStorage() {
@@ -117,39 +122,10 @@ export function Home({ user, trainingPlans }) {
     user,
     trainingPlans
   });
-
-  // fixLocalStorage()
-
-  // useEffect(() => {
-  //   const { getData, saveData } = localStorageAPI()
-  //   const trainingPlansFromLocalStorate = getData('trainingPlans')
-
-  //   if (trainingPlansFromLocalStorate) {
-  //     fetch('/api/updateTrainingPlans', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json'
-  //       },
-  //       body: JSON.stringify({ trainingPlansFromLocalStorate })
-  //     })
-  //   }
-  // }, [])
-
-
-
-  // const { getData } = localStorageAPI()
-  // const exercises = getData('exercises')
-  // const workouts = getData('workouts')
-
-  // return <button onClick={() => {
-  //   navigator.clipboard.writeText(JSON.stringify({ exercises, workouts }, null, 2))
-
-  // }}>Copy local storage</button>
-
-
-
-
-
+  const [menuOpen, setMenuOpen] = React.useState(false)
+  const toggleDrawer = () => {
+    setMenuOpen(!menuOpen)
+  }
 
   const routeToComp = {
     'workouts': Workout,
@@ -157,14 +133,19 @@ export function Home({ user, trainingPlans }) {
     'training_plans': TrainingPlans,
     'edit_plan': EditPlan,
     'settings': Settings,
-    'runExercise': RunExercise
+    'runExercise': RunExercise,
+    'users': Users,
+    'user': User,
+    'askAI': AskAI
   }
+
 
   const Comps = [
     { label: "Workouts", route: 'workouts', icon: <FitnessCenterIcon /> },
     { label: "Training Plans", route: 'training_plans', icon: <FormatListBulletedIcon /> },
     { label: "Edit Plan", route: 'edit_plan', icon: <NoteAddIcon /> },
     { label: "Settings", route: 'settings', icon: <SettingsIcon /> },
+
   ]
   const [route, setValue] = React.useState('workouts');
 
@@ -231,55 +212,50 @@ export function Home({ user, trainingPlans }) {
 
 
 
+  return (<main className={styles.main}>
 
-  return (
-    <main className={styles.main}>
-
-      <AppProvider
-        setRoute={setInernalRoute}
-        params={getParams()}
-        trainingPlans={trainingPlans}
-      >
-        <div>
-
-          <CompToRender />
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '60px',
-          }}>
-          </div>
+    <AppProvider
+      setRoute={setInernalRoute}
+      params={getParams()}
+      trainingPlans={trainingPlans}
+    >
+      <div>
+        <ResponsiveAppBar
+          toggleDrawer={toggleDrawer}
+        />
+        <CompToRender />
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '60px',
+        }}>
         </div>
-
-
-        <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
-
-          <Box sx={{ minWidth: 380 }}>
-            <BottomNavigation
-              showLabels
-              value={Comps.findIndex(({ route: r }) => r === route)}
-              onChange={(event, newValue) => setRoute(newValue)}
-            >
-              {
-                Comps.map(({ label, icon }, index) => (
-                  <BottomNavigationAction
-                    sx={{
-                      padding: '0px'
-                    }}
-                    key={index} label={label} icon={icon} />
-                ))
-              }
-            </BottomNavigation>
-          </Box>
-
-
-        </Paper>
-
-        <FloaingAlert />
-
-      </AppProvider>
-
-    </main >
+      </div>
+      <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
+        <Box sx={{ minWidth: 380 }}>
+          <BottomNavigation
+            showLabels
+            value={Comps.findIndex(({ route: r }) => r === route)}
+            onChange={(event, newValue) => setRoute(newValue)}
+          >
+            {
+              Comps.map(({ label, icon }, index) => (
+                <BottomNavigationAction
+                  sx={{
+                    padding: '0px'
+                  }}
+                  key={index} label={label} icon={icon} />
+              ))
+            }
+          </BottomNavigation>
+        </Box>
+      </Paper>
+      <FloaingAlert />
+      <Menu onRouteChanged={setInernalRoute} menuOpen={menuOpen} toggleDrawer={toggleDrawer} />
+    </AppProvider>
+  </main >
   );
 }
+
+

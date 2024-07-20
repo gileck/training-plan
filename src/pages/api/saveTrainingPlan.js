@@ -1,9 +1,10 @@
 import { getUser } from './userApi.js';
 import { getDB } from './db.js';
+import { sendMessage } from '@/telegramBot/bot.js';
 export default async function handler(req, res) {
-    const { username } = await getUser(req);
+    const { username, name } = await getUser(req);
     const db = await getDB();
-    const { trainingPlan } = req.body;
+    const { trainingPlan, options } = req.body;
     // await db.collection('trainingPlans').deleteMany({ user: username });
 
     const result = await db.collection('trainingPlans').updateOne({
@@ -20,8 +21,17 @@ export default async function handler(req, res) {
         }
     })
 
-
-
+    if (options && options.action) {
+        const { exerciseId, workoutId, weekIndex } = options;
+        // const exercise = trainingPlan.exercises.find(e => e.id === options.exerciseId);
+        const exercise = trainingPlan.workouts.find(w => w.id === workoutId).exercises.find(e => e.id === exerciseId)
+        const currentWeek = exercise.weeks[weekIndex];
+        // await sendMessage(`Training plan updated for ${username} with action ${action}`);
+        await sendMessage(`${name} just finisied ${exercise?.name} (${currentWeek.totalWeeklySets}/${currentWeek.weeklyTarget})`);
+        if (currentWeek.totalWeeklySets >= currentWeek.weeklyTarget) {
+            await sendMessage(`Nice! ${name} just completed the weekly target of ${currentWeek.weeklyTarget} sets for ${exercise?.name}`);
+        }
+    }
 
 
     res.status(200).json({

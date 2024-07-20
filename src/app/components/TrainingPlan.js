@@ -5,7 +5,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
+import { AddCircle as AddCircleIcon } from '@mui/icons-material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { localStorageAPI } from "../localStorageAPI";
 import { ExpandLess, ExpandMore, RemoveCircle } from "@mui/icons-material";
@@ -20,7 +20,7 @@ export function TrainingPlan() {
     const { exercises, getExercisesByWeeks, cleanData, updateExercise, addExercise, calculateExerciseDone, calculateTotalSetsDoneWeek, calculateTotalSetsTargetWeek } = useExercisesAPI()
     const groupByWeek = getExercisesByWeeks();
     // console.log(' groupByWeek', groupByWeek);
-    console.log({exercises})
+    console.log({ exercises })
     function handleCollapseClick(week) {
         setOpen({ ...open, [week]: !open[week] });
     }
@@ -72,9 +72,9 @@ export function TrainingPlan() {
 }
 export function ExercisesWeekly({ exercises, updateExercise, week, calculateExerciseDone }) {
     function onSetComplete(exercise, sets) {
-        updateExercise(exercise.id, week, {
-            totalWeeklySets: Number(exercise.totalWeeklySets || 0) + Number(sets)
-        });
+        // updateExercise(exercise.id, week, {
+        //     totalWeeklySets: Number(exercise.totalWeeklySets || 0) + Number(sets)
+        // });
     }
 
     function getExercises() {

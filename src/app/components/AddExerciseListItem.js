@@ -9,7 +9,7 @@ import Divider from '@mui/material/Divider';
 import Collapse from '@mui/material/Collapse';
 import AddIcon from '@mui/icons-material/Add';
 import IconButton from '@mui/material/IconButton';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
+import {AddCircle as AddCircleIcon} from '@mui/icons-material';
 import { Delete, ExpandCircleDown, ExpandCircleUp, ExpandMore, ExpandLess, Label, } from "@mui/icons-material";
 import {
     Autocomplete,

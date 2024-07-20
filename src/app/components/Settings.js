@@ -71,61 +71,6 @@ export function Settings() {
         <List>
 
             <ListItem>
-                <ListItemText primary="Clear Local Storage" />
-
-                <Select
-                    onChange={onClearDataChanged}
-                    value={cleanDataOption}
-                    placeholder="Select option"
-                >
-
-                    {
-                        Object.keys(localStorage).map((key, index) => (
-                            <MenuItem key={index} value={key}>{key}</MenuItem>
-                        ))
-                    }
-                </Select>
-
-                <IconButton onClick={cleanData}>
-                    <Delete color="error" />
-                </IconButton>
-            </ListItem>
-            <Divider />
-
-            {/* <ListItem>
-                <ListItemText primary="OPEN-AI API key:" />
-
-                <TextField onInput={onApiKeyChanged} label="API KEY" />
-            </ListItem> */}
-
-            <ListItem>
-                <ListItemText primary="Set Local Storage" />
-                <TextField
-                    sx={{
-                        width: '300px'
-
-                    }}
-                    onInput={onSetLocalStorageEntered} label="Paste Object" />
-                <Button
-                    sx={{
-                        marginLeft: '20px'
-
-                    }}
-                    variant="contained"
-                    onClick={onSetLocalStorageClicked}>Set</Button>
-            </ListItem>
-            <Divider />
-
-            <ListItem>
-                <ListItemText primary="Copy Local Storage" />
-                <Button
-                    variant="contained"
-                    onClick={copyLocalStorage}>Copy</Button>
-            </ListItem>
-
-            <Divider />
-
-            <ListItem>
                 <ListItemText primary="Keep Current Week Opened" />
                 <Switch
                     checked={keepCurrentWeekOpened}

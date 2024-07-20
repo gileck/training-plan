@@ -81,7 +81,7 @@ const Login = () => {
                         sx={{ mb: 2 }}
                         onClick={() => window.location.href = '/signup'}
                     >
-                        Sign Up
+                        Log In
                     </Button>
                 </Box>
             </Box>

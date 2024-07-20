@@ -1,0 +1,13 @@
+
+    {
+  "content": "To determine which exercise you are performing at the lowest weight compared to the average of your exercises, we can calculate the average weight across all exercises and then identify the exercise where you are lifting the least weight.\n\nLet's look at the weights for each exercise in your training plan:\n\n1. **ATG Split Squats** - 16 kg\n2. **Shoulder Side Raise** - 14 kg\n3. **Cable Biceps Curl** - 50 kg\n4. **Shoulder Press** - 15 kg\n5. **Incline Bench Press** - 17 kg\n6. **Interval Sprints** - 0 kg (not applicable for weight)\n7. **Kettlebell Swings** - 28 kg\n8. **Single Leg Press** - 32 kg\n9. **Farmer Carry** - 28 kg\n10. **Muscle Up** - 0 kg (not applicable for weight)\n11. **Chin-ups** - 0 kg (not applicable for weight)\n12. **Pull-ups** - 0 kg (not applicable for weight)\n13. **Single Leg Squats** - 0 kg (not applicable for weight)\n14. **Tricep Dips** - 0 kg (not applicable for weight)\n\nNow, let's calculate the average weight of the applicable exercises:\n\n**Weights for consideration:**\n- ATG Split Squats: 16 kg\n- Shoulder Side Raise: 14 kg\n- Cable Biceps Curl: 50 kg\n- Shoulder Press: 15 kg\n- Incline Bench Press: 17 kg\n- Kettlebell Swings: 28 kg\n- Single Leg Press: 32 kg\n- Farmer Carry: 28 kg\n\n**Total Weight = 16 + 14 + 50 + 15 + 17 + 28 + 32 + 28 = 200 kg**\n**Number of exercises = 8**\n**Average Weight = Total Weight / Number of Exercises = 200 kg / 8 = 25 kg**\n\nNow, comparing each exercise’s weight to the average:\n\n- ATG Split Squats: 16 kg (below average)\n- Shoulder Side Raise: 14 kg (below average)\n- Cable Biceps Curl: 50 kg (above average)\n- Shoulder Press: 15 kg (below average)\n- Incline Bench Press: 17 kg (below average)\n- Kettlebell Swings: 28 kg (above average)\n- Single Leg Press: 32 kg (above average)\n- Farmer Carry: 28 kg (above average)\n\n**Lowest Weight Compared to Average:**\nThe exercise you are doing at the lowest weight is **Shoulder Side Raise** at **14 kg**, which is the lowest compared to the average weight of **25 kg**.\n\nTherefore, it suggests that the shoulder muscles (specifically targeted by the Shoulder Side Raise) are the weakest compared to your other lifts. Consider focusing on shoulder strength to bring that up!",
+  "usage": {
+    "prompt_tokens": 9448,
+    "completion_tokens": 612,
+    "total_tokens": 10060
+  },
+  "apiPrice": 0.007
+}
+
+
+    

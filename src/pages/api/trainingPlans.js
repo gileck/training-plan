@@ -1,7 +1,7 @@
 import { getUser } from './userApi.js';
 import { getDB } from './db.js';
 export default async function handler(req, res) {
-    const { username } = await getUser(req);
+    const { username } = req.query.username && { username: req.query.username } || await getUser(req);
     const db = await getDB();
     // await db.collection('trainingPlans').deleteMany({ user: username });
 

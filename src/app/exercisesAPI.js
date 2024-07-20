@@ -67,7 +67,7 @@ export function useExercisesAPI() {
     }
 
 
-    function saveTrainingPlan(trainingPlan) {
+    function saveTrainingPlan(trainingPlan, options) {
         const newTrainingPlans = trainingPlans.map(tp => {
             if (tp.id === trainingPlan.id) {
                 return trainingPlan;
@@ -82,7 +82,7 @@ export function useExercisesAPI() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ trainingPlan })
+            body: JSON.stringify({ trainingPlan, options })
         }).then(res => res.json()).then(data => {
             if (data.error || data.result.modifiedCount === 0) {
                 context.openAlert('Error saving Training Plan')
@@ -449,7 +449,7 @@ export function useExercisesAPI() {
             saveTrainingPlan(trainingPlan);
         }
 
-        const updateExercise = (workoutId, exerciseId, weekIndex, partialUpdate) => {
+        const updateExercise = (workoutId, exerciseId, weekIndex, partialUpdate, options = {}) => {
 
             const { workouts } = trainingPlan;
 
@@ -482,7 +482,7 @@ export function useExercisesAPI() {
             })
 
             trainingPlan.workouts = newWorkouts;
-            saveTrainingPlan(trainingPlan);
+            saveTrainingPlan(trainingPlan, { exerciseId, workoutId, weekIndex, ...options });
 
         }
 

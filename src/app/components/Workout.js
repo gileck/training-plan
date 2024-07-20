@@ -4,9 +4,9 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
+import { AddCircle as AddCircleIcon } from '@mui/icons-material';
 import { Button, Chip, Collapse, Divider, ListItemSecondaryAction, Typography } from "@mui/material";
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { CheckCircle } from '@mui/icons-material';
 import { getPrimaryMuscle, getSecondaryMuscles, useExercisesAPI } from "../exercisesAPI";
 import { RemoveCircle, ExpandLess, ExpandMore, Label, ExpandMoreOutlined, ExpandLessRounded, ArrowLeft, ArrowRight, NavigationOutlined, ArrowUpward, ArrowDownward } from "@mui/icons-material";
 import { AppContext } from "../AppContext";
@@ -103,7 +103,7 @@ function Exercise({
                 <IconButton
                     disabled={disableEdit || exercise.sets.done === exercise.sets.target}
                     onClick={() => onSetDone()}>
-                    <CheckCircleIcon />
+                    <CheckCircle />
                 </IconButton>
                 <IconButton
                     disabled={disableEdit || exercise.sets.done >= exercise.sets.target}
@@ -180,16 +180,19 @@ export function Workout() {
 
 
     function onSetComplete(workoutId, exercise, sets, selectedWeek) {
-
         updateExercise(workoutId, exercise.id, selectedWeek, {
             totalWeeklySets: Number(exercise.weeks[selectedWeek].totalWeeklySets || 0) + Number(sets)
+        }, {
+            action: sets > 0 ? 'SetComplete' : null,
         });
     }
 
     function onExerciseDone(workoutId, exercise, selectedWeek) {
         updateExercise(workoutId, exercise.id, selectedWeek, {
             totalWeeklySets: Number(exercise.weeks[selectedWeek].weeklyTarget || 0)
-        });
+        }, {
+            action: 'ExerciseDone',
+        })
     }
 
     function getAllExercises() {

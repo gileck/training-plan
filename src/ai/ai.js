@@ -17,6 +17,10 @@ const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
 const MILLION = 1000000
 const modelPrices = {
+    'gpt-4o-mini': {
+        prompt_tokens_price: 0.15 / MILLION,
+        completion_tokens_price: 0.6 / MILLION
+    },
     'gpt-3.5-turbo': {
         prompt_tokens_price: 0.5 / MILLION,
         completion_tokens_price: 1.5 / MILLION
@@ -40,11 +44,12 @@ function calcPrice(model, tokens) {
 }
 
 const models = {
-    '3': 'gpt-3.5-turbo',
-    '4': 'gpt-4o'
+    '3': 'gpt-4o-mini',
+    '4': 'gpt-4o',
+
 }
 export async function getResult({ messages, systemText, inputText, max_tokens, isJSON, temperature, model }) {
-    const modelToUse = models[model] || 'gpt-4-1106-preview'
+    const modelToUse = models[model] || 'gpt-4o-mini'
     const gptOptions = {
         model: modelToUse,
         temperature: temperature || 0.8,
@@ -75,7 +80,7 @@ export async function getResult({ messages, systemText, inputText, max_tokens, i
     const usage = response.usage
     const apiPrice = calcPrice(modelToUse, usage)
 
-    fs.appendFileSync(path.resolve('gptFiles', `${(new Date()).toLocaleTimeString()}.json`), `
+    fs.appendFileSync(path.resolve('./gptFiles', `${(new Date()).toLocaleTimeString()}.json`), `
     ${JSON.stringify({ content, usage, apiPrice }, null, 2) + '\n\n'}
     `)
 
@@ -86,7 +91,8 @@ export async function getResult({ messages, systemText, inputText, max_tokens, i
 }
 
 export async function getResponseFromGpt({ system, inputText, isJSON, model }) {
-    const modelToUse = models[model || '4']
+    const modelToUse = models[model] || 'gpt-4o-mini'
+
 
     const data = {
         model: modelToUse,
@@ -107,6 +113,8 @@ export async function getResponseFromGpt({ system, inputText, isJSON, model }) {
     }
 
 
+    console.log({ data });
+
     const response = await openai.chat.completions.create(data).catch(e => {
         console.log(`ERROR in getResponseFromGpt: ${e.message}`)
         return {
@@ -123,7 +131,9 @@ export async function getResponseFromGpt({ system, inputText, isJSON, model }) {
             message: response.message
         }
     }
-    console.log({ response })
+
+
+
 
 
 
@@ -131,9 +141,11 @@ export async function getResponseFromGpt({ system, inputText, isJSON, model }) {
     const usage = response.usage
     const apiPrice = calcPrice(modelToUse, usage)
 
-    // fs.appendFileSync(path.resolve('gptFiles', `${(new Date()).toLocaleTimeString()}.json`), `
-    // ${JSON.stringify({ content, usage, apiPrice }, null, 2) + '\n\n'}
-    // `)
+    if (process.env.NODE_ENV === 'development') {
+        fs.appendFileSync(path.resolve('./gptFiles', `${(new Date()).toLocaleTimeString()}.json`), `
+    ${JSON.stringify({ content, usage, apiPrice }, null, 2) + '\n\n'}
+    `)
+    }
 
     return {
         result: isJSON ? JSON.parse(content) : content,

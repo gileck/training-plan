@@ -1,7 +1,12 @@
+import cookie from 'cookie';
 import clientPromise from '../../mongo.js';
-
 import { encryptData } from '@/crypto.js';
 
+const calculateExpires = () => {
+    const oneYearFromNow = new Date();
+    oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
+    return oneYearFromNow
+};
 
 export default async function handler(req, res) {
     const client = await clientPromise;

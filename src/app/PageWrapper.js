@@ -2,11 +2,12 @@ import { decryptData } from '@/crypto';
 import { Home } from './home';
 import { Client } from './client';
 import { cookies } from 'next/headers'
+// import { DataProvider } from './DataProvider';
 
 const baseUrl = process.env.NODE_ENV === 'production' ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : 'http://localhost:3000';
 console.log({ baseUrl });
 
-export default async function () {
+export async function PageWrapper({ children }) {
     const cookieStore = cookies()
     const cookie = cookieStore.get('key')
     const key = cookie?.value
@@ -45,7 +46,7 @@ export default async function () {
 
 
     if (user) {
-        return <Home user={user} trainingPlans={plans} />
+        { children }
     } else {
         return <Client />
     }

@@ -1,6 +1,6 @@
 // components/SignUp.js
 import { useState } from 'react';
-import { Box, Button, TextField, Typography, Container, Alert } from '@mui/material';
+import { Box, Button, TextField, Typography, Container, Alert, CircularProgress } from '@mui/material';
 
 const SignUp = () => {
     const [username, setUsername] = useState('');
@@ -9,9 +9,11 @@ const SignUp = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
         setError(null);
         setSuccess(null);
 
@@ -19,6 +21,10 @@ const SignUp = () => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password, name }),
+        }).catch((error) => {
+            console.error('Error:', error);
+            setError(error);
+            return error
         });
 
         if (res.ok) {
@@ -28,6 +34,7 @@ const SignUp = () => {
             const data = await res.json();
             setError(data.error);
         }
+        setLoading(false);
     };
 
     return (
@@ -99,8 +106,11 @@ const SignUp = () => {
                         fullWidth
                         variant="contained"
                         sx={{ mt: 3, mb: 2 }}
+                        disabled={loading}
+
                     >
-                        Sign Up
+                        {loading && <CircularProgress size={20} />}
+                        {!loading && 'Sign Up'}
                     </Button>
                 </Box>
             </Box>
