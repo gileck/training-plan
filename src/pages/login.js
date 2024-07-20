@@ -1,4 +1,3 @@
-// components/SignUp.js
 import { useState } from 'react';
 import { Box, Button, TextField, Typography, Container, Alert } from '@mui/material';
 
