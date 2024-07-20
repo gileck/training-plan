@@ -52,7 +52,12 @@ export function User() {
                 mb: 4
 
             }}>
-                <Avatar src={data.user.profilePic} />
+                <Avatar
+                    sx={{
+                        width: 45,
+                        height: 45
+                    }}
+                    src={data.user.profilePic} />
                 <Typography
                     sx={{
                         ml: 2,
