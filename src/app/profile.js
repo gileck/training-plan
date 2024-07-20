@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Box, TextField, Button, Avatar, Typography, Alert } from '@mui/material';
+import { Box, TextField, Button, Avatar, Typography, Alert, CircularProgress } from '@mui/material';
 import { AppContext } from '@/app/AppContext';
 
 export const Profile = () => {
@@ -10,10 +10,12 @@ export const Profile = () => {
     const [email, setEmail] = useState(user.email);
     const [isSaved, setIsSaved] = useState(false);
     const [isError, setIsError] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const handleSave = async () => {
         setIsSaved(false);
         setIsError(false);
+        setLoading(true);
         const res = await fetch('/api/updateUser', {
             method: 'POST',
             headers: {
@@ -28,8 +30,9 @@ export const Profile = () => {
             .catch((e) => {
                 console.error(e);
                 setIsError(true);
-
+                setLoading(false);
             })
+        setLoading(false);
 
         if (res?.result?.acknowledged) {
             setIsSaved(true);
@@ -120,8 +123,9 @@ export const Profile = () => {
                 variant="contained"
                 color="primary"
                 onClick={handleSave}
+                disabled={loading}
             >
-                Save
+                {loading ? <CircularProgress size={24} sx={{ ml: 1, color: 'white' }} /> : 'Save'}
             </Button>
             {isSaved && <Alert severity="success">Profile saved successfully</Alert>}
             {isError && <Alert severity="error">Error saving profile</Alert>}
