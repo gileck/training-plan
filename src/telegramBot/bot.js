@@ -7,7 +7,8 @@ if (process.env.NODE_ENV === 'development') {
     });
 }
 const bot = new TelegramBot(process.env.TELEGRAM_BOT_KEY, { polling: true })
-const chatId = '-4217945529'
+const logsChatId = '-4217945529'
+const groupChatId = '-4217945529'
 
 // bot.on('message', (msg) => {
 //     const chatId = msg.chat.id;
@@ -15,8 +16,12 @@ const chatId = '-4217945529'
 //     bot.sendMessage(chatId, 'Received your message');
 // })
 
+export const sendLog = (message) => {
+    return bot.sendMessage(logsChatId, message);
+}
+
 export const sendMessage = (message) => {
-    return bot.sendMessage(chatId, message);
+    return bot.sendMessage(groupChatId, message);
 }
 
 

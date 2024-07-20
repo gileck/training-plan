@@ -14,6 +14,12 @@ export default async function () {
         return <Client />
     }
 
+    fetch(`${baseUrl}/api/enter`, {
+        headers: {
+            cookie: `key=${key}`
+        }
+    })
+
     const [{ user }, { plans }] = await Promise.all([
         fetch(`${baseUrl}/api/user/`, {
             headers: {

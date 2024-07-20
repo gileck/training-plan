@@ -1,6 +1,7 @@
 import cookie from 'cookie';
 import clientPromise from '../../mongo.js';
 import { encryptData } from '@/crypto.js';
+import { sendLog } from '@/telegramBot/bot.js';
 
 const calculateExpires = () => {
     const oneYearFromNow = new Date();
@@ -38,4 +39,9 @@ export default async function handler(req, res) {
     const serializedCookie = cookie.serialize('key', hashedUsername, cookieOptions);
     res.setHeader('Set-Cookie', serializedCookie);
     res.status(200).json({ message: 'User created' })
+
+    await sendLog(`
+        User ${username} created. 
+        details: ${JSON.stringify(req.body)}
+    `)
 }

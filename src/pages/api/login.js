@@ -1,5 +1,6 @@
 import { encryptData } from '@/crypto.js';
 import clientPromise from '../../mongo.js';
+import { sendLog } from '@/telegramBot/bot.js';
 const cookie = require('cookie');
 const calculateExpires = () => {
     const oneYearFromNow = new Date();
@@ -33,5 +34,7 @@ export default async function POST(req, res) {
     const serializedCookie = cookie.serialize('key', hashedUsername, cookieOptions);
     res.setHeader('Set-Cookie', serializedCookie);
     res.status(200).json({ message: 'User logged in' });
+
+    await sendLog(`User ${username} logged in`)
 
 }
