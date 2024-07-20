@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Box, TextField, Button, Avatar, Typography, Alert } from '@mui/material';
 import { AppContext } from '@/app/AppContext';
 
-const ProfilePage = () => {
+export const Profile = () => {
     const { user } = useContext(AppContext);
     console.log({ user });
     const [profilePic, setProfilePic] = useState(user.profilePic); // URL or base64 image
@@ -130,4 +130,3 @@ const ProfilePage = () => {
     );
 };
 
-export default ProfilePage;

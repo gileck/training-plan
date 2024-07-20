@@ -25,6 +25,7 @@ import { Users } from "./components/Users";
 import { User } from "./components/User";
 import { AskAI } from "./components/askAI";
 import ProfilePage from "@/pages/profile";
+import { Profile } from "./profile";
 
 
 function fixLocalStorage() {
@@ -139,7 +140,7 @@ export function Home({ user, trainingPlans }) {
     'users': Users,
     'user': User,
     'askAI': AskAI,
-    'profile': ProfilePage
+    'profile': Profile
   }
 
 
