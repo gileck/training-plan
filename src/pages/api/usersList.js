@@ -10,7 +10,8 @@ export default async function handler(req, res) {
     res.status(200).json({
         users: users.map(user => ({
             name: user.name,
-            username: user.username
+            username: user.username,
+            profilePic: user.profilePic
         }))
     });
 }

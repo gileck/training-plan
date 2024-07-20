@@ -13,7 +13,8 @@ export default async function handler(req, res) {
     res.status(200).json({
         user: {
             name: user.name,
-            username: user.username
+            username: user.username,
+            profilePic: user.profilePic
         }
     });
 }

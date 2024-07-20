@@ -13,11 +13,14 @@ import MenuItem from '@mui/material/MenuItem';
 import { FitnessCenter as FitnessCenterIcon, Person } from '@mui/icons-material';
 import { Menu as MenuIcon } from '@mui/icons-material';
 import { Adb as AdbIcon } from '@mui/icons-material';
+import { AppContext } from '../AppContext';
 
 
 const pages = ['Products', 'Pricing', 'Blog'];
 
 function ResponsiveAppBar({ toggleDrawer }) {
+
+    const { setRoute, user } = React.useContext(AppContext);
 
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
@@ -44,7 +47,13 @@ function ResponsiveAppBar({ toggleDrawer }) {
     }
 
     const handleProfileClicked = () => {
-        // window.location.href = '/profile'
+        handleCloseUserMenu()
+        setRoute('profile')
+    }
+
+    const handleSettingsClicked = () => {
+        handleCloseUserMenu()
+        setRoute('settings')
     }
 
     return (
@@ -83,7 +92,9 @@ function ResponsiveAppBar({ toggleDrawer }) {
 
                         </Menu>
                     </Box>
-                    <FitnessCenterIcon sx={{ display: 'flex', mr: 1 }} />
+                    <FitnessCenterIcon
+                        onClick={() => setRoute('')}
+                        sx={{ display: 'flex', mr: 1 }} />
                     <Typography
                         variant="h5"
                         noWrap
@@ -109,8 +120,9 @@ function ResponsiveAppBar({ toggleDrawer }) {
                     <Box sx={{ flexGrow: 0 }}>
                         <Tooltip title="Open settings">
                             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                {/* <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" /> */}
-                                <Person />
+                                {user.profilePic ? <Avatar src={user.profilePic} /> : <Person />}
+
+
                             </IconButton>
                         </Tooltip>
                         <Menu
@@ -131,6 +143,9 @@ function ResponsiveAppBar({ toggleDrawer }) {
                         >
                             <MenuItem onClick={handleProfileClicked}>
                                 <Typography textAlign="center">Profile</Typography>
+                            </MenuItem>
+                            <MenuItem onClick={handleSettingsClicked}>
+                                <Typography textAlign="center">Settings</Typography>
                             </MenuItem>
                             <MenuItem onClick={handleLogoutClicked}>
                                 <Typography textAlign="center">Logout</Typography>

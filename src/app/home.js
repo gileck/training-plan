@@ -11,7 +11,7 @@ import Box from '@mui/material/Box';
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import { Alert, Paper, Snackbar } from "@mui/material";
-import { Settings as SettingsIcon } from '@mui/icons-material';
+import { People, Settings as SettingsIcon } from '@mui/icons-material';
 import { FormatListBulleted as FormatListBulletedIcon } from '@mui/icons-material';
 import { FitnessCenter as FitnessCenterIcon } from '@mui/icons-material';
 import { NoteAdd as NoteAddIcon } from '@mui/icons-material';
@@ -24,6 +24,7 @@ import ResponsiveAppBar from "./components/AppBar";
 import { Users } from "./components/Users";
 import { User } from "./components/User";
 import { AskAI } from "./components/askAI";
+import ProfilePage from "@/pages/profile";
 
 
 function fixLocalStorage() {
@@ -70,13 +71,14 @@ function useAlert() {
   }
 }
 
-function AppProvider({ children, setRoute, params, trainingPlans }) {
+function AppProvider({ children, setRoute, params, trainingPlans, user }) {
 
   const [trainingPlansState, setTrainingPlans] = useState(trainingPlans || []);
 
 
   const alert = useAlert()
   const contextValue = {
+    user,
     trainingPlans: trainingPlansState,
     setTrainingPlans,
     params,
@@ -136,7 +138,8 @@ export function Home({ user, trainingPlans }) {
     'runExercise': RunExercise,
     'users': Users,
     'user': User,
-    'askAI': AskAI
+    'askAI': AskAI,
+    'profile': ProfilePage
   }
 
 
@@ -144,7 +147,8 @@ export function Home({ user, trainingPlans }) {
     { label: "Workouts", route: 'workouts', icon: <FitnessCenterIcon /> },
     { label: "Training Plans", route: 'training_plans', icon: <FormatListBulletedIcon /> },
     { label: "Edit Plan", route: 'edit_plan', icon: <NoteAddIcon /> },
-    { label: "Settings", route: 'settings', icon: <SettingsIcon /> },
+    { label: "Users", route: 'users', icon: <People /> },
+    // { label: "Settings", route: 'settings', icon: <SettingsIcon /> },
 
   ]
   const [route, setValue] = React.useState('workouts');
@@ -218,6 +222,7 @@ export function Home({ user, trainingPlans }) {
       setRoute={setInernalRoute}
       params={getParams()}
       trainingPlans={trainingPlans}
+      user={user}
     >
       <div>
         <ResponsiveAppBar
