@@ -24,7 +24,6 @@ import ResponsiveAppBar from "./components/AppBar";
 import { Users } from "./components/Users";
 import { User } from "./components/User";
 import { AskAI } from "./components/askAI";
-import ProfilePage from "@/pages/profile";
 import { Profile } from "./profile";
 
 
