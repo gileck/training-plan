@@ -17,7 +17,7 @@ const groupChatId = '-4217945529'
 // })
 
 export const sendLog = (message) => {
-    return bot.sendMessage(logsChatId, message);
+    // return bot.sendMessage(logsChatId, message);
 }
 
 export const sendMessage = (message) => {

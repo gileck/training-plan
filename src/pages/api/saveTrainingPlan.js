@@ -27,7 +27,7 @@ export default async function handler(req, res) {
         const exercise = trainingPlan.workouts.find(w => w.id === workoutId).exercises.find(e => e.id === exerciseId)
         const currentWeek = exercise.weeks[weekIndex];
         // await sendMessage(`Training plan updated for ${username} with action ${action}`);
-        await sendMessage(`${name} just finisied ${exercise?.name} (${currentWeek.totalWeeklySets}/${currentWeek.weeklyTarget})`);
+        // await sendMessage(`${name} just finisied ${exercise?.name} (${currentWeek.totalWeeklySets}/${currentWeek.weeklyTarget})`);
         if (currentWeek.totalWeeklySets >= currentWeek.weeklyTarget) {
             await sendMessage(`Nice! ${name} just completed the weekly target of ${currentWeek.weeklyTarget} sets for ${exercise?.name}`);
         }
