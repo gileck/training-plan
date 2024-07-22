@@ -86,10 +86,13 @@ export function useExercisesAPI() {
         }).then(res => res.json()).then(data => {
             if (data.error || data.result.modifiedCount === 0) {
                 context.openAlert('Error saving Training Plan')
-                return;
+                console.error(data.error);
             } else {
-                context.openAlert('Training Plan saved successfully')
+                // context.openAlert('Training Plan saved successfully')
             }
+        }).catch(err => {
+            context.openAlert('Error saving Training Plan')
+            console.error(err);
         })
 
     }
@@ -127,7 +130,7 @@ export function useExercisesAPI() {
                     newTrainingPlan
                 ]
                 setTrainingPlans(newTrainingPlans);
-                context.openAlert('Training Plan saved successfully')
+                context.openAlert('Training Plan Added successfully')
                 selectTrainingPlan(data.id);
             }
 
