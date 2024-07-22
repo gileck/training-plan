@@ -85,13 +85,13 @@ export function useExercisesAPI() {
             body: JSON.stringify({ trainingPlan, options })
         }).then(res => res.json()).then(data => {
             if (data.error || data.result.modifiedCount === 0) {
-                context.openAlert('Error saving Training Plan')
+                context.openErrorAlert('Error saving Training Plan')
                 console.error(data.error);
             } else {
                 // context.openAlert('Training Plan saved successfully')
             }
         }).catch(err => {
-            context.openAlert('Error saving Training Plan')
+            context.openErrorAlert('Error saving Training Plan')
             console.error(err);
         })
 

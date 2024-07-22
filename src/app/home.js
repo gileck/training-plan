@@ -61,13 +61,16 @@ function fixLocalStorage() {
 
 function useAlert() {
   const [isAlertOpen, setIsAlertOpen] = React.useState(false)
+  const [isErrorAlertOpen, setIsErrorAlertOpen] = React.useState(false)
+
   const [alertMessage, setAlertMessage] = React.useState('')
   return {
     isAlertOpen,
     setIsAlertOpen,
     alertMessage,
-    setAlertMessage
-
+    setAlertMessage,
+    isErrorAlertOpen,
+    setIsErrorAlertOpen
   }
 }
 
@@ -86,9 +89,18 @@ function AppProvider({ children, setRoute, params, trainingPlans, user }) {
     isAlertOpen: alert.isAlertOpen,
     alertMessage: alert.alertMessage,
     setIsAlertOpen: alert.setIsAlertOpen,
-    openAlert: message => {
+    openAlert: (message) => {
       alert.setAlertMessage(message)
       alert.setIsAlertOpen(true)
+    },
+    openErrorAlert: (message) => {
+      alert.setAlertMessage(message)
+      alert.setIsErrorAlertOpen(true)
+    },
+    isErrorAlertOpen: alert.isErrorAlertOpen,
+    closeAlert: () => {
+      alert.setIsAlertOpen(false)
+      alert.setIsErrorAlertOpen(false)
     }
   }
   return <AppContext.Provider value={contextValue}>
@@ -98,19 +110,17 @@ function AppProvider({ children, setRoute, params, trainingPlans, user }) {
 
 
 function FloaingAlert() {
-  const { isAlertOpen, setIsAlertOpen, alertMessage } = React.useContext(AppContext)
-
-  console.log({ isAlertOpen });
+  const { isErrorAlertOpen, isAlertOpen, closeAlert, alertMessage } = React.useContext(AppContext)
 
   return <Snackbar
-    open={isAlertOpen}
+    open={isAlertOpen || isErrorAlertOpen}
     autoHideDuration={6000}
-    onClose={() => setIsAlertOpen(false)}
+    onClose={() => closeAlert(false)}
 
   >
     <Alert
-      onClose={() => setIsAlertOpen(false)}
-      severity="success"
+      onClose={() => closeAlert(false)}
+      severity={isErrorAlertOpen ? 'error' : 'success'}
       variant="filled"
       sx={{ width: '100%' }}
     >
