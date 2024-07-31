@@ -1,7 +1,7 @@
 import { getResponseFromGpt } from "@/ai/ai"
 import { buildPrompt } from "@/app/trainingPlanPrompt"
 export const config = {
-    maxDuration: 2,
+    maxDuration: 60,
 };
 
 export default async function handler(req, res) {
