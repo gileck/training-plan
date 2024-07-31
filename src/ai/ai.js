@@ -160,7 +160,8 @@ export async function getResponseFromGpt({ system, inputText, isJSON, model }) {
             apiPrice: 0,
             modelToUse,
             error: true,
-            message: e.message
+            message: e.message,
+            finish_reason
         }
     }
 
