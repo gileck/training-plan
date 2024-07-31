@@ -200,6 +200,7 @@ export function BuildTrainingPlanDialog({
     buildTrainigPlanDialigOpen
 }) {
     const [loading, setLoading] = useState(false)
+    const [isError, setError] = useState(false)
 
     const { openAlert } = React.useContext(AppContext)
 
@@ -253,21 +254,42 @@ export function BuildTrainingPlanDialog({
 
     async function onBuildTrainingPlanInternal() {
         setLoading(true)
+        setError(null)
         const response = await fetch('/api/buildTrainingPlan', {
             method: 'POST',
             body: JSON.stringify({ trainingPlanParams }),
             headers: {
                 'Content-Type': 'application/json'
             }
-        }).then(res => res.json())
+        })
+            .then(res => res.json())
+            .catch((error) => {
+                console.error(error)
+                setError(true)
+                setLoading(false)
+            })
+
+        if (!response) {
+            setError(true)
+            setLoading(false)
+            return;
+        }
         const { result, apiPrice } = response
 
-        onBuildTrainingPlan({ plan: result, name: `AI Plan ${new Date().toLocaleDateString()}` })
+        if (result) {
+            onBuildTrainingPlan({ plan: result, name: `AI Plan ${new Date().toLocaleDateString()}` })
 
-        console.log({ result });
-        setLoading(false)
+            console.log({ result });
+            setLoading(false)
 
-        openAlert(`Success (price: ${apiPrice})`)
+            openAlert(`Success (price: ${apiPrice})`)
+        } else {
+            setError(true)
+            setLoading(false)
+            openAlert(`Error: ${error}`)
+        }
+
+
 
         // onClose()
         // setPrompDialogOpen(true)
@@ -431,6 +453,12 @@ export function BuildTrainingPlanDialog({
                     onChange={onFormChanged}
                 />
 
+                {
+                    isError && <Alert severity="error">
+                        Error building training plan with AI
+                    </Alert>
+                }
+
                 <DialogActions>
                     <Button
                         variant="outlined"
@@ -447,6 +475,8 @@ export function BuildTrainingPlanDialog({
                         {!loading && 'Build Training Plan'}
                     </Button>
                 </DialogActions>
+
+
 
             </Dialog >
         </>

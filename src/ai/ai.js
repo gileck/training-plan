@@ -54,7 +54,7 @@ export async function getResult({ messages, systemText, inputText, max_tokens, i
         model: modelToUse,
         temperature: temperature || 0.8,
         response_format: { "type": isJSON ? "json_object" : 'text' },
-        max_tokens: max_tokens || 1000,
+        max_tokens: max_tokens || 10000,
         messages: messages || [
             {
                 "role": "system",
@@ -77,14 +77,16 @@ export async function getResult({ messages, systemText, inputText, max_tokens, i
     }
     // console.log({response})
     const content = response.choices[0].message.content
+    const finish_reason = response.choices[0].finish_reason
     const usage = response.usage
     const apiPrice = calcPrice(modelToUse, usage)
 
     fs.appendFileSync(path.resolve('./gptFiles', `${(new Date()).toLocaleTimeString()}.json`), `
-    ${JSON.stringify({ content, usage, apiPrice }, null, 2) + '\n\n'}
+    ${JSON.stringify({ content, usage, apiPrice, finish_reason }, null, 2) + '\n\n'}
     `)
 
     return {
+        finish_reason,
         result: isJSON ? JSON.parse(content) : content,
         apiPrice
     }
@@ -109,7 +111,7 @@ export async function getResponseFromGpt({ system, inputText, isJSON, model }) {
                 "content": `${inputText}`
             }
         ],
-        max_tokens: 1000,
+        max_tokens: 10000,
     }
 
 
@@ -138,17 +140,32 @@ export async function getResponseFromGpt({ system, inputText, isJSON, model }) {
 
 
     const content = response.choices[0].message.content
+    const finish_reason = response.choices[0].finish_reason
     const usage = response.usage
     const apiPrice = calcPrice(modelToUse, usage)
 
     if (process.env.NODE_ENV === 'development') {
         fs.appendFileSync(path.resolve('./gptFiles', `${(new Date()).toLocaleTimeString()}.json`), `
-    ${JSON.stringify({ content, usage, apiPrice }, null, 2) + '\n\n'}
+    ${JSON.stringify({ content, usage, apiPrice, finish_reason }, null, 2) + '\n\n'}
     `)
     }
 
+    let result = null
+    try {
+        result = isJSON ? JSON.parse(content) : content
+    } catch (e) {
+        console.log(e)
+        return {
+            result: null,
+            apiPrice: 0,
+            modelToUse,
+            error: true,
+            message: e.message
+        }
+    }
+
     return {
-        result: isJSON ? JSON.parse(content) : content,
+        result,
         apiPrice,
         modelToUse
     }

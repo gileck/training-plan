@@ -1,6 +1,9 @@
 import { getResponseFromGpt } from "@/ai/ai";
 import { getUser } from "./userApi";
 import { getDB } from "./db";
+export const config = {
+    maxDuration: 60,
+};
 
 export default async function handler(req, res) {
     const { text, currentTrainingPlan } = req.body;
