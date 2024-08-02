@@ -1,7 +1,7 @@
 // theme.js
 import { createTheme } from '@mui/material/styles';
 
-const colors2 = {
+const colors = {
     listHeaderBackground: '#d4ddff', // Indigo 100 for a light header background
     listHeaderText: '#1A237E',      // Indigo 900 for strong, dark header text
     listHeaderSecondaryText: '#5C6BC0', // Indigo 400 for secondary text
@@ -10,10 +10,11 @@ const colors2 = {
     exerciseBackgroundSelected: '#7986CB', // Indigo 300 for selected exercises
     header: '#111e68',              // Indigo 500 for a vibrant header
     footer: 'white',              // Indigo 800 for a bold footer
+    footerText: '#111e68',          // Indigo 500 for footer text
 };
 
 
-const colors = {
+const colors2 = {
     listHeaderBackground: '#e3f2fd', // Light blue background for headers
     listHeaderText: '#0d47a1',      // Dark blue for header text
     listHeaderSecondaryText: '#5c6bc0', // Light grey-blue for secondary text
@@ -21,7 +22,8 @@ const colors = {
     exerciseBackground: '#f5f5f5',  // Light grey for exercise items
     exerciseBackgroundSelected: '#c8e6c9', // Light green for selected items
     header: '#1e88e5',              // Vibrant blue for the header
-    footer: '#424242',              // Dark grey for the footer
+    footer: 'white',              // Dark grey for the footer
+    footerText: 'gray',          // White text for the footer
 };
 
 
@@ -109,7 +111,7 @@ const theme2 = createTheme({
         MuiBottomNavigationAction: {
             styleOverrides: {
                 root: {
-                    color: 'gray', // Example of customizing component styles
+                    color: colors2.footerText,
                 },
             },
         }
