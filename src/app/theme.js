@@ -95,16 +95,12 @@ const theme2 = createTheme({
         MuiButton: {
             styleOverrides: {
                 root: {
-                    borderRadius: 8,
-                    textTransform: 'none',
                 },
             },
         },
         MuiCard: {
             styleOverrides: {
                 root: {
-                    borderRadius: 8,
-                    boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
                 },
             },
         },
