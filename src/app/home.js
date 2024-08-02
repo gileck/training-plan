@@ -10,7 +10,7 @@ import { Workout } from "./components/Workout.js";
 import Box from '@mui/material/Box';
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
-import { Alert, Paper, Snackbar } from "@mui/material";
+import { Alert, Paper, Snackbar, ThemeProvider } from "@mui/material";
 import { People, Settings as SettingsIcon } from '@mui/icons-material';
 import { FormatListBulleted as FormatListBulletedIcon } from '@mui/icons-material';
 import { FitnessCenter as FitnessCenterIcon } from '@mui/icons-material';
@@ -25,6 +25,7 @@ import { Users } from "./components/Users";
 import { User } from "./components/User";
 import { AskAI } from "./components/askAI";
 import { Profile } from "./profile";
+import theme from "./theme";
 
 
 function fixLocalStorage() {
@@ -228,47 +229,55 @@ export function Home({ user, trainingPlans }) {
 
   return (<main className={styles.main}>
 
-    <AppProvider
-      setRoute={setInernalRoute}
-      params={getParams()}
-      trainingPlans={trainingPlans}
-      user={user}
-    >
-      <div>
-        <ResponsiveAppBar
-          toggleDrawer={toggleDrawer}
-        />
-        <CompToRender />
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '60px',
-        }}>
+    <ThemeProvider theme={theme}>
+
+      <AppProvider
+        setRoute={setInernalRoute}
+        params={getParams()}
+        trainingPlans={trainingPlans}
+        user={user}
+      >
+        <div>
+          <ResponsiveAppBar
+            toggleDrawer={toggleDrawer}
+          />
+          <CompToRender />
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '60px',
+          }}>
+          </div>
         </div>
-      </div>
-      <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
-        <Box sx={{ minWidth: 380 }}>
-          <BottomNavigation
-            showLabels
-            value={Comps.findIndex(({ route: r }) => r === route)}
-            onChange={(event, newValue) => setRoute(newValue)}
-          >
-            {
-              Comps.map(({ label, icon }, index) => (
-                <BottomNavigationAction
-                  sx={{
-                    padding: '0px'
-                  }}
-                  key={index} label={label} icon={icon} />
-              ))
-            }
-          </BottomNavigation>
-        </Box>
-      </Paper>
-      <FloaingAlert />
-      <Menu onRouteChanged={setInernalRoute} menuOpen={menuOpen} toggleDrawer={toggleDrawer} />
-    </AppProvider>
+        <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
+          <Box sx={{ minWidth: 380 }}>
+            <BottomNavigation
+              showLabels
+              value={Comps.findIndex(({ route: r }) => r === route)}
+              onChange={(event, newValue) => setRoute(newValue)}
+              sx={{
+                backgroundColor: theme.colors.footer,
+                // color: 'white'
+              }}
+            >
+              {
+                Comps.map(({ label, icon }, index) => (
+                  <BottomNavigationAction
+                    sx={{
+                      padding: '0px',
+                      // color: 'white'
+                    }}
+                    key={index} label={label} icon={icon} />
+                ))
+              }
+            </BottomNavigation>
+          </Box>
+        </Paper>
+        <FloaingAlert />
+        <Menu onRouteChanged={setInernalRoute} menuOpen={menuOpen} toggleDrawer={toggleDrawer} />
+      </AppProvider>
+    </ThemeProvider >
   </main >
   );
 }

@@ -599,7 +599,13 @@ export function useExercisesAPI() {
             } else {
                 context.openAlert('Training Plan deleted successfully')
             }
+        }).then(() => {
+            if (savedTrainingPlanId === id) {
+                selectTrainingPlan(newTrainingPlans[0]?.id)
+            }
         })
+
+
 
     }
 

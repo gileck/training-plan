@@ -8,8 +8,8 @@ function uniqueId(prefix) {
     return `${prefix}${randomNum(0, 99999)}`
 }
 export default async function handler(req, res) {
-    const { username } = await getUser(req);
-    const db = await getDB();
+    const { username } = await getUser(req)
+    const db = await getDB()
     const { trainingPlan } = req.body;
     // await db.collection('trainingPlans').deleteMany({ user: username });
     const id = `${username}_${uniqueId("plan_")}`
@@ -26,11 +26,6 @@ export default async function handler(req, res) {
     }).catch((e) => {
         console.log('Training plan already exists', e.message);
     })
-
-
-
-
-
     res.status(200).json({
         result,
         id

@@ -14,6 +14,7 @@ import { FitnessCenter as FitnessCenterIcon, Person } from '@mui/icons-material'
 import { Menu as MenuIcon } from '@mui/icons-material';
 import { Adb as AdbIcon } from '@mui/icons-material';
 import { AppContext } from '../AppContext';
+import theme from '../theme';
 
 
 const pages = ['Products', 'Pricing', 'Blog'];
@@ -57,7 +58,11 @@ function ResponsiveAppBar({ toggleDrawer }) {
     }
 
     return (
-        <AppBar position="static">
+        <AppBar position="static"
+            sx={{
+                backgroundColor: theme.colors.header,
+            }}
+        >
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
                     <Box sx={{ flexGrow: 1, display: 'flex' }}>

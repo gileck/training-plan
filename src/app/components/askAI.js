@@ -5,6 +5,7 @@ import { localStorageAPI } from "../localStorageAPI";
 import PendingIcon from '@mui/icons-material/Pending';
 import ReactMarkdown from 'react-markdown';
 import { styled } from '@mui/material/styles';
+import { useExercisesAPI } from "../exercisesAPI";
 
 
 const TypingIndicator = styled(Box)(({ theme }) => ({
@@ -52,7 +53,8 @@ export function AskAI() {
     const [messages, setMessages] = useState(localMessages || []);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
-    const currentTrainingPlan = localStorageAPI().getData('currentTrainingPlanId')
+    const { currentTrainingPlan } = useExercisesAPI()
+    // const currentTrainingPlan = localStorageAPI().getData('currentTrainingPlanId')
 
     useEffect(() => {
         localStorageAPI().saveData('ai-chat-messages', messages)

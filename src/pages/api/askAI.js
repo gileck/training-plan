@@ -1,6 +1,8 @@
 import { getResponseFromGpt } from "@/ai/ai";
 import { getUser } from "./userApi";
 import { getDB } from "./db";
+import { sendLog } from '@/telegramBot/bot.js';
+
 export const config = {
     maxDuration: 60,
 };
@@ -35,7 +37,7 @@ export default async function handler(req, res) {
     ${text}
     `;
 
-    const { result, apiPrice } = await getResponseFromGpt({
+    const { result, apiPrice, modelToUse, usage, duration } = await getResponseFromGpt({
         system: '',
         inputText: prompt,
         isJSON: false,
@@ -43,5 +45,30 @@ export default async function handler(req, res) {
     })
 
 
+
     res.status(200).json({ result, apiPrice });
+
+    await sendLog(`
+        AI: AskAI
+        User: ${user.username}
+        Question: ${text}
+        Result: ${result.length} characters
+        price: ${apiPrice}
+        model: ${modelToUse}
+        tokens: ${usage.total_tokens}
+        duration: ${duration}
+        date: ${new Date().toLocaleString()}
+    `);
+
+    await db.collection('ai-api-logs').insertOne({
+        user: user.username,
+        input: text,
+        result,
+        price: apiPrice,
+        model: modelToUse,
+        tokens: usage.total_tokens,
+        date: new Date(),
+        duration
+    });
+
 }

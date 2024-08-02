@@ -117,6 +117,9 @@ export async function getResponseFromGpt({ system, inputText, isJSON, model }) {
 
     console.log({ data });
 
+    const startTime = new Date()
+
+
     const response = await openai.chat.completions.create(data).catch(e => {
         console.log(`ERROR in getResponseFromGpt: ${e.message}`)
         return {
@@ -124,6 +127,10 @@ export async function getResponseFromGpt({ system, inputText, isJSON, model }) {
 
         }
     })
+
+    const endTime = new Date()
+    const duration = (endTime - startTime) / 1000
+
     if (!response.choices) {
         return {
             result: null,
@@ -142,6 +149,7 @@ export async function getResponseFromGpt({ system, inputText, isJSON, model }) {
     const content = response.choices[0].message.content
     const finish_reason = response.choices[0].finish_reason
     const usage = response.usage
+
     const apiPrice = calcPrice(modelToUse, usage)
 
     if (process.env.NODE_ENV === 'development') {
@@ -161,14 +169,17 @@ export async function getResponseFromGpt({ system, inputText, isJSON, model }) {
             modelToUse,
             error: true,
             message: e.message,
-            finish_reason
+            finish_reason,
+            duration
         }
     }
 
     return {
         result,
         apiPrice,
-        modelToUse
+        modelToUse,
+        usage: usage,
+        duration
     }
 
 

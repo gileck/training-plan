@@ -12,16 +12,18 @@ import { RemoveCircle, ExpandLess, ExpandMore, Label, ExpandMoreOutlined, Expand
 import { AppContext } from "../AppContext";
 import Fab from '@mui/material/Fab';
 import { localStorageAPI } from "@/app/localStorageAPI";
-
+import theme from "@/app/theme";
 // import { Exercise } from "./TrainingPlan";
 
+
 const colors = {
-    listHeaderBackground: '#a8cbe1',
-    listHeaderText: '#FFFFFF',
-    listHeaderSecondaryText: '#FFFFFF',
-    workoutBackground: '#e4e4e4',
-    exerciseBackground: '#FAFAFA',
-    exerciseBackgroundSelected: '#96ddff',
+    listHeaderBackground: theme.colors.listHeaderBackground,
+    listHeaderText: theme.colors.listHeaderText,
+    listHeaderSecondaryText: theme.colors.listHeaderSecondaryText,
+    workoutBackground: theme.colors.workoutBackground,
+    exerciseBackground: theme.colors.exerciseBackground,
+    exerciseBackgroundSelected: theme.colors.exerciseBackgroundSelected,
+
 }
 
 
@@ -333,10 +335,9 @@ export function WorkoutList({
                 <ListItem
                     sx={{
                         backgroundColor: colors.listHeaderBackground,
-                        borderTopLeftRadius: '10px',
-                        borderTopRightRadius: '10px',
                     }}
                 >
+
                     <ListItemText
                         sx={{
                             // color: colors.listHeaderText,

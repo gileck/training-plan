@@ -100,10 +100,10 @@ export function EditPlan({ }) {
 
 
     return <AppTabs noCard={true} Comps={[
-        { label: 'Training Plan', Comp: <EditTrainingPlan trainingPlan={trainingPlan} {...actions} /> },
-        { label: 'Workout Plan', Comp: <WorkoutPlan trainingPlan={trainingPlan} {...actions} /> },
+        { label: 'Exercises', Comp: <EditTrainingPlan trainingPlan={trainingPlan} {...actions} /> },
+        { label: 'Workouts', Comp: <WorkoutPlan trainingPlan={trainingPlan} {...actions} /> },
         // { label: 'Body Parts', Comp: <BodyPartsPlan trainingPlan={trainingPlan} {...actions} /> },
-        { label: 'Plan Settings', Comp: <PlanSettings trainingPlan={trainingPlan} {...actions} /> },
+        { label: 'Settings', Comp: <PlanSettings trainingPlan={trainingPlan} {...actions} /> },
     ]} />
 }
 

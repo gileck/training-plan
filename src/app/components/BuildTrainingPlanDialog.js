@@ -1,6 +1,6 @@
 import { FormControl } from "@mui/base";
-import { Button, Box, ButtonBase, Checkbox, Dialog, DialogTitle, FormControlLabel, FormGroup, InputLabel, MenuItem, Radio, RadioGroup, Select, Chip, TextField, Alert, Link, DialogActions, Divider, CircularProgress } from "@mui/material";
-import React, { useState } from "react";
+import { Button, Box, ButtonBase, Checkbox, Dialog, DialogTitle, FormControlLabel, FormGroup, InputLabel, MenuItem, Radio, RadioGroup, Select, Chip, TextField, Alert, Link, DialogActions, Divider, CircularProgress, LinearProgress, DialogContent, Typography } from "@mui/material";
+import React, { useEffect, useState } from "react";
 import { getAllBodyParts } from "../exercisesAPI";
 import { Add, AddCircle, CheckBox, CheckBoxOutlineBlankRounded, CheckBoxRounded, CheckRounded, ContentPaste, CopyAll, Description, Error, ErrorOutline, LinkRounded, OpenInNewOutlined } from "@mui/icons-material";
 import { BuildTrainingPlan } from "./buildTrainingPlanLogic";
@@ -226,6 +226,13 @@ export function BuildTrainingPlanDialog({
         setTrainingPlanParams(values)
     }
 
+    useEffect(() => {
+        if (loading && document.getElementById('loading-bar')) {
+            document.getElementById('loading-bar').scrollIntoView()
+        }
+
+    }, [loading])
+
 
 
 
@@ -447,17 +454,38 @@ export function BuildTrainingPlanDialog({
                 >
                     Build Training Plan With AI
                 </DialogTitle>
+                <DialogContent>
+                    <FormBuilder
+                        formElements={formElements}
+                        onChange={onFormChanged}
+                    />
 
-                <FormBuilder
-                    formElements={formElements}
-                    onChange={onFormChanged}
-                />
 
-                {
-                    isError && <Alert severity="error">
-                        Error building training plan with AI
-                    </Alert>
-                }
+                    {loading && <Box>
+                        <Typography
+                            sx={{
+                                mb: 1,
+                                color: 'gray',
+                                fontSize: '14px'
+
+                            }}
+                        >
+                            Building Training Plan with AI...
+                            Will take a few seconds
+                        </Typography>
+                        <LinearProgress
+                            variant="indeterminate"
+                            color="secondary" />
+                        <div id='loading-bar'></div>
+
+                    </Box>}
+
+                    {
+                        isError && <Alert severity="error">
+                            Error building training plan with AI
+                        </Alert>
+                    }
+                </DialogContent>
 
                 <DialogActions>
                     <Button
@@ -471,8 +499,7 @@ export function BuildTrainingPlanDialog({
                         onClick={onBuildTrainingPlanInternal}
                         disabled={loading}
                     >
-                        {loading && <CircularProgress size={20} />}
-                        {!loading && 'Build Training Plan'}
+                        Build Training Plan
                     </Button>
                 </DialogActions>
 
