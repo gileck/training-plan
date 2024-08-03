@@ -4,8 +4,8 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
-import { AddCircle as AddCircleIcon } from '@mui/icons-material';
-import { Button, Chip, Collapse, Divider, ListItemSecondaryAction, Typography } from "@mui/material";
+import { AddCircle as AddCircleIcon, Assistant, AssistantDirectionSharp, ChatBubble, ChatBubbleOutline, ChatBubbleOutlineRounded, ChatBubbleTwoTone, Help, HelpCenter, HelpOutline, SmartToy, SupportAgent } from '@mui/icons-material';
+import { Button, Chip, Collapse, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, ListItemSecondaryAction, Typography } from "@mui/material";
 import { CheckCircle } from '@mui/icons-material';
 import { getPrimaryMuscle, getSecondaryMuscles, useExercisesAPI } from "../exercisesAPI";
 import { RemoveCircle, ExpandLess, ExpandMore, Label, ExpandMoreOutlined, ExpandLessRounded, ArrowLeft, ArrowRight, NavigationOutlined, ArrowUpward, ArrowDownward } from "@mui/icons-material";
@@ -13,6 +13,7 @@ import { AppContext } from "../AppContext";
 import Fab from '@mui/material/Fab';
 import { localStorageAPI } from "@/app/localStorageAPI";
 import theme from "@/app/theme";
+import { Chat } from "./chat";
 // import { Exercise } from "./TrainingPlan";
 
 
@@ -26,6 +27,59 @@ const colors = {
 
 }
 
+function ExerciseAskAIDialog({ open, onClose, exercise: { exercise, selectedWeek } }) {
+    if (!exercise) {
+        return <></>
+    }
+
+    const exerciseDetails = {
+        ...exercise,
+        ...exercise[exercise.selectedWeek]
+    }
+
+    delete exerciseDetails.weeks
+
+    console.log({ exerciseDetails });
+
+    function getResponse({ input }) {
+        console.log({ input });
+        return fetch('/api/getAIReponseForExercise', {
+            method: 'POST',
+            body: JSON.stringify({
+                text: input,
+                exercise: exerciseDetails
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(res => res.json())
+    }
+
+    return <div>
+        <Dialog
+            open={open}
+            onClose={onClose}
+            fullScreen={true}
+        >
+            <DialogTitle
+                sx={{
+                    backgroundColor: colors.listHeaderBackground,
+                }}
+            >Ask about {exerciseDetails.name}</DialogTitle>
+            <DialogContent>
+                <Chat
+                    chatId={`ask-ai-${exerciseDetails.id}`}
+                    getResponse={getResponse}
+                />
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={onClose}>Close</Button>
+            </DialogActions>
+        </Dialog>
+    </div>
+}
+
 
 function Exercise({
     shouldShowArrows,
@@ -37,7 +91,8 @@ function Exercise({
     onRemoveSetComplete,
     onAddSetComplete,
     onSetDone,
-    disableEdit
+    disableEdit,
+    openAskAIDialog
 }) {
     if (!exercise) {
         return null;
@@ -75,8 +130,12 @@ function Exercise({
 
                 <ListItemText
                     onClick={() => selectExercise(exercise.id)}
-                    style={{ textDecoration: weeklyTargetReached ? 'line-through' : '' }}
-                    primary={exercise.name}
+
+                    primary={
+                        <Typography
+                            sx={{ textDecoration: weeklyTargetReached ? 'line-through' : '' }}
+                        >{exercise.name}</Typography>
+                    }
                     secondary={
                         <React.Fragment>
                             <Typography
@@ -104,36 +163,72 @@ function Exercise({
                     } />
                 <IconButton
                     disabled={disableEdit || exercise.sets.done === exercise.sets.target}
-                    onClick={() => onSetDone()}>
-                    <CheckCircle />
+                    onClick={() => onSetDone()}
+
+                >
+                    <CheckCircle
+                        sx={{
+                            fontSize: '30px',
+                        }}
+                    />
                 </IconButton>
                 <IconButton
                     disabled={disableEdit || exercise.sets.done >= exercise.sets.target}
-                    onClick={() => onAddSetComplete()}>
-                    <AddCircleIcon />
+                    onClick={() => onAddSetComplete()}
+
+                >
+
+                    <AddCircleIcon
+                        sx={{
+                            fontSize: '30px',
+                        }}
+                    />
                 </IconButton>
                 <IconButton
                     disabled={disableEdit || exercise.sets.done === 0}
-                    onClick={() => onRemoveSetComplete()}>
-                    <RemoveCircle />
+                    onClick={() => onRemoveSetComplete()}
+                >
+
+                    <RemoveCircle
+                        sx={{
+                            fontSize: '30px',
+                        }}
+                    />
                 </IconButton>
             </Box>
-            <Box sx={{ pt: 1 }}> {/* This Box is optional and provides padding top */}
-                {getPrimaryMuscle(exercise.name) ? <Chip
-                    sx={{ mr: 1 }}
-                    key={getPrimaryMuscle(exercise.name)}
-                    label={getPrimaryMuscle(exercise.name)}
-                    size="small"
-                /> : ''}
-                {getSecondaryMuscles(exercise.name).map((bodyPart) => (
-                    <Chip
+            <Box sx={{
+                pt: 1,
+                display: 'flex',
+                justifyContent: 'space-between',
+                width: '100%',
+            }}>
+                <div>
+                    {getPrimaryMuscle(exercise.name) ? <Chip
                         sx={{ mr: 1 }}
-                        key={bodyPart}
-                        label={bodyPart}
+                        key={getPrimaryMuscle(exercise.name)}
+                        label={getPrimaryMuscle(exercise.name)}
                         size="small"
-                        variant="outlined"
+                    /> : ''}
+                    {getSecondaryMuscles(exercise.name).map((bodyPart) => (
+                        <Chip
+                            sx={{ mr: 1 }}
+                            key={bodyPart}
+                            label={bodyPart}
+                            size="small"
+                            variant="outlined"
+                        />
+                    ))}
+                </div>
+
+                <div>
+                    <Assistant
+                        onClick={() => openAskAIDialog(exercise)}
+                        sx={{
+                            color: '#7c69dc',
+                            fontSize: '20px',
+                        }}
                     />
-                ))}
+                </div>
             </Box>
         </ListItem >
     );
@@ -261,7 +356,7 @@ export function WorkoutList({
     const totalSetsThisWeek = workouts.reduce((acc, w) => acc + w.exercises.reduce((acc, e) => acc + (e.weeks[selectedWeek].totalWeeklySets || 0), 0), 0)
     const thisWeekSetsTarget = workouts.reduce((acc, w) => acc + w.exercises.reduce((acc, e) => acc + (e.weeks[selectedWeek].weeklyTarget || 0), 0), 0)
     const isWeekDone = totalSetsThisWeek >= thisWeekSetsTarget
-
+    const [AskAIExerciseDialogOpen, setAskAIExerciseDialogOpen] = useState(false)
     // const [openWorkouts, setOpenWorkouts] = useState({
     //     [firstWorkoutWithExercisesLeft?.id]: true
     // });
@@ -304,156 +399,189 @@ export function WorkoutList({
         return exerciseData;
     }
 
+    function openAskAIDialog(exercise, selectedWeek) {
+        console.log('openAskAIDialog', exercise);
+        setAskAIExerciseDialogOpen({ exercise, selectedWeek })
+    }
 
-    return (
 
-        <>
-            {
-                selectedExercises.length > 0 ? <Fab
-                    onClick={() => setRoute('runExercise', {
-                        week: selectedWeek
-                    })
-                    }
-                    variant="extended"
-                    color="primary"
-                    sx={{
-                        position: 'fixed',
-                        bottom: '70px',
-                        right: "130px",
-                    }}>
-
-                    {/* <NavigationOutlined sx={{ mr: 1 }} /> */}
-                    Super Set ({selectedExercises.length})
-                </Fab> : ''}
-            < List
+    return (<>
+        <ExerciseAskAIDialog
+            open={AskAIExerciseDialogOpen}
+            onClose={() => setAskAIExerciseDialogOpen(false)}
+            exercise={AskAIExerciseDialogOpen}
+        />
+        {
+            selectedExercises.length > 0 ? <Fab
+                onClick={() => setRoute('runExercise', {
+                    week: selectedWeek
+                })
+                }
+                variant="extended"
+                color="primary"
                 sx={{
-                    paddingTop: '0px',
+                    position: 'fixed',
+                    bottom: '70px',
+                    right: "130px",
+                }}>
 
+                {/* <NavigationOutlined sx={{ mr: 1 }} /> */}
+                Super Set ({selectedExercises.length})
+            </Fab> : ''}
+        < List
+            sx={{
+                paddingTop: '0px',
+
+            }}
+
+        >
+            <ListItem
+                sx={{
+                    backgroundColor: colors.listHeaderBackground,
                 }}
-
             >
-                <ListItem
+
+                <ListItemText
                     sx={{
-                        backgroundColor: colors.listHeaderBackground,
+                        // color: colors.listHeaderText,
                     }}
-                >
+                    primary={<div style={{ fontSize: '25px' }}>
+                        Workouts
+                    </div>}
 
-                    <ListItemText
-                        sx={{
-                            // color: colors.listHeaderText,
-                        }}
-                        primary={<div style={{ fontSize: '25px' }}>
-                            Workouts
-                        </div>}
+                    secondary={<React.Fragment>
+                        <div>Week:
+                            <IconButton
+                                sx={{ padding: '3px', mb: '2px' }}
+                                disabled={selectedWeek === 0}
 
-                        secondary={<React.Fragment>
-                            <div>Week:
-                                <IconButton
-                                    sx={{ padding: '3px', mb: '2px' }}
-                                    disabled={selectedWeek === 0}
+                                onClick={() => onSelectedWeekChanges((selectedWeek - 1) % numberOfWeeks)}>
+                                <ArrowLeft sx={{ fontSize: '15px' }} />
+                            </IconButton>
+                            {selectedWeek + 1}
 
-                                    onClick={() => onSelectedWeekChanges((selectedWeek - 1) % numberOfWeeks)}>
-                                    <ArrowLeft sx={{ fontSize: '15px' }} />
-                                </IconButton>
-                                {selectedWeek + 1}
+                            <span style={{ marginLeft: '5px', marginRight: '5px' }}>/</span>
 
-                                <span style={{ marginLeft: '5px', marginRight: '5px' }}>/</span>
+                            {numberOfWeeks}
 
-                                {numberOfWeeks}
+                            <IconButton
+                                sx={{ padding: '3px' }}
+                                disabled={selectedWeek === numberOfWeeks - 1}
 
-                                <IconButton
-                                    sx={{ padding: '3px' }}
-                                    disabled={selectedWeek === numberOfWeeks - 1}
+                                onClick={() => onSelectedWeekChanges(selectedWeek + 1 % numberOfWeeks)}>
+                                <ArrowRight sx={{ fontSize: '15px' }} />
+                            </IconButton>
 
-                                    onClick={() => onSelectedWeekChanges(selectedWeek + 1 % numberOfWeeks)}>
-                                    <ArrowRight sx={{ fontSize: '15px' }} />
-                                </IconButton>
+                        </div>
 
-                            </div>
-
-                            <div>Sets:
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                padding: '0px',
+                            }}
+                        >
+                            <div>
+                                Sets:
                                 <span style={{ marginLeft: '5px', }}>{totalSetsThisWeek}</span>
                                 <span style={{ marginLeft: '5px', marginRight: '5px' }}>/</span>
                                 <span style={{ marginRight: '5px', }}>{thisWeekSetsTarget}</span>
                                 {isWeekDone ? '✅' : ''}
                             </div>
-                        </React.Fragment>}
+                            <div>
+                                <Assistant
+                                    onClick={() => setRoute('askAI')}
+                                    sx={{
+                                        fontSize: '20px',
+                                        height: '20px',
+                                        color: '#7c69dc'
+                                    }}
 
-                    />
+                                />
+
+                            </div>
+
+                        </Box>
+
+                    </React.Fragment>}
+
+                />
 
 
 
-                </ListItem>
-                <Divider />
-                {
-                    workouts.map((workout) => (
-                        <React.Fragment key={workout.id}>
+            </ListItem>
+            <Divider />
+            {
+                workouts.map((workout) => (
+                    <React.Fragment key={workout.id}>
 
-                            <ListItem
+                        <ListItem
 
-                                sx={{
-                                    backgroundColor: colors.workoutBackground,
-                                }}
+                            sx={{
+                                backgroundColor: colors.workoutBackground,
+                            }}
 
-                                onClick={() => openWorkout(workout.id)} key={workout.id}>
+                            onClick={() => openWorkout(workout.id)} key={workout.id}>
 
 
-                                <ListItemText
-                                    sx={{}}
-                                    primary={`
+                            <ListItemText
+                                sx={{}}
+                                primary={`
                                     ${workout.name}
                                     ${isWorkoutFinished(workout) ? '✅' : ''}
                                 `}
-                                    secondary={<React.Fragment>
-                                        <div>
+                                secondary={<React.Fragment>
+                                    <div>
 
-                                            <span style={{ marginRight: '5px' }}>Sets:</span>
-                                            {workout.exercises.reduce((acc, e) => acc + (e.weeks[selectedWeek].totalWeeklySets || 0), 0)}
-                                            <span style={{ marginLeft: '5px', marginRight: '5px' }}>/</span>
+                                        <span style={{ marginRight: '5px' }}>Sets:</span>
+                                        {workout.exercises.reduce((acc, e) => acc + (e.weeks[selectedWeek].totalWeeklySets || 0), 0)}
+                                        <span style={{ marginLeft: '5px', marginRight: '5px' }}>/</span>
 
-                                            {workout.exercises.reduce((acc, e) => acc + (e.weeks[selectedWeek].weeklyTarget || 0), 0)}
-                                        </div>
-                                    </React.Fragment>}
-                                />
+                                        {workout.exercises.reduce((acc, e) => acc + (e.weeks[selectedWeek].weeklyTarget || 0), 0)}
+                                    </div>
+                                </React.Fragment>}
+                            />
 
-                                <ListItemSecondaryAction>
-                                    <IconButton onClick={() => openWorkout(workout.id)}>
-                                        {openWorkouts[workout.id] ? <ExpandLess /> : <ExpandMore />}
-                                    </IconButton>
-                                </ListItemSecondaryAction>
+                            <ListItemSecondaryAction>
+                                <IconButton onClick={() => openWorkout(workout.id)}>
+                                    {openWorkouts[workout.id] ? <ExpandLess /> : <ExpandMore />}
+                                </IconButton>
+                            </ListItemSecondaryAction>
 
-                            </ListItem>
-                            {openWorkouts[workout.id] ? <Divider /> : ''}
+                        </ListItem>
+                        {openWorkouts[workout.id] ? <Divider /> : ''}
 
-                            <Collapse in={openWorkouts[workout.id]} timeout="auto" unmountOnExit>
-                                {
-                                    workout.exercises.map((exercise) => (
-                                        <React.Fragment key={exercise.id}>
-                                            <Exercise
-                                                shouldShowArrows={true}
-                                                onWorkoutArrowClicked={(e, v) => onWorkoutArrowClicked(workout.id, e.id, v)}
-                                                isSelected={selectedExercises.includes(exercise.id)}
-                                                selectExercise={selectExercise}
-                                                selectedWeek={selectedWeek}
-                                                key={exercise.id}
-                                                exercise={getExercise(exercise)}
-                                                onRemoveSetComplete={() => onSetComplete(workout.id, exercise, -1, selectedWeek)}
-                                                onAddSetComplete={() => onSetComplete(workout.id, exercise, 1, selectedWeek)}
-                                                onSetDone={() => onExerciseDone(workout.id, exercise, selectedWeek)}
-                                                disableEdit={disableEdit}
-                                            />
-                                            <Divider />
-                                        </React.Fragment>
+                        <Collapse in={openWorkouts[workout.id]} timeout="auto" unmountOnExit>
+                            {
+                                workout.exercises.map((exercise) => (
+                                    <React.Fragment key={exercise.id}>
+                                        <Exercise
+                                            openAskAIDialog={() => openAskAIDialog(exercise, selectedWeek)}
+                                            shouldShowArrows={true}
+                                            onWorkoutArrowClicked={(e, v) => onWorkoutArrowClicked(workout.id, e.id, v)}
+                                            isSelected={selectedExercises.includes(exercise.id)}
+                                            selectExercise={selectExercise}
+                                            selectedWeek={selectedWeek}
+                                            key={exercise.id}
+                                            exercise={getExercise(exercise)}
+                                            onRemoveSetComplete={() => onSetComplete(workout.id, exercise, -1, selectedWeek)}
+                                            onAddSetComplete={() => onSetComplete(workout.id, exercise, 1, selectedWeek)}
+                                            onSetDone={() => onExerciseDone(workout.id, exercise, selectedWeek)}
+                                            disableEdit={disableEdit}
+                                        />
+                                        <Divider />
+                                    </React.Fragment>
 
-                                    ))
-                                }
-                            </Collapse>
-                            <Divider />
-                        </React.Fragment>
-                    ))
-                }
-            </List>
-        </>
+                                ))
+                            }
+                        </Collapse>
+                        <Divider />
+                    </React.Fragment>
+                ))
+            }
+        </List>
+    </>
 
     )
 }

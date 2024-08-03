@@ -8,7 +8,12 @@ export const config = {
 };
 
 export default async function handler(req, res) {
-    const { text, currentTrainingPlan } = req.body;
+    const { text, exercise } = req.body;
+
+    console.log({
+        text,
+        exercise
+    });
     const user = await getUser(req);
     if (!user) {
         res.status(401).json({ error: 'Unauthorized' });
@@ -17,34 +22,40 @@ export default async function handler(req, res) {
 
     const db = await getDB();
 
-    const trainingPlan = await db.collection('trainingPlans').findOne({ id: currentTrainingPlan });
 
-    console.log({ trainingPlan });
+
+    // const trainingPlan = await db.collection('trainingPlans').findOne({ id: currentTrainingPlan });
 
     const prompt = `
 
     you are an experienced fitness trainer.
-    a client has come to you for help with their fitness plan.
+    your client has come to you for help with one of their exercises.
     They already have an existing training plan. 
-    They want to ask you a question about their training plan.
+    They want to ask you a question about a specific exercise they are doing which is part of their training plan.
 
-    this is their training plan:
+    this is the exercise details:
 
-    ${JSON.stringify(trainingPlan)}
+    ${JSON.stringify(exercise, null, 2)}
 
     this is the question they have asked you:
     
     ${text}
     `;
 
-    const { result, apiPrice, modelToUse, usage, duration } = await getResponseFromGpt({
+    console.log({ prompt });
+
+    const { result, apiPrice, modelToUse, usage, duration, error, message } = await getResponseFromGpt({
         system: '',
         inputText: prompt,
         isJSON: false,
         model: '3'
     })
 
-
+    if (error) {
+        console.error(message);
+        res.status(500).json({ error, message });
+        return;
+    }
 
     res.status(200).json({ result, apiPrice });
 

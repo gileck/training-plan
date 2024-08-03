@@ -52,6 +52,25 @@ const staticExercisesList = [
     { name: "Incline Bench Press", gym: true, primaryMuscle: "Chest", secondaryMuscles: ["Triceps", "Shoulders"], pullPush: "Push", bodyWeight: false, category: "Upper body" },
     { name: "Farmer Carry", gym: true, primaryMuscle: "Forearms", secondaryMuscles: ["Core", "Shoulders"], pullPush: null, bodyWeight: false, category: "Core" },
     { name: "Dragon Flies", primaryMuscle: "Core", secondaryMuscles: [], pullPush: null, bodyWeight: true, category: "Core" },
+    { name: "Cable biceps curls", gym: true, primaryMuscle: "Biceps", secondaryMuscles: [], pullPush: "Pull", bodyWeight: false, category: "Upper body" },
+    { name: "Russian Twists", primaryMuscle: "Core", secondaryMuscles: ["Obliques"], pullPush: null, bodyWeight: true, category: "Core" },
+    { name: "Hammer Curls", gym: true, primaryMuscle: "Biceps", secondaryMuscles: [], pullPush: "Pull", bodyWeight: false, category: "Upper body" },
+    { name: "Step-ups", primaryMuscle: "Quadriceps", secondaryMuscles: ["Glutes", "Hamstrings"], pullPush: "Push", bodyWeight: true, category: "Legs" },
+    { name: "Reverse Lunges", primaryMuscle: "Quadriceps", secondaryMuscles: ["Hamstrings", "Glutes"], pullPush: "Push", bodyWeight: true, category: "Legs" },
+    { name: "Flutter Kicks", primaryMuscle: "Core", secondaryMuscles: ["Hip Flexors"], pullPush: null, bodyWeight: true, category: "Core" },
+    { name: "Chest Press Machine", gym: true, primaryMuscle: "Chest", secondaryMuscles: ["Triceps", "Shoulders"], pullPush: "Push", bodyWeight: false, category: "Upper body" },
+    { name: "Lat Pulldown Machine", gym: true, primaryMuscle: "Back", secondaryMuscles: ["Biceps"], pullPush: "Pull", bodyWeight: false, category: "Upper body" },
+    { name: "Side Crunch", primaryMuscle: "Core", secondaryMuscles: ["Obliques"], pullPush: null, bodyWeight: true, category: "Core" },
+    { name: "Running", primaryMuscle: "Cardio", secondaryMuscles: [], pullPush: null, bodyWeight: true, category: "Cardio" },
+    { name: "Crunches", primaryMuscle: "Core", secondaryMuscles: [], pullPush: null, bodyWeight: true, category: "Core" },
+    { name: "Rowing Machine", gym: true, primaryMuscle: "Cardio", secondaryMuscles: [], pullPush: null, bodyWeight: false, category: "Cardio" },
+    { name: "Inner Thigh Extensions", primaryMuscle: "Thighs", secondaryMuscles: [], pullPush: "Push", bodyWeight: false, category: "Legs" },
+    { name: "Cable Kickbacks", gym: true, primaryMuscle: "Glutes", secondaryMuscles: ["Hamstrings"], pullPush: "Push", bodyWeight: false, category: "Legs" },
+    { name: "Goblet Squats", primaryMuscle: "Quadriceps", secondaryMuscles: ["Hamstrings", "Glutes"], pullPush: "Push", bodyWeight: false, category: "Legs" },
+    { name: "Front Squats", gym: true, primaryMuscle: "Quadriceps", secondaryMuscles: ["Hamstrings", "Glutes"], pullPush: "Push", bodyWeight: false, category: "Legs" },
+    { name: "Sumo Squats", primaryMuscle: "Quadriceps", secondaryMuscles: ["Hamstrings", "Glutes", "Adductors"], pullPush: "Push", bodyWeight: false, category: "Legs" },
+    { name: "Cossack Squats", primaryMuscle: "Quadriceps", secondaryMuscles: ["Hamstrings", "Glutes", "Adductors"], pullPush: "Push", bodyWeight: false, category: "Legs" },
+
 ];
 
 const { getData } = localStorageAPI()

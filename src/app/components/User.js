@@ -45,11 +45,13 @@ export function User() {
         <Paper sx={{
             p: 2,
             height: '74vh',
-            m: '10px'
+            m: '10px',
+            overflowY: 'auto',
+
         }}>
             <Box sx={{
                 display: 'flex',
-                mb: 4
+                mb: 4,
 
             }}>
                 <Avatar
@@ -65,7 +67,6 @@ export function User() {
                     }}
                 >{data.user.name}</Typography>
             </Box>
-            <Divider />
             <Box>
                 <TrainingPlansList
                     trainingPlans={data.trainingPlans}

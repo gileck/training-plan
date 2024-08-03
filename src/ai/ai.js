@@ -123,7 +123,7 @@ export async function getResponseFromGpt({ system, inputText, isJSON, model }) {
     const response = await openai.chat.completions.create(data).catch(e => {
         console.log(`ERROR in getResponseFromGpt: ${e.message}`)
         return {
-            message: e.message,
+            error: e.message,
 
         }
     })
@@ -131,19 +131,17 @@ export async function getResponseFromGpt({ system, inputText, isJSON, model }) {
     const endTime = new Date()
     const duration = (endTime - startTime) / 1000
 
-    if (!response.choices) {
+    if (!response || response.error) {
         return {
             result: null,
             apiPrice: 0,
             modelToUse,
             error: true,
-            message: response.message
+            message: response?.error,
+            duration,
+            usage: response?.usage || {},
         }
     }
-
-
-
-
 
 
     const content = response.choices[0].message.content
@@ -170,7 +168,8 @@ export async function getResponseFromGpt({ system, inputText, isJSON, model }) {
             error: true,
             message: e.message,
             finish_reason,
-            duration
+            duration,
+            usage
         }
     }
 
@@ -178,7 +177,7 @@ export async function getResponseFromGpt({ system, inputText, isJSON, model }) {
         result,
         apiPrice,
         modelToUse,
-        usage: usage,
+        usage,
         duration
     }
 
