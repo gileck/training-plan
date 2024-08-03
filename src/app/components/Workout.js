@@ -5,7 +5,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
 import { AddCircle as AddCircleIcon, Assistant, AssistantDirectionSharp, ChatBubble, ChatBubbleOutline, ChatBubbleOutlineRounded, ChatBubbleTwoTone, Help, HelpCenter, HelpOutline, SmartToy, SupportAgent } from '@mui/icons-material';
-import { Button, Chip, Collapse, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, ListItemSecondaryAction, Typography } from "@mui/material";
+import { Avatar, Button, Chip, Collapse, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, ListItemAvatar, ListItemSecondaryAction, Typography } from "@mui/material";
 import { CheckCircle } from '@mui/icons-material';
 import { getPrimaryMuscle, getSecondaryMuscles, useExercisesAPI } from "../exercisesAPI";
 import { RemoveCircle, ExpandLess, ExpandMore, Label, ExpandMoreOutlined, ExpandLessRounded, ArrowLeft, ArrowRight, NavigationOutlined, ArrowUpward, ArrowDownward } from "@mui/icons-material";
@@ -14,6 +14,8 @@ import Fab from '@mui/material/Fab';
 import { localStorageAPI } from "@/app/localStorageAPI";
 import theme from "@/app/theme";
 import { Chat } from "./chat";
+import { getImageUrl } from "../exercisesList";
+import Image from "next/image";
 // import { Exercise } from "./TrainingPlan";
 
 
@@ -108,12 +110,27 @@ function Exercise({
                 backgroundColor: isSelected ? colors.exerciseBackgroundSelected : colors.exerciseBackground,
             }}
         >
+
             <Box
                 sx={{
                     display: 'flex',
                     justifyContent: 'space-between',
-                    width: '100%'
+                    width: '100%',
+
                 }}>
+
+                {/* {getImageUrl(exercise.name) ? <ListItemAvatar
+                    sx={{
+                        margin: "auto",
+                        marginRight: '15px',
+                    }}
+
+                >
+                    <Image
+                        width={60}
+                        height={60}
+                        src={getImageUrl(exercise.name)} />
+                </ListItemAvatar> : ''} */}
 
                 {isSelected ? <div style={{
                     display: 'grid',

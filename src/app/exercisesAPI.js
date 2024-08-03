@@ -107,9 +107,7 @@ export function useExercisesAPI() {
     }
 
     function saveNewTraininPlan({ newTrainingPlan }) {
-
-
-        fetch('/api/addTrainingPlan', {
+        return fetch('/api/addTrainingPlan', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -637,6 +635,11 @@ export function useExercisesAPI() {
 
     }
 
+    function importTrainingPlan({ plan, name }) {
+        const newTrainingPlan = createTrainingPlanFromObject({ tpObject: plan, name })
+        return saveNewTraininPlan({ newTrainingPlan });
+    }
+
 
     return {
         createNewPlan,
@@ -652,7 +655,8 @@ export function useExercisesAPI() {
         addTrainingPlanFromPlan,
         addTrainingPlanFromObject,
         duplicateTrainingPlan,
-        markTrainingPlanAsDone
+        markTrainingPlanAsDone,
+        importTrainingPlan
 
     }
 }
