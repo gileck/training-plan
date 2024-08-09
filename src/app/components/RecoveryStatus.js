@@ -18,11 +18,6 @@ function calculateRecoveryScore(volumes) {
     // Calculate weighted average of normalized volumes
     const weightsTotal = weights.reduce((acc, weight) => acc + weight, 0);
     const valuesTotal = normalizedVolumes.reduce((acc, volume, index) => {
-        console.log({
-            volume,
-            value: acc + volume * weights[index],
-            index
-        });
         return acc + volume * weights[index];
     }, 0)
     const weightedAverage = valuesTotal / weightsTotal;
@@ -77,7 +72,7 @@ export function RecoveryStatus() {
 
     // const totalVolumePerDayTest = [10000, 0];
     const recoveryScore = calculateRecoveryScore(totalVolumePerDay);
-    console.log({ recoveryScore });
+    // console.log({ recoveryScore });
 
 
 
