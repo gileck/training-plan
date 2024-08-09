@@ -5,7 +5,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
 import { AddCircle as AddCircleIcon, Assistant, AssistantDirectionSharp, ChatBubble, ChatBubbleOutline, ChatBubbleOutlineRounded, ChatBubbleTwoTone, Help, HelpCenter, HelpOutline, SmartToy, SupportAgent } from '@mui/icons-material';
-import { Avatar, Button, Chip, Collapse, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, ListItemAvatar, ListItemSecondaryAction, Typography } from "@mui/material";
+import { Avatar, Button, Chip, CircularProgress, Collapse, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, LinearProgress, ListItemAvatar, ListItemSecondaryAction, Typography } from "@mui/material";
 import { CheckCircle } from '@mui/icons-material';
 import { getPrimaryMuscle, getSecondaryMuscles, useExercisesAPI } from "../exercisesAPI";
 import { RemoveCircle, ExpandLess, ExpandMore, Label, ExpandMoreOutlined, ExpandLessRounded, ArrowLeft, ArrowRight, NavigationOutlined, ArrowUpward, ArrowDownward } from "@mui/icons-material";
@@ -16,6 +16,7 @@ import theme from "@/app/theme";
 import { Chat } from "./chat";
 import { getImageUrl } from "../exercisesList";
 import Image from "next/image";
+import { RecoveryStatus } from "./RecoveryStatus";
 // import { Exercise } from "./TrainingPlan";
 
 
@@ -298,6 +299,7 @@ export function Workout() {
             totalWeeklySets: Number(exercise.weeks[selectedWeek].totalWeeklySets || 0) + Number(sets)
         }, {
             action: sets > 0 ? 'SetComplete' : null,
+            numberOfSetsDone: sets
         });
     }
 
@@ -306,6 +308,7 @@ export function Workout() {
             totalWeeklySets: Number(exercise.weeks[selectedWeek].weeklyTarget || 0)
         }, {
             action: 'ExerciseDone',
+            numberOfSetsDone: exercise.weeks[selectedWeek].weeklyTarget - exercise.weeks[selectedWeek].totalWeeklySets
         })
     }
 
@@ -449,12 +452,14 @@ export function WorkoutList({
             sx={{
                 paddingTop: '0px',
 
+
             }}
 
         >
             <ListItem
                 sx={{
                     backgroundColor: colors.listHeaderBackground,
+                    paddingBottom: '0px',
                 }}
             >
 
@@ -506,19 +511,38 @@ export function WorkoutList({
                                 <span style={{ marginRight: '5px', }}>{thisWeekSetsTarget}</span>
                                 {isWeekDone ? '✅' : ''}
                             </div>
-                            <div>
-                                <Assistant
-                                    onClick={() => setRoute('askAI')}
-                                    sx={{
-                                        fontSize: '20px',
-                                        height: '20px',
-                                        color: '#7c69dc'
-                                    }}
+                            <Box sx={{
+                                position: 'absolute',
+                                right: '20px',
+                                marginBottom: '50px'
+                            }}>
+                                <div>
+                                    <RecoveryStatus />
 
-                                />
 
-                            </div>
 
+                                    <Assistant
+                                        onClick={() => setRoute('askAI')}
+                                        sx={{
+                                            fontSize: '20px',
+                                            height: '20px',
+                                            color: '#7c69dc'
+                                        }}
+
+                                    />
+
+                                </div>
+                            </Box>
+
+                        </Box>
+                        <Box>
+                            <LinearProgress
+                                sx={{
+                                    marginTop: '10px'
+                                }}
+                                variant="determinate"
+                                value={totalSetsThisWeek / thisWeekSetsTarget * 100}
+                            />
                         </Box>
 
                     </React.Fragment>}
@@ -597,7 +621,7 @@ export function WorkoutList({
                     </React.Fragment>
                 ))
             }
-        </List>
+        </List >
     </>
 
     )

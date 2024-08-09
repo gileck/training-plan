@@ -1,6 +1,8 @@
 import { getUser } from './userApi.js';
 import { getDB } from './db.js';
 import { sendLog, sendMessage } from '@/telegramBot/bot.js';
+// const DAY = 1000 * 60 * 60 * 24;
+
 export default async function handler(req, res) {
     const { username, name } = await getUser(req);
     const db = await getDB();
@@ -21,11 +23,49 @@ export default async function handler(req, res) {
         }
     })
 
+
+
     if (options && options.action) {
         const { exerciseId, workoutId, weekIndex } = options;
         // const exercise = trainingPlan.exercises.find(e => e.id === options.exerciseId);
         const exercise = trainingPlan.workouts.find(w => w.id === workoutId).exercises.find(e => e.id === exerciseId)
         const currentWeek = exercise.weeks[weekIndex];
+
+        // console.log({
+        //     username,
+        //     date: new Date(),
+        //     trainingPlanId: trainingPlan.id,
+        //     action: options.action,
+        //     numberOfSetsDone: options.numberOfSetsDone,
+        //     exercise: {
+        //         id: exercise.id,
+        //         name: exercise.name,
+        //         weekIndex,
+        //         totalWeeklySets: currentWeek.totalWeeklySets,
+        //         weeklyTarget: currentWeek.weeklyTarget,
+        //         numberOfReps: currentWeek.numberOfReps,
+        //         weight: currentWeek.weight,
+        //     }
+        // });
+
+        await db.collection('activity').insertOne({
+            username,
+            date: new Date().getTime(),
+            trainingPlanId: trainingPlan.id,
+            action: options.action,
+            numberOfSetsDone: options.numberOfSetsDone,
+            exercise: {
+                id: exercise.id,
+                name: exercise.name,
+                weekIndex,
+                totalWeeklySets: currentWeek.totalWeeklySets,
+                weeklyTarget: currentWeek.weeklyTarget,
+                numberOfReps: currentWeek.numberOfReps,
+                weight: currentWeek.weight,
+            }
+        })
+
+
         // await sendMessage(`Training plan updated for ${username} with action ${action}`);
         await sendLog(`${name} finisied ${exercise?.name} (${currentWeek.totalWeeklySets}/${currentWeek.weeklyTarget})`);
         if (currentWeek.totalWeeklySets >= currentWeek.weeklyTarget) {

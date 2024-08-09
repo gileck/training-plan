@@ -4,54 +4,57 @@ import { Client } from './client';
 import { cookies } from 'next/headers'
 
 const baseUrl = process.env.NODE_ENV === 'production' ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : 'http://localhost:3000';
-console.log({ baseUrl });
+// console.log({ baseUrl });
 
 export default async function () {
     const cookieStore = cookies()
     const cookie = cookieStore.get('key')
-    const key = cookie?.value
-    if (!key) {
+    const userKey = cookie?.value
+    if (!userKey) {
         return <Client />
     }
 
     fetch(`${baseUrl}/api/enter`, {
         headers: {
-            cookie: `key=${key}`
+            cookie: `key=${userKey}`
         }
     })
 
-    const [{ user }, { plans }] = await Promise.all([
-        fetch(`${baseUrl}/api/user/`, {
+    const dataToFetch = {
+        user: {
+            url: '/api/user/',
+            default: null
+        },
+        plans: {
+            url: '/api/trainingPlans/',
+            default: []
+        },
+        activity: {
+            url: '/api/activity',
+            default: []
+        }
+    }
+
+    const data = Object.assign(...await Promise.all(Object.entries(dataToFetch).map(async ([key, { url, default: defaultValue }]) => {
+        return fetch(`${baseUrl}${url}`, {
             headers: {
-                cookie: `key=${key}`
+                cookie: `key=${userKey}`
             }
         })
             .then(res => res.json())
+            .then(data => ({ [key]: data[key] }))
             .catch((e) => {
                 console.error('Error fetching data', e.message)
-                return { user: null }
+                return { [key]: defaultValue }
             })
+    })))
 
-        ,
-        fetch(`${baseUrl}/api/trainingPlans/`, {
-            headers: {
-                cookie: `key=${key}`
-            }
-        })
-            .then(res => res.json())
-            .catch((e) => {
-                console.error('Error fetching data', e.message)
-                return { plans: [] }
-            })
+    // console.log({ data });
 
-    ]).catch((e) => {
-        console.error('Error fetching data', e.message)
-        return [{ user: null }, { plans: [] }]
-    })
-
+    const { user, plans, activity } = data
 
     if (user) {
-        return <Home user={user} trainingPlans={plans} />
+        return <Home user={user} trainingPlans={plans} activity={activity} />
     } else {
         return <Client />
     }
