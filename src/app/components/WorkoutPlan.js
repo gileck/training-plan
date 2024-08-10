@@ -594,8 +594,11 @@ export function WorkoutPlan({
                                     secondary={`Total Sets: ${workout.exercises.reduce((acc, exercise) => acc + (Number(exercise.sets) || 0), 0)}`}
                                 />
                                 <ListItemSecondaryAction >
-                                    <IconButton onClick={() => displayWorkout(workout.id)}>
-                                        {openWorkouts[workout.id] ? <ExpandLess /> : <ExpandMore />}
+                                    <IconButton onClick={() => updateWorkoutIndex(workout.id, 1)}>
+                                        <ExpandMore />
+                                    </IconButton>
+                                    <IconButton onClick={() => updateWorkoutIndex(workout.id, -1)}>
+                                        <ExpandLess />
                                     </IconButton>
                                     <IconButton
                                         disabled={isWorkoutIncludesAllExercises(workout)}

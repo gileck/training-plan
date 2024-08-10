@@ -43,7 +43,6 @@ export function RecoveryStatus() {
         fetch('/api/activity/activity')
             .then(res => res.json())
             .then(data => {
-                console.log({ data });
                 setActivity(data.activity)
             })
             .catch((e) => {

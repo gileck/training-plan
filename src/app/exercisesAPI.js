@@ -55,7 +55,7 @@ export function useExercisesAPI() {
     const { trainingPlans, setTrainingPlans } = context
 
     const { getData, saveData, cleanData } = localStorageAPI();
-    console.log("useExercisesAPI: trainingPlans", trainingPlans)
+    // console.log("useExercisesAPI: trainingPlans", trainingPlans)
     const savedTrainingPlanId = getData('currentTrainingPlanId') || trainingPlans[0]?.id;
     const savedTrainingPlan = trainingPlans.find(tp => tp.id === savedTrainingPlanId) || trainingPlans[0]
     const [currentTrainingPlanId, setCurrentTrainingPlanId] = useState(savedTrainingPlan?.id || null);

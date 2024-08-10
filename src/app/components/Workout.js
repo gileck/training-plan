@@ -343,6 +343,7 @@ export function Workout() {
             shouldKeepCurrentWeekOpened={shouldKeepCurrentWeekOpened}
             currentWeekOpened={currentWeekOpened}
             saveConfig={saveConfig}
+            shouldShowRecoveryStatus={true}
 
         />
 
@@ -366,7 +367,8 @@ export function WorkoutList({
     shouldKeepCurrentWeekOpened,
     currentWeekOpened,
     saveConfig,
-    disableEdit
+    disableEdit,
+    shouldShowRecoveryStatus
 }) {
     const firstWeekWithExercisesLeft = _.range(0, numberOfWeeks).find(week => !workouts.every(w => w.exercises.every(e => e.weeks[week].totalWeeklySets >= e.weeks[week].weeklyTarget))) || 0
     const weekOpened = shouldKeepCurrentWeekOpened ? currentWeekOpened : firstWeekWithExercisesLeft
@@ -375,6 +377,8 @@ export function WorkoutList({
     // const firstWorkoutWithExercisesLeft = workouts.find(w => w.exercises.some(e => e.weeks[firstWeekWithExercisesLeft].totalWeeklySets < e.weeks[firstWeekWithExercisesLeft].weeklyTarget))
     const totalSetsThisWeek = workouts.reduce((acc, w) => acc + w.exercises.reduce((acc, e) => acc + (e.weeks[selectedWeek].totalWeeklySets || 0), 0), 0)
     const thisWeekSetsTarget = workouts.reduce((acc, w) => acc + w.exercises.reduce((acc, e) => acc + (e.weeks[selectedWeek].weeklyTarget || 0), 0), 0)
+    // const totalSets = _.sumBy(workouts, w => _.sumBy(w.exercises, e => _.sumBy(e.weeks, 'totalWeeklySets')))
+    // const totalSetsTarget = _.sumBy(workouts, w => _.sumBy(w.exercises, e => _.sumBy(e.weeks, 'weeklyTarget')))
     const isWeekDone = totalSetsThisWeek >= thisWeekSetsTarget
     const [AskAIExerciseDialogOpen, setAskAIExerciseDialogOpen] = useState(false)
     // const [openWorkouts, setOpenWorkouts] = useState({
@@ -517,7 +521,7 @@ export function WorkoutList({
                                 marginBottom: '50px'
                             }}>
                                 <div>
-                                    <RecoveryStatus />
+                                    {shouldShowRecoveryStatus ? <RecoveryStatus /> : ''}
 
 
 
@@ -543,6 +547,14 @@ export function WorkoutList({
                                 variant="determinate"
                                 value={totalSetsThisWeek / thisWeekSetsTarget * 100}
                             />
+                            {/* <LinearProgress
+                                color="secondary"
+                                sx={{
+                                    marginTop: '5px'
+                                }}
+                                variant="determinate"
+                                value={totalSets / totalSetsTarget * 100}
+                            /> */}
                         </Box>
 
                     </React.Fragment>}

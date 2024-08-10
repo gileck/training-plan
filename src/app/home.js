@@ -132,6 +132,7 @@ function FloaingAlert() {
 
 }
 export function Home({ user, trainingPlans }) {
+  console.log({ user, trainingPlans });
   const [menuOpen, setMenuOpen] = React.useState(false)
   const toggleDrawer = () => {
     setMenuOpen(!menuOpen)
@@ -211,13 +212,15 @@ export function Home({ user, trainingPlans }) {
     if (routeParam) {
       return setValue(routeParam);
     } else {
+      return setValue('workouts')
+
       // const trainingPlans = localStorageAPI().getData('trainingPlans')
-      const isTrainingPlanExist = trainingPlans && trainingPlans.length > 0
-      if (isTrainingPlanExist) {
-        return setValue('workouts')
-      } else {
-        return setValue('training_plans')
-      }
+      // const isTrainingPlanExist = trainingPlans && trainingPlans.length > 0
+      // if (isTrainingPlanExist) {
+      //   return setValue('workouts')
+      // } else {
+      //   return setValue('training_plans')
+      // }
     }
   }, [route])
 
