@@ -132,6 +132,10 @@ export function Home({ user }) {
     'activity': Activity,
   }
 
+  const getComponent = (route) => {
+    return routeToComp[route] || Workout
+  }
+
 
   const Comps = [
     { label: "Workouts", route: 'workouts', icon: <FitnessCenterIcon /> },
@@ -205,7 +209,8 @@ export function Home({ user }) {
     }
   }, [route])
 
-  const CompToRender = dynamic(() => Promise.resolve(routeToComp[route]), { ssr: false })
+  // const CompToRender = dynamic(() => Promise.resolve(getComponent(route)), { ssr: false })
+  const CompToRender = getComponent(route)
 
 
 
