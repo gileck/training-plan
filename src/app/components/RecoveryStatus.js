@@ -6,7 +6,7 @@ import { AppContext } from "../AppContext";
 function calculateRecoveryScore(volumes) {
     // Normalize volumes to a 0-1 scale
     // const maxVolume = Math.max(...volumes);
-    const maxVolume = 10000
+    const maxVolume = 30
     const normalizedVolumes = volumes.map(v => v / maxVolume);
 
     // console.log({ normalizedVolumes });
@@ -55,13 +55,15 @@ export function RecoveryStatus() {
     }
 
     const calcVolume = ({ numberOfReps, weight }) => {
+        return 1
         return Number(numberOfReps) * (weight ? Number(weight) : 1)
     }
 
     const currentDate = new Date().getDate()
-    const range = _.range(currentDate - 7, currentDate)
+    const range = _.range(currentDate - 7, currentDate + 1)
 
     const activityPerDay = _.groupBy(activity, item => new Date(item.date).getDate())
+    console.log({ activityPerDay });
 
     const totalVolumePerDay = _(range)
         .map((day) => {
@@ -72,6 +74,7 @@ export function RecoveryStatus() {
         .value()
 
     // const totalVolumePerDayTest = [10000, 0];
+    console.log({ totalVolumePerDay });
     const recoveryScore = calculateRecoveryScore(totalVolumePerDay);
     // console.log({ recoveryScore });
 

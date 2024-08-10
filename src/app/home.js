@@ -112,7 +112,7 @@ function FloaingAlert() {
 
 }
 export function Home({ user }) {
-  console.log({ user });
+  // console.log({ user });
   const [menuOpen, setMenuOpen] = React.useState(false)
   const toggleDrawer = () => {
     setMenuOpen(!menuOpen)
