@@ -28,39 +28,6 @@ import { Profile } from "./profile";
 import theme from "./theme";
 import { Activity } from "./components/Activity";
 
-
-function fixLocalStorage() {
-  const { getData, saveData } = localStorageAPI()
-  const exercises = getData('exercises')
-  const workouts = getData('workouts')
-  const trainingPlans = getData('trainingPlans')
-  const numberOfWeeks = getData('numberOfWeeks') || 8
-  console.log({
-    exercises,
-    workouts,
-    trainingPlans,
-    numberOfWeeks
-  });
-  if (!trainingPlans && exercises && workouts) {
-    saveData('trainingPlans', [{
-      exercises,
-      workouts,
-      name: 'Training Plan 1',
-      numberOfWeeks,
-    }
-    ])
-  }
-  if (trainingPlans && trainingPlans.length > 0) {
-    const updatedTraininPlans = trainingPlans.map((tp, index) => {
-      if (!tp.id) {
-        tp.id = `plan_${index + 1}`
-      }
-      return tp
-    })
-    saveData('trainingPlans', updatedTraininPlans)
-  }
-}
-
 function useAlert() {
   const [isAlertOpen, setIsAlertOpen] = React.useState(false)
   const [isErrorAlertOpen, setIsErrorAlertOpen] = React.useState(false)
@@ -76,9 +43,22 @@ function useAlert() {
   }
 }
 
-function AppProvider({ children, setRoute, params, trainingPlans, user }) {
+function AppProvider({ children, setRoute, params, user }) {
 
-  const [trainingPlansState, setTrainingPlans] = useState(trainingPlans || []);
+  const trainingPlansFromLocal = localStorageAPI().getData('trainingPlans')
+  const [trainingPlansState, setTrainingPlans] = useState(trainingPlansFromLocal || []);
+
+  useEffect(() => {
+    fetch(`/api/trainingPlans/`)
+      .then(res => res.json())
+      .then(data => {
+        setTrainingPlans(data.plans)
+        localStorageAPI().saveData('trainingPlans', data.plans)
+      })
+      .catch((e) => {
+        console.error('Error fetching data', e.message)
+      })
+  }, [])
 
 
   const alert = useAlert()
@@ -131,8 +111,8 @@ function FloaingAlert() {
   </Snackbar>
 
 }
-export function Home({ user, trainingPlans }) {
-  console.log({ user, trainingPlans });
+export function Home({ user }) {
+  console.log({ user });
   const [menuOpen, setMenuOpen] = React.useState(false)
   const toggleDrawer = () => {
     setMenuOpen(!menuOpen)
@@ -206,6 +186,7 @@ export function Home({ user, trainingPlans }) {
   }, [])
 
   useEffect(() => {
+    return
     if (typeof window === 'undefined') return;
     const url = new URL(window.location);
     const routeParam = url.searchParams.get("route");
@@ -235,7 +216,6 @@ export function Home({ user, trainingPlans }) {
       <AppProvider
         setRoute={setInernalRoute}
         params={getParams()}
-        trainingPlans={trainingPlans}
         user={user}
       >
         <div>

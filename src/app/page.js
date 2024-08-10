@@ -22,14 +22,13 @@ export default function () {
     //     }
     // })
 
-    const plansFromLocalStorage = localStorageAPI().getData('trainingPlans')
+    // const plansFromLocalStorage = localStorageAPI().getData('trainingPlans')
 
 
 
     const [user, setUser] = useState(null);
-    const [plans, setPlans] = useState(plansFromLocalStorage || []);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    // const [error, setError] = useState(null);
 
 
 
@@ -57,15 +56,7 @@ export default function () {
                 console.error('Error fetching data', e.message)
             })
 
-        fetch(`/api/trainingPlans/`)
-            .then(res => res.json())
-            .then(data => {
-                setPlans(data.plans)
-                localStorageAPI().saveData('trainingPlans', data.plans)
-            })
-            .catch((e) => {
-                console.error('Error fetching data', e.message)
-            })
+
 
 
 
@@ -78,7 +69,7 @@ export default function () {
     if (loading) return <LinearProgress color="secondary" />
 
     if (user) {
-        return <Home user={user} trainingPlans={plans} />
+        return <Home user={user} />
     } else {
         return <Client />
     }
