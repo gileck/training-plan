@@ -1,5 +1,5 @@
-import { getUser } from './userApi.js';
-import { getDB } from './db.js';
+import { getUser } from '../userApi.js';
+import { getDB } from '../db.js';
 const DAY = 1000 * 60 * 60 * 24;
 export default async function handler(req, res) {
     const { username } = await getUser(req);
@@ -20,7 +20,9 @@ export default async function handler(req, res) {
         date: {
             $gte: LAST_7_DAYS.getTime()
         }
-    }).toArray();
+    })
+        .sort({ date: -1 })
+        .toArray();
 
     // console.log({ activity });
 

@@ -1,6 +1,7 @@
 import { Box, CircularProgress, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import _ from 'lodash'
+import { AppContext } from "../AppContext";
 
 function calculateRecoveryScore(volumes) {
     // Normalize volumes to a 0-1 scale
@@ -35,10 +36,11 @@ function calculateRecoveryScore(volumes) {
 
 
 export function RecoveryStatus() {
+    const { setRoute } = useContext(AppContext);
 
     const [activity, setActivity] = useState(null);
     useEffect(() => {
-        fetch('/api/activity')
+        fetch('/api/activity/activity')
             .then(res => res.json())
             .then(data => {
                 console.log({ data });
@@ -100,13 +102,14 @@ export function RecoveryStatus() {
 
     const color = getColorFromRecovery(recoveryScore)
 
-    console.log({ color });
-
     return <Box sx={{
         position: 'relative',
         display: 'inline-flex',
         marginRight: '20px'
-    }}>
+
+    }}
+        onClick={() => setRoute('activity')}
+    >
         <CircularProgress
             sx={{
                 color: color,

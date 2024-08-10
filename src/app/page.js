@@ -28,10 +28,6 @@ export default async function () {
         plans: {
             url: '/api/trainingPlans/',
             default: []
-        },
-        activity: {
-            url: '/api/activity',
-            default: []
         }
     }
 
@@ -51,10 +47,10 @@ export default async function () {
 
     // console.log({ data });
 
-    const { user, plans, activity } = data
+    const { user, plans } = data
 
     if (user) {
-        return <Home user={user} trainingPlans={plans} activity={activity} />
+        return <Home user={user} trainingPlans={plans} />
     } else {
         return <Client />
     }

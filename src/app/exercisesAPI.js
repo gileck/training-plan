@@ -555,6 +555,20 @@ export function useExercisesAPI() {
             return trainingPlan.exercises.length === 0 && trainingPlan.workouts.length === 0;
         }
 
+        function updateWorkoutIndex(workoutId, value) {
+            const index = trainingPlan.workouts.findIndex(w => w.id === workoutId);
+            const newIndex = index + value;
+            if (newIndex < 0 || newIndex >= trainingPlan.workouts.length) {
+                return;
+            }
+            const newWorkouts = [...trainingPlan.workouts];
+            const temp = newWorkouts[index];
+            newWorkouts[index] = newWorkouts[newIndex];
+            newWorkouts[newIndex] = temp;
+            trainingPlan.workouts = newWorkouts;
+            saveTrainingPlan(trainingPlan);
+        }
+
         return {
             exercises: trainingPlan.exercises,
             workouts: trainingPlan.workouts,
@@ -576,7 +590,8 @@ export function useExercisesAPI() {
             getTotalSets,
             getWeeksDone,
             updateName,
-            isEmptyPlan
+            isEmptyPlan,
+            updateWorkoutIndex
         }
     }
 

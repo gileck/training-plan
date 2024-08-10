@@ -384,7 +384,8 @@ export function WorkoutPlan({
     numberOfWeeks,
     addWorkout,
     deleteWorkout,
-    editWorkout
+    editWorkout,
+    updateWorkoutIndex
 }) {
 
     console.log({ workouts, exercises });
