@@ -138,19 +138,13 @@ export function RunExercise(props) {
             .map(exercise => {
                 return Object.assign(exercise, exercise.weeks[Number(week)])
             })
-    console.log({
-        workouts,
-        exercises,
-        week,
-        exercisesToShow
-    });
-
 
     function updateSet(exercise, sets) {
         updateExercise(exercise.workoutId, exercise.id, Number(week), {
             totalWeeklySets: Number(exercise.totalWeeklySets || 0) + Number(sets)
         }, {
             action: sets > 0 ? 'SetComplete' : null,
+            numberOfSetsDone: sets
         });
     }
 

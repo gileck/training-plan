@@ -63,7 +63,7 @@ export function RecoveryStatus() {
     const range = _.range(currentDate - 7, currentDate + 1)
 
     const activityPerDay = _.groupBy(activity, item => new Date(item.date).getDate())
-    console.log({ activityPerDay });
+    // console.log({ activityPerDay });
 
     const totalVolumePerDay = _(range)
         .map((day) => {
@@ -74,7 +74,7 @@ export function RecoveryStatus() {
         .value()
 
     // const totalVolumePerDayTest = [10000, 0];
-    console.log({ totalVolumePerDay });
+    // console.log({ totalVolumePerDay });
     const recoveryScore = calculateRecoveryScore(totalVolumePerDay);
     // console.log({ recoveryScore });
 
