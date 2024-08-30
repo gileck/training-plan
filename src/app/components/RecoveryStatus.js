@@ -2,6 +2,7 @@ import { Box, CircularProgress, Typography } from "@mui/material";
 import { useEffect, useState, useContext } from "react";
 import _ from 'lodash'
 import { AppContext } from "../AppContext";
+import { useFetch } from "@/useFetch";
 
 function calculateRecoveryScore(volumes) {
     // Normalize volumes to a 0-1 scale
@@ -38,21 +39,9 @@ function calculateRecoveryScore(volumes) {
 export function RecoveryStatus() {
     const { setRoute } = useContext(AppContext);
 
-    const [activity, setActivity] = useState(null);
-    useEffect(() => {
-        fetch('/api/activity/activity')
-            .then(res => res.json())
-            .then(data => {
-                setActivity(data.activity)
-            })
-            .catch((e) => {
-                console.error('Error fetching data', e.message)
-            })
-    }, [])
+    const { data, loading: isLoading, error } = useFetch('/api/activity/activity')
+    const activity = data?.activity || []
 
-    if (!activity) {
-        return null
-    }
 
     const calcVolume = ({ numberOfReps, weight }) => {
         return 1
@@ -114,14 +103,15 @@ export function RecoveryStatus() {
     >
         <CircularProgress
             sx={{
-                color: color,
+                color: isLoading ? 'lightgray' : color,
                 border: '1px solid',
                 borderRadius: '50%',
                 borderColor: 'white'
 
             }}
 
-            variant="determinate" value={recoveryScore}
+            variant={isLoading ? 'indeterminate' : 'determinate'}
+            value={isLoading ? 0 : recoveryScore}
             size={60}
         />
         <Box
@@ -144,7 +134,7 @@ export function RecoveryStatus() {
                 sx={{
                     fontSize: '20px',
                 }}
-            >{`${Math.round(recoveryScore)}`}</Typography>
+            >{isLoading ? '' : Math.round(recoveryScore)}</Typography>
         </Box>
     </Box>
 

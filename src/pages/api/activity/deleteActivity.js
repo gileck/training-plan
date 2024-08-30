@@ -5,7 +5,6 @@ const DAY = 1000 * 60 * 60 * 24;
 export default async function handler(req, res) {
     const { username } = await getUser(req);
     const { items } = req.body
-    console.log({ items });
     if (!username) {
         res.status(401).json({ error: 'Unauthorized' });
         return;

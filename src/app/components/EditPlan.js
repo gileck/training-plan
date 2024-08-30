@@ -42,9 +42,10 @@ function PlanSettings({ trainingPlan, setNumberOfWeeks, updateName }) {
         }
     }
 
+    const debouncedUpdateName = _.debounce(updateName, 1000)
     function onTrainingPlanNameChange(name) {
         if (name) {
-            updateName(name)
+            debouncedUpdateName(name)
         }
     }
 

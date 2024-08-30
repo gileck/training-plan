@@ -4,6 +4,7 @@ import { localStorageAPI } from "./localStorageAPI";
 import { getExercisesList } from "./exercisesList";
 import { AppContext } from './AppContext';
 import { toBase64 } from 'openai/core';
+const debouncedFetch = _.debounce(fetch, 1000);
 
 function randomNum(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
@@ -66,6 +67,32 @@ export function useExercisesAPI() {
         saveData('currentTrainingPlanId', planId);
     }
 
+    function updateTrainingPlan(trainingPlan, options) {
+        const res = debouncedFetch('/api/saveTrainingPlan', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ trainingPlan, options })
+        })
+
+        if (res) {
+            res.then(res => res.clone().json()).then(data => {
+                if (data.error || data.result.modifiedCount === 0) {
+                    context.openErrorAlert('Error saving Training Plan')
+                    console.error(data.error);
+                } else {
+                    // context.openAlert('Training Plan saved successfully')
+                }
+            }).catch(err => {
+                context.openErrorAlert('Error saving Training Plan')
+                console.error(err);
+            })
+        }
+    }
+
+
+
 
     function saveTrainingPlan(trainingPlan, options) {
         const newTrainingPlans = trainingPlans.map(tp => {
@@ -77,24 +104,8 @@ export function useExercisesAPI() {
         // saveData('trainingPlans', newTrainingPlans);
 
         setTrainingPlans(_.cloneDeep(newTrainingPlans))
-        fetch('/api/saveTrainingPlan', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ trainingPlan, options })
-        }).then(res => res.json()).then(data => {
-            if (data.error || data.result.modifiedCount === 0) {
-                context.openErrorAlert('Error saving Training Plan')
-                console.error(data.error);
-            } else {
-                // context.openAlert('Training Plan saved successfully')
-            }
-        }).catch(err => {
-            context.openErrorAlert('Error saving Training Plan')
-            console.error(err);
-        })
-
+        localStorageAPI().saveData('trainingPlans', newTrainingPlans)
+        updateTrainingPlan(trainingPlan, options);
     }
 
     function createTrainingPlanFromObject({ tpObject, name }) {
