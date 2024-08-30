@@ -67,8 +67,8 @@ export function Activity() {
     }, [])
 
     const Comps = {
-        activity: () => <ActivityTable activity={activity} />,
-        progress: () => <Progress activity={activity} />,
+        activity: ActivityTable,
+        progress: Progress
     }
 
     const Comp = Comps[tabValue] || Comps.activity;
@@ -81,7 +81,7 @@ export function Activity() {
             <Tab value="activity" label="Activity" />
             <Tab value="progress" label="Progress" />
         </Tabs>
-        <Comp />
+        <Comp activity={activity} setIsLoading={setIsLoading} setActivity={setActivity} />
     </>
 }
 
@@ -201,7 +201,7 @@ function Progress({ activity }) {
     );
 }
 
-function ActivityTable({ activity }) {
+function ActivityTable({ activity, setIsLoading, setActivity }) {
 
     const [selectedItem, setSelectedItem] = useState(null);
     const [editDateDialogOpen, setEditDateDialogOpen] = useState(false);
