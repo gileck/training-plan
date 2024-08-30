@@ -43,10 +43,16 @@ function useAlert() {
   }
 }
 
+
 function AppProvider({ children, setRoute, params, user }) {
+
+
 
   const trainingPlansFromLocal = localStorageAPI().getData('trainingPlans')
   const [trainingPlansState, setTrainingPlans] = useState(trainingPlansFromLocal || []);
+
+  
+
 
   useEffect(() => {
     fetch(`/api/trainingPlans/`)
@@ -58,6 +64,8 @@ function AppProvider({ children, setRoute, params, user }) {
       .catch((e) => {
         console.error('Error fetching data', e.message)
       })
+
+      
   }, [])
 
 

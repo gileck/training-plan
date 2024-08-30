@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
-import { DialogActions, DialogTitle, Box, Button, Checkbox, Dialog, Divider, IconButton, List, ListItemSecondaryAction, TextField, DialogContent, LinearProgress } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { DialogActions, DialogTitle, Box, Button, Checkbox, Dialog, Divider, IconButton, List, ListItemSecondaryAction, TextField, DialogContent, LinearProgress, Tabs, Tab } from "@mui/material";
 import { ListItem } from "@mui/material";
 import { ListItemText } from "@mui/material";
 import { Delete, Edit } from "@mui/icons-material";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 function EditDateDialog({ open, onClose, onDateChange, item }) {
 
@@ -43,11 +44,13 @@ function EditDateDialog({ open, onClose, onDateChange, item }) {
 
 
 export function Activity() {
-
+    const [tabValue, setTabValue] = useState('activity');
     const [isLoading, setIsLoading] = useState(true);
-    const [selectedItem, setSelectedItem] = useState(null);
-    const [editDateDialogOpen, setEditDateDialogOpen] = useState(false);
     const [activity, setActivity] = useState([])
+
+    const handleTabChange = (event, newValue) => {
+        setTabValue(newValue);
+    };
 
     useEffect(() => {
         setIsLoading(true);
@@ -62,6 +65,148 @@ export function Activity() {
                 console.error('Error fetching data', e.message)
             })
     }, [])
+
+    const Comps = {
+        activity: () => <ActivityTable activity={activity} />,
+        progress: () => <Progress activity={activity} />,
+    }
+
+    const Comp = Comps[tabValue] || Comps.activity;
+
+
+
+    return <>
+        {isLoading ? <LinearProgress color="secondary" /> : ''}
+        <Tabs value={tabValue} onChange={handleTabChange}>
+            <Tab value="activity" label="Activity" />
+            <Tab value="progress" label="Progress" />
+        </Tabs>
+        <Comp />
+    </>
+}
+
+
+function Progress({ activity }) {
+    const [graphData, setGraphData] = useState([]);
+    const [selectedDay, setSelectedDay] = useState(null);
+    const [dialogOpen, setDialogOpen] = useState(false);
+
+    useEffect(() => {
+        const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const last7Days = Array.from({ length: 7 }, (_, i) => {
+            const date = new Date(today);
+            date.setDate(date.getDate() - i);
+            return date;
+        }).reverse();
+
+        const dataByDay = activity.reduce((acc, item) => {
+            const date = new Date(item.date);
+            date.setHours(0, 0, 0, 0);
+            const key = date.toISOString();
+            if (!acc[key]) {
+                acc[key] = 0;
+            }
+            acc[key] += item.numberOfSetsDone;
+            return acc;
+        }, {});
+
+        const sortedData = last7Days.map(date => ({
+            day: daysOfWeek[date.getDay()],
+            date: date.toLocaleDateString(),
+            sets: dataByDay[date.toISOString()] || 0
+        }));
+
+        setGraphData(sortedData);
+    }, [activity]);
+
+    const handleBarClick = (data) => {
+        const clickedDate = new Date(data.date);
+        const exercisesForDay = activity.filter(item => {
+            const itemDate = new Date(item.date);
+            return itemDate.toDateString() === clickedDate.toDateString();
+        });
+
+        // Group exercises by name
+        const groupedExercises = exercisesForDay.reduce((acc, item) => {
+            const key = item.exercise.name;
+            if (!acc[key]) {
+                acc[key] = { ...item, totalSets: 0 };
+            }
+            acc[key].totalSets += item.numberOfSetsDone;
+            return acc;
+        }, {});
+
+        setSelectedDay({ date: data.date, exercises: Object.values(groupedExercises) });
+        setDialogOpen(true);
+    };
+
+    const handleCloseDialog = () => {
+        setDialogOpen(false);
+        setSelectedDay(null);
+    };
+
+    const formatDate = (date) => {
+        const d = new Date(date);
+        return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+    }
+
+    return (
+        <Box sx={{ width: '100%', height: 400, padding: 2 }}>
+            <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                    data={graphData}
+                    margin={{
+                        top: 5,
+                        right: 30,
+                        left: 20,
+                        bottom: 5,
+                    }}
+                >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="day" />
+                    <YAxis />
+                    <Tooltip
+                        labelFormatter={(value, name, props) => value}
+                        formatter={(value) => [`${value} sets`, 'Sets']}
+                    />
+                    <Legend />
+                    <Bar dataKey="sets" fill="#8884d8" name="Number of Sets" onClick={handleBarClick} />
+                </BarChart>
+            </ResponsiveContainer>
+
+            <Dialog open={dialogOpen} onClose={handleCloseDialog}>
+                <DialogTitle>Exercises on {selectedDay?.date}</DialogTitle>
+                <DialogContent>
+                    <List>
+                        {selectedDay?.exercises
+                            .sort((a, b) => new Date(a.date) - new Date(b.date))
+                            .map((exercise, index) => (
+                                <React.Fragment key={index}>
+                                    <ListItem>
+                                        <ListItemText
+                                            primary={`${exercise.exercise.name} (${exercise.totalSets} sets)`}
+                                            secondary={`Last set at: ${formatDate(exercise.date)}`}
+                                        />
+                                    </ListItem>
+                                    <Divider />
+                                </React.Fragment>
+                            ))}
+                    </List>
+                </DialogContent>
+            </Dialog>
+        </Box>
+    );
+}
+
+function ActivityTable({ activity }) {
+
+    const [selectedItem, setSelectedItem] = useState(null);
+    const [editDateDialogOpen, setEditDateDialogOpen] = useState(false);
+
+
 
     const toDateString = (timestamp) => {
         return new Date(timestamp).toLocaleDateString() + ' ' + new Date(timestamp).toLocaleTimeString()
@@ -177,15 +322,19 @@ export function Activity() {
             });
     }
 
+
+
+
     return (
+
         <>
+
             {selectedItem ? <EditDateDialog
                 open={editDateDialogOpen}
                 onClose={() => setEditDateDialogOpen(false)}
                 onDateChange={handleDateChange}
                 item={selectedItem}
             /> : ''}
-            {isLoading ? <LinearProgress color="secondary" /> : ''}
 
             <Box
                 sx={{
@@ -200,23 +349,23 @@ export function Activity() {
                     }}
                 >
                     <Button
-                        sx={{ color: "#0063fe" }}
+                        sx={{ color: "#0063fe", fontSize: '11px' }}
                         onClick={() => toggleEnableSelect()}
                     >{selectEnabled ? 'Cancel' : 'Edit'}</Button>
                     <Button
-                        sx={{ color: "#0063fe" }}
+                        sx={{ color: "#0063fe", fontSize: '11px' }}
                         disabled={!selectEnabled}
                         onClick={() => handleSelectAll()}
                     >Select All</Button>
                     <Button
-                        sx={{ color: "#0063fe" }}
+                        sx={{ color: "#0063fe", fontSize: '11px' }}
                         disabled={selectedItems.length === 0}
                         onClick={() => handleDeselectAll()}
                     >Deselect All</Button>
                     <Button
                         startIcon={<Delete />}
                         disabled={selectedItems.length === 0}
-                        sx={{ color: "#0063fe" }}
+                        sx={{ color: "#0063fe", fontSize: '11px' }}
                         onClick={() => deleteItems()}
                     >
                         Delete

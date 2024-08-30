@@ -38,7 +38,7 @@ function updateCacheInBackground(url) {
         .then((data) => {
             saveDataToCache(url, data);
         }).catch((e) => {
-            console.error(e);
+            console.error('Error fetching data', e.message);
         });
 }
 

@@ -1,10 +1,10 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import _ from 'lodash';
 import { localStorageAPI } from "./localStorageAPI";
 import { getExercisesList } from "./exercisesList";
 import { AppContext } from './AppContext';
 import { toBase64 } from 'openai/core';
-const debouncedFetch = _.debounce(fetch, 1000);
+const debouncedFetch = _.debounce((url, options, onSuccess, onError) => fetch(url, options).then(res => res.json()).then(onSuccess).catch(onError), 1000);
 
 function randomNum(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
@@ -62,33 +62,37 @@ export function useExercisesAPI() {
     const [currentTrainingPlanId, setCurrentTrainingPlanId] = useState(savedTrainingPlan?.id || null);
     const currentTrainingPlan = trainingPlans.find(tp => tp.id === currentTrainingPlanId) || trainingPlans[0];
 
+    useEffect(() => {
+        window.addEventListener('online', () => {
+            updateTrainingPlan(currentTrainingPlan, { online: true });
+        });
+    })
+
     function selectTrainingPlan(planId) {
         setCurrentTrainingPlanId(planId);
         saveData('currentTrainingPlanId', planId);
     }
 
     function updateTrainingPlan(trainingPlan, options) {
-        const res = debouncedFetch('/api/saveTrainingPlan', {
+        debouncedFetch('/api/saveTrainingPlan', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ trainingPlan, options })
-        })
-
-        if (res) {
-            res.then(res => res.clone().json()).then(data => {
-                if (data.error || data.result.modifiedCount === 0) {
-                    context.openErrorAlert('Error saving Training Plan')
-                    console.error(data.error);
-                } else {
-                    // context.openAlert('Training Plan saved successfully')
-                }
-            }).catch(err => {
+        }, data => {
+            if (!data || data.error || data.result.modifiedCount === 0) {
                 context.openErrorAlert('Error saving Training Plan')
-                console.error(err);
-            })
-        }
+                console.error(data.error);
+            } else {
+                if (options.online) {
+                    context.openAlert('Training Plan saved successfully')
+                }
+            }
+        }, err => {
+            context.openErrorAlert('Error saving Training Plan')
+            console.error("ERROR:", err);
+        })
     }
 
 
