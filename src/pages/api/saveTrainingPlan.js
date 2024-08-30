@@ -19,7 +19,8 @@ export default async function handler(req, res) {
                 workouts: trainingPlan.workouts,
                 numberOfWeeks: trainingPlan.numberOfWeeks
             },
-            dateUpdated: new Date()
+            dateUpdated: new Date(),
+            name: trainingPlan.name,
         }
     })
 
