@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Box, CircularProgress, Typography, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from "@mui/material";
 import { useEffect, useState, useContext } from "react";
 import _ from 'lodash'
 import { AppContext } from "../AppContext";
@@ -93,49 +93,127 @@ export function RecoveryStatus() {
 
     const color = getColorFromRecovery(recoveryScore)
 
-    return <Box sx={{
-        position: 'relative',
-        display: 'inline-flex',
-        marginRight: '20px'
+    const [open, setOpen] = useState(false);
 
-    }}
-        onClick={() => setRoute('activity')}
-    >
-        <CircularProgress
-            sx={{
-                color: isLoading ? 'lightgray' : color,
-                border: '1px solid',
-                borderRadius: '50%',
-                borderColor: 'white'
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
 
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    return (
+        <>
+            <Box sx={{
+                position: 'relative',
+                display: 'inline-flex',
+                marginRight: '20px'
             }}
+                onClick={handleClickOpen}
+            >
+                <CircularProgress
+                    sx={{
+                        color: isLoading ? 'lightgray' : color,
+                        border: '1px solid',
+                        borderRadius: '50%',
+                        borderColor: 'white'
+                    }}
 
-            variant={isLoading ? 'indeterminate' : 'determinate'}
-            value={isLoading ? 0 : recoveryScore}
-            size={60}
-        />
-        <Box
-            sx={{
-                top: 0,
-                left: 0,
-                bottom: 0,
-                right: 0,
-                position: 'absolute',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
+                    variant={isLoading ? 'indeterminate' : 'determinate'}
+                    value={isLoading ? 0 : recoveryScore}
+                    size={60}
+                />
+                <Box
+                    sx={{
+                        top: 0,
+                        left: 0,
+                        bottom: 0,
+                        right: 0,
+                        position: 'absolute',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
 
-            }}
-        >
-            <Typography
-                variant="caption"
-                component="div"
-                color={color}
-                sx={{
-                    fontSize: '20px',
-                }}
-            >{isLoading ? '' : Math.round(recoveryScore)}</Typography>
-        </Box>
-    </Box>
+                    }}
+                >
+                    <Typography
+                        variant="caption"
+                        component="div"
+                        color={color}
+                        sx={{
+                            fontSize: '20px',
+                        }}
+                    >{isLoading ? '' : Math.round(recoveryScore)}</Typography>
+                </Box>
+            </Box>
 
+            <Dialog open={open} onClose={handleClose}>
+                <DialogTitle>Recovery Status</DialogTitle>
+                <DialogContent>
+                    <Box sx={{
+                        position: 'relative',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginBottom: '20px'
+                    }}>
+                        <CircularProgress
+                            sx={{
+                                color: isLoading ? 'lightgray' : color,
+                                border: '1px solid',
+                                borderRadius: '50%',
+                                borderColor: 'white'
+                            }}
+                            variant={isLoading ? 'indeterminate' : 'determinate'}
+                            value={isLoading ? 0 : recoveryScore}
+                            size={100}
+                        />
+                        <Box
+                            sx={{
+                                top: 0,
+                                left: 0,
+                                bottom: 0,
+                                right: 0,
+                                position: 'absolute',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            <Typography
+                                variant="caption"
+                                component="div"
+                                color={color}
+                                sx={{
+                                    fontSize: '30px',
+                                }}
+                            >{isLoading ? '' : Math.round(recoveryScore)}</Typography>
+                        </Box>
+                    </Box>
+                    <DialogContentText>
+                        <b>Your recovery score is: {isLoading ? '' : Math.round(recoveryScore)}</b>
+                    </DialogContentText>
+                    <DialogContentText>
+                        The recovery score is a measure of your recent activity levels, normalized and weighted to give an indication of your recovery status. A higher score indicates better recovery.
+                    </DialogContentText>
+                    <DialogContentText>
+
+                        <ul>
+                            <li>Below 25: Take a rest day or engage in light activity.</li>
+                            <li>Between 25 and 50: Engage in moderate activity.</li>
+                            <li>Between 50 and 75: You can perform regular workouts.</li>
+                            <li>Above 75: You are well-recovered and can engage in intense workouts.</li>
+                        </ul>
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose} color="primary">
+                        Close
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </>
+    );
 }
