@@ -118,6 +118,83 @@ function TrainingPlanMenuDialog({ open, onClose, planId, trainingPlans, deleteTr
         </Dialog>
     );
 }
+function UploadTrainingPlanImage() {
+    const [selectedFile, setSelectedFile] = useState(null);
+
+    const handleFileChange = (event) => {
+        setSelectedFile(event.target.files[0]);
+    };
+
+    const handleUpload = () => {
+        if (selectedFile) {
+            // Create a FormData object to send the file
+            const formData = new FormData();
+            formData.append('image', selectedFile);
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const image = e.target.result;
+                console.log(image);
+
+                fetch('/api/uploadTrainingPlanImage', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': selectedFile.type // Pass the MIME type of the image
+                    },
+                    body: image,
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Image uploaded successfully:', data);
+                        // You can add additional logic here, such as updating the UI
+                    })
+                    .catch(error => {
+                        console.error('Error uploading image:', error);
+                        // Handle the error, perhaps by showing a message to the user
+                    });
+
+
+            };
+            reader.readAsDataURL(selectedFile);
+            console.log('Uploading file:', selectedFile.name);
+            // You can add your file upload logic here
+        }
+    };
+
+    return (
+        <Box sx={{ mt: 2 }}>
+            <input
+                accept="image/*"
+                style={{ display: 'none' }}
+                id="raised-button-file"
+                type="file"
+                onChange={handleFileChange}
+            />
+            <label htmlFor="raised-button-file">
+                <Button variant="contained" component="span">
+                    Upload Image
+                </Button>
+            </label>
+            {selectedFile && (
+                <Box sx={{ mt: 2 }}>
+                    <Typography>{selectedFile.name}</Typography>
+                    <Button
+                        variant="contained"
+                        onClick={handleUpload}
+                        sx={{ mt: 1 }}
+                    >
+                        Upload
+                    </Button>
+                </Box>
+            )}
+        </Box>
+    );
+
+}
 function AddTrainingPlanDialog({ open, onClose: closeDialog, onCreateTrainingPlanClicked, openBuilTrainingPlanWithAI }) {
     const [name, setName] = useState('')
     const [numberOfWeeks, setNumberOfWeeks] = useState(8)
@@ -149,6 +226,11 @@ function AddTrainingPlanDialog({ open, onClose: closeDialog, onCreateTrainingPla
         onCreateTrainingPlanClicked({ name, numberOfWeeks })
         onClose()
     }
+
+
+
+
+
     return <Dialog open={open} onClose={onClose}>
         <DialogTitle
             sx={{
@@ -184,7 +266,7 @@ function AddTrainingPlanDialog({ open, onClose: closeDialog, onCreateTrainingPla
                 </Select>
 
                 {/* <TextField label="Import Training Plan" value={tpObject} onChange={(e) => setTrainingPlanObject(e.target.value)} /> */}
-                {/* <Button
+                <Button
                     startIcon={<ContentPaste />}
                     variant='contained'
                     onClick={() => {
@@ -196,7 +278,7 @@ function AddTrainingPlanDialog({ open, onClose: closeDialog, onCreateTrainingPla
                             .catch(err => {
                                 console.error('Failed to read clipboard contents: ', err);
                             });
-                    }}>Paste Object</Button> */}
+                    }}>Paste Object</Button>
                 <Button
 
                     startIcon={<AssistantIcon />}
@@ -205,6 +287,8 @@ function AddTrainingPlanDialog({ open, onClose: closeDialog, onCreateTrainingPla
                         openBuilTrainingPlanWithAI()
                         onClose()
                     }}>Build with AI</Button>
+
+                {/* <UploadTrainingPlanImage /> */}
 
                 <Button
                     startIcon={<AddCircleIcon />}
@@ -250,6 +334,7 @@ export function TrainingPlansList({
         <List
         >
             {trainingPlans.map((plan, index) => {
+
                 const { getTotalSets, getWeeksDone, isEmptyPlan } = createTrainingPlanActions(plan)
 
                 const { totalSets, totalSetsDone } = getTotalSets()
@@ -383,7 +468,7 @@ export function TrainingPlans() {
 
     function onCreateTrainingPlanClicked({ name, tpObject, plan, numberOfWeeks }) {
         if (tpObject) {
-            addTrainingPlanFromObject({ name, tpObject })
+            onBuildAiTrainingPlan({ name, plan: tpObject })
         } else if (plan) {
             addTrainingPlanFromPlan({ name, plan })
         } else {

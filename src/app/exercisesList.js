@@ -89,6 +89,9 @@ const images = {
     "Half Burpee": "burpee.jpg",
     "Jump lunges": "bodyweight_forward_lunge_(hinge_at_hips).jpg",
     "Scapular pull ups": "rocky_pull_up_pulldown.jpg",
+    "Cable Triceps Pushdowns": "cable_triceps_pushdown.jpg",
+    "Back Extension": "lever_back_extension.jpg",
+    "Back Extension (Roman Chair)": "lever_back_extension.jpg",
 }
 
 export const getImageUrl = (name) => {
@@ -171,6 +174,8 @@ const staticExercisesList = [
     { name: "Cossack Squats", primaryMuscle: "Quadriceps", secondaryMuscles: ["Hamstrings", "Glutes", "Adductors"], pullPush: "Push", bodyWeight: false, category: "Legs" },
     { name: "Dumbbell Bench Press", gym: true, primaryMuscle: "Chest", secondaryMuscles: ["Triceps", "Shoulders"], pullPush: "Push", bodyWeight: false, category: "Upper body" },
     { name: "Lateral Raises", gym: true, primaryMuscle: "Shoulders", secondaryMuscles: [], pullPush: "Push", bodyWeight: false, category: "Upper body" },
+    { name: "Cable Triceps Pushdowns", gym: true, primaryMuscle: "Triceps", secondaryMuscles: [], pullPush: "Push", bodyWeight: false, category: "Upper body" },
+    { name: "Back Extension", gym: true, primaryMuscle: "Back", secondaryMuscles: [], pullPush: "Pull", bodyWeight: false, category: "Upper body" },
 ];
 
 const { getData } = localStorageAPI()

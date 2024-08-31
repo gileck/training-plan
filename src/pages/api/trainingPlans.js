@@ -7,6 +7,11 @@ export default async function handler(req, res) {
 
     const plans = await db.collection('trainingPlans').find({ user: username }).toArray();
 
+    // await db.collection('trainingPlans').deleteOne({ id: "gileck_plan_63645" });
+
+
+
+
     const plansToReturn = plans.map(({ id, name, plan, user, dateCreated }) => {
         return {
             id,

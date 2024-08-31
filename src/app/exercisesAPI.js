@@ -85,7 +85,7 @@ export function useExercisesAPI() {
                 context.openErrorAlert('Error saving Training Plan')
                 console.error(data.error);
             } else {
-                if (options.online) {
+                if (options && options.online) {
                     context.openAlert('Training Plan saved successfully')
                 }
             }
@@ -113,6 +113,9 @@ export function useExercisesAPI() {
     }
 
     function createTrainingPlanFromObject({ tpObject, name }) {
+        if (!tpObject || !tpObject.exercises || !tpObject.workouts) {
+            throw new Error('Invalid Training Plan Object');
+        }
         return {
             name: name || `Training Plan ${trainingPlans.length + 1}`,
             exercises: tpObject.exercises,
@@ -161,7 +164,10 @@ export function useExercisesAPI() {
 
     function addTrainingPlanFromObject({ name, tpObject }) {
         const newTrainingPlan = createTrainingPlanFromObject({ tpObject, name })
-        saveNewTraininPlan({ newTrainingPlan });
+        if (newTrainingPlan) {
+            saveNewTraininPlan({ newTrainingPlan });
+        }
+
     }
 
     function resetTrainingPlan(plan) {
