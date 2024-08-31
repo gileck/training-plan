@@ -130,6 +130,30 @@ export function ActivityTable({ setIsLoading }) {
             });
     };
 
+    const deleteItemsByDate = (date) => {
+        const itemsToDelete = activity.filter(item => new Date(item.date).toLocaleDateString() === date).map(item => item._id);
+        setIsLoading(true);
+        fetch('/api/activity/deleteActivity', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                items: itemsToDelete,
+            }),
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                setActivity((prevActivity) =>
+                    prevActivity.filter((item) => !itemsToDelete.includes(item._id))
+                );
+                setIsLoading(false);
+            })
+            .catch((e) => {
+                console.error('Error deleting data', e.message);
+            });
+    };
+
     function handleDateChange(newDate, id) {
         setEditDateDialogOpen(false);
         setIsLoading(true);
@@ -216,6 +240,13 @@ export function ActivityTable({ setIsLoading }) {
                         <React.Fragment key={date}>
                             <ListItem sx={{ backgroundColor: '#f0f0f0' }}>
                                 <ListItemText primary={toDateHeaderString(date, groupedActivities[date].totalSets)} />
+                                {selectEnabled && (
+                                    <ListItemSecondaryAction>
+                                        <IconButton onClick={() => deleteItemsByDate(date)}>
+                                            <Delete />
+                                        </IconButton>
+                                    </ListItemSecondaryAction>
+                                )}
                             </ListItem>
                             <Divider />
                             {Object.keys(groupedActivities[date].exercises).map((exerciseName) => (
@@ -252,6 +283,7 @@ export function ActivityTable({ setIsLoading }) {
                     ))}
                 </List>
             </Box>
+
         </>
     );
 }

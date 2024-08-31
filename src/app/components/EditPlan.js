@@ -20,7 +20,7 @@ import { exercisesList, getLocalExercises } from "../exercisesList";
 import { localStorageAPI } from "../localStorageAPI";
 import { BodyPartsPlan } from "./BodyPartsPlan";
 import { BuildTrainingPlanDialog } from "./BuildTrainingPlanDialog";
-import { WorkoutList } from "./Workout";
+import { WorkoutList } from "./WorkoutList";
 import { AppContext } from "../AppContext";
 
 const { getData, saveData, cleanData } = localStorageAPI();

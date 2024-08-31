@@ -45,7 +45,7 @@ export function Progress({ setIsLoading }) {
 
         const sortedData = last7Days.map(date => ({
             day: daysOfWeek[date.getDay()],
-            date: date.toLocaleDateString(),
+            date: date.toISOString(),
             upperBody: dataByDay[date.toISOString()]?.upperBody || 0,
             lowerBody: dataByDay[date.toISOString()]?.lowerBody || 0,
             abs: dataByDay[date.toISOString()]?.abs || 0,
@@ -55,11 +55,15 @@ export function Progress({ setIsLoading }) {
         setGraphData(sortedData);
     }, [activity]);
 
+    function isSameDay(date1, date2) {
+        return date1.getDate() === date2.getDate()
+    }
+
     const handleBarClick = (data) => {
         const clickedDate = new Date(data.date);
         const exercisesForDay = activity.filter(item => {
             const itemDate = new Date(item.date);
-            return itemDate.toDateString() === clickedDate.toDateString();
+            return isSameDay(itemDate, clickedDate);
         });
 
         // Group exercises by name
@@ -84,6 +88,13 @@ export function Progress({ setIsLoading }) {
     const formatDate = (date) => {
         const d = new Date(date);
         return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+    }
+
+    function getDayName(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        return daysOfWeek[date.getDay()];
     }
 
     return (
@@ -145,7 +156,7 @@ export function Progress({ setIsLoading }) {
                 label="Show by Exercise Type"
             />
             <Dialog open={dialogOpen} onClose={handleCloseDialog}>
-                <DialogTitle>Exercises on {selectedDay?.date}</DialogTitle>
+                <DialogTitle>Exercises on {getDayName(selectedDay?.date)}</DialogTitle>
                 <DialogContent>
                     <List>
                         {selectedDay?.exercises

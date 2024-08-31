@@ -199,7 +199,6 @@ export function Home({ user }) {
   }, [])
 
   useEffect(() => {
-    return
     if (typeof window === 'undefined') return;
     const url = new URL(window.location);
     const routeParam = url.searchParams.get("route");

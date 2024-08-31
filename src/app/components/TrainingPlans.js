@@ -23,7 +23,7 @@ import { Delete, ExpandCircleDown, ExpandCircleUp, ExpandMore, ExpandLess, Label
 import { Dialog } from '@mui/material';
 import { EditPlan, EditTrainingPlan, EditTrainingPlanInternal } from './EditPlan';
 import { AppContext } from '../AppContext';
-import { WorkoutList } from './Workout';
+import { WorkoutList } from "./WorkoutList";
 import { BuildTrainingPlanDialog } from './BuildTrainingPlanDialog';
 import { getLocalExercises } from '../exercisesList'
 function TrainingPlanMenuDialog({ open, onClose, planId, trainingPlans, deleteTrainingPlan, duplicateTrainingPlan, markTrainingPlanAsDone }) {
