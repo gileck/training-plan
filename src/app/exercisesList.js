@@ -1,5 +1,88 @@
 import { localStorageAPI } from "./localStorageAPI";
 
+const images = {
+    "Wide Push-ups": "wide_hand_push_up.jpg",
+    "Push-ups": "clap_push_up.jpg",
+    "Squats": "kettlebell_goblet_squat_mobility.jpg",
+    "Lunges": "dumbbell_lunge.jpg",
+    "Deadlifts": "barbell_clean_deadlift.jpg",
+    "Bench Press": "bench_press.jpg",
+    "Pull-ups": "archer_pull_up.jpg",
+    "Sit-ups": "janda_sit_up.jpg",
+    "Mountain Climbers": "mountain_climber.jpg",
+    "Bicep Curls": "dumbbell_drag_bicep_curl.jpg",
+    "Shoulder Press": "dumbbell_alternate_shoulder_press.jpg",
+    "Shoulder Side raise": "dumbbell_lateral_raise.jpg",
+    "Shoulder Front raise": "dumbbell_standing_front_raise_above_head.jpg",
+    "Tricep Dips": "chest_dip.jpg",
+    "Jump Squats": "double_jump_squat.jpg",
+    "Kettlebell Swings": "kettlebell_swing.jpg",
+    "Box Jumps": "jump_on_fit-box.jpg",
+    "Wall Sit": "dumbbell_wall_squat.jpg",
+    "ATG Split Squats": "split_squats.jpg",
+    "Hip Extention": "cable_standing_hip_extension.jpg",
+    "Muscle Up": "archer_pull_up.jpg",
+    "Dips": "elbow_dips.jpg",
+    "Plank": "plank_jack.jpg",
+    "Side Plank": "side_plank_leg_lift.jpg",
+    "Lat Pull-downs": "cable_wide-grip_lat_pulldown.jpg",
+    "Chin-ups": "chin-up.jpg",
+    "Leg Press": "lever_seated_leg_press.jpg",
+    "Single Leg Press": "lever_horizontal_one_leg_press.jpg",
+    "Cable Chest Fly": "cable_standing_fly.jpg",
+    "Seated Row": "cable_low_seated_row.jpg",
+    "Leg Curls": "lever_seated_leg_curl.jpg",
+    "Leg Extensions": "lever_one_leg_extension.jpg",
+    "Face Pulls": "cable_standing_supinated_face_pull_(with_rope).jpg",
+    "Calf Raises": "standing_calf_raise.jpg",
+    "Diamond Push-ups": "diamond_push_up.jpg",
+    "Pistol Squats": "kettlebell_pistol_squat.jpg",
+    "Handstand Push-ups": "handstand_push-up.jpg",
+    "Glute Bridge": "glute_bridge_two_legs_on_floor.jpg",
+    "Inverted Row": "inverted_row_with_bed_sheet.jpg",
+    "L-Sit": "l-sit_on_floor.jpg",
+    "Archer Push-ups": "incline_close-grip_push-up.jpg",
+    "Single-leg Deadlift": "kettlebell_kickstand_one_leg_deadlift.jpg",
+    "Nordic Hamstring Curl": "bodyweight_lying_legs_curl_(male).jpg",
+    "Bulgarian split squats": "smith_split_squat.jpg",
+    "Single leg Squats": "single_leg_squat.jpg",
+    "Thrusters": "dumbbell_swing.jpg",
+    "Hip Thrust": "barbell_staggered_stance_hip_thrust.jpg",
+    "Romanian Deadlift": "barbell_romanian_deadlift.jpg",
+    "Incline Bench Press": "incline_bench_press.jpg",
+    "Farmer Carry": "kettlebell_farmers_carry.jpg",
+    "Dragon Flies": "weighted_muscle_up.jpg",
+    "Cable biceps curls": "biceps_curl.jpg",
+    "Russian Twists": "russian_twist.jpg",
+    "Hammer Curls": "dumbbell_seated_alternate_shoulder.jpg",
+    "Step-ups": "jump_step-up.jpg",
+    "Reverse Lunges": "warming-up_in_lunge.jpg",
+    "Flutter Kicks": "prisoner_half_sit-up.jpg",
+    "Chest Press Machine": "lever_incline_chest_press.jpg",
+    "Lat Pulldown Machine": "cable_reverse_grip_pulldown.jpg",
+    "Side Crunch": "bottle_weighted_side_bend_(female).jpg",
+    "Running": "stationary_bike_run.jpg",
+    "Crunches": "crunch_floor.jpg",
+    "Rowing Machine": "cable_seated_row_with_v_bar.jpg",
+    "Inner Thigh Extensions": "band_hip_adduction.jpg",
+    "Cable Kickbacks": "cable_kneeling_glute_kickback_(female).jpg",
+    "Goblet Squats": "dumbbell_goblet_squat.jpg",
+    "Front Squats": "smith_front_squat.jpg",
+    "Sumo Squats": "sitting_sumo_right_twist_stretch.jpg",
+    "Cossack Squats": "smith_split_squat.jpg",
+    "Dumbbell Bench Press": "dumbbell_one_arm_bench_fly.jpg",
+    "Lateral Raises": "dumbbell_partials_lateral_raise.jpg",
+    "Snatch": "dumbbell_one_arm_snatch.jpg"
+}
+
+export const getImageUrl = (name) => {
+    const item = images[name]
+    if (!item) {
+        return null
+    }
+    return `/images/${item}`
+}
+
 const staticExercisesList = [
     { name: "Wide Push-ups", primaryMuscle: "Chest", secondaryMuscles: ["Triceps", "Shoulders"], pullPush: "Push", bodyWeight: true, category: "Upper body" },
     { name: "Push-ups", primaryMuscle: "Triceps", secondaryMuscles: ["Chest", "Shoulders"], pullPush: "Push", bodyWeight: true, category: "Upper body" },
@@ -19,7 +102,7 @@ const staticExercisesList = [
     { name: "Kettlebell Swings", gym: true, primaryMuscle: "Glutes", secondaryMuscles: ["Hamstrings", "Back"], pullPush: "Pull", bodyWeight: false, category: "Legs" },
     { name: "Box Jumps", primaryMuscle: "Quadriceps", secondaryMuscles: ["Glutes", "Hamstrings", "Calves"], pullPush: "Push", bodyWeight: true, category: "Legs" },
     { name: "Wall Sit", primaryMuscle: "Quadriceps", secondaryMuscles: ["Glutes"], pullPush: null, bodyWeight: false, category: "Legs" },
-    { name: "ATG Split Squats", primaryMuscle: "Quadriceps", secondaryMuscles: [], pullPush: "Push", bodyWeight: false, category: "Legs", image: 'dumbbell_low_split_squat_(male).jpg' },
+    { name: "ATG Split Squats", primaryMuscle: "Quadriceps", secondaryMuscles: [], pullPush: "Push", bodyWeight: false, category: "Legs" },
     { name: "Hip Extention", gym: true, primaryMuscle: "Glutes", secondaryMuscles: ["Hamstrings"], pullPush: "Pull", bodyWeight: false, category: "Legs" },
     { name: "Muscle Up", primaryMuscle: "Back", secondaryMuscles: ["Triceps", "Biceps"], pullPush: "Pull", bodyWeight: true, category: "Upper body" },
     { name: "Dips", primaryMuscle: "Triceps", secondaryMuscles: ["Chest", "Shoulders"], pullPush: "Push", bodyWeight: true, category: "Upper body" },
@@ -27,8 +110,8 @@ const staticExercisesList = [
     { name: "Side Plank", primaryMuscle: "Core", secondaryMuscles: [], pullPush: null, bodyWeight: true, category: "Core", static: true },
     { name: "Lat Pull-downs", gym: true, primaryMuscle: "Back", secondaryMuscles: ["Biceps"], pullPush: "Pull", bodyWeight: false, category: "Upper body" },
     { name: "Chin-ups", primaryMuscle: "Back", secondaryMuscles: ["Biceps"], pullPush: "Pull", bodyWeight: true, category: "Upper body" },
-    { name: "Leg Press", gym: true, primaryMuscle: "Quadriceps", secondaryMuscles: ["Glutes", "Hamstrings"], pullPush: "Push", bodyWeight: false, category: "Legs", image: "lever_seated_horizontal_leg_press.jpg" },
-    { name: "Single Leg Press", gym: true, primaryMuscle: "Quadriceps", secondaryMuscles: ["Glutes", "Hamstrings"], pullPush: "Push", bodyWeight: false, category: "Legs", image: "single_leg_press.jpg" },
+    { name: "Leg Press", gym: true, primaryMuscle: "Quadriceps", secondaryMuscles: ["Glutes", "Hamstrings"], pullPush: "Push", bodyWeight: false, category: "Legs" },
+    { name: "Single Leg Press", gym: true, primaryMuscle: "Quadriceps", secondaryMuscles: ["Glutes", "Hamstrings"], pullPush: "Push", bodyWeight: false, category: "Legs" },
     { name: "Cable Chest Fly", gym: true, primaryMuscle: "Chest", secondaryMuscles: ["Shoulders"], pullPush: "Push", bodyWeight: false, category: "Upper body" },
     { name: "Seated Row", gym: true, primaryMuscle: "Back", secondaryMuscles: ["Biceps"], pullPush: "Pull", bodyWeight: false, category: "Upper body" },
     { name: "Leg Curls", gym: true, primaryMuscle: "Hamstrings", secondaryMuscles: [], pullPush: "Pull", bodyWeight: false, category: "Legs" },
@@ -88,11 +171,4 @@ export const getExercisesList = () => {
         ...staticExercisesList,
         ...exercisesListFromLocalStorage
     ]
-}
-export const getImageUrl = (name) => {
-    const item = exercisesList.find(item => item.name === name)
-    if (!item?.image) {
-        return null
-    }
-    return `/images/${item.image}`
 }

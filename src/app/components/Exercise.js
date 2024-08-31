@@ -1,8 +1,9 @@
 import React from 'react';
-import { ListItem, Box, ListItemText, IconButton, Typography, Chip } from "@mui/material";
+import { ListItem, Box, ListItemText, IconButton, Typography, Chip, ListItemAvatar } from "@mui/material";
 import { CheckCircle, AddCircle as AddCircleIcon, RemoveCircle, ArrowUpward, ArrowDownward, Assistant } from '@mui/icons-material';
 import { getPrimaryMuscle, getSecondaryMuscles } from "../exercisesAPI";
 import { colors } from './colors';
+import { getImageUrl } from '../exercisesList';
 
 export function Exercise({
     shouldShowArrows,
@@ -40,18 +41,18 @@ export function Exercise({
 
                 }}>
 
-                {/* {getImageUrl(exercise.name) ? <ListItemAvatar
+                {getImageUrl(exercise.name) ? <ListItemAvatar
                     sx={{
                         margin: "auto",
                         marginRight: '15px',
                     }}
 
                 >
-                    <Image
+                    <img
                         width={60}
                         height={60}
                         src={getImageUrl(exercise.name)} />
-                </ListItemAvatar> : ''} */}
+                </ListItemAvatar> : ''}
 
                 {isSelected ? <div style={{
                     display: 'grid',
