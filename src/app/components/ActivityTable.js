@@ -118,7 +118,6 @@ export function ActivityTable({ setIsLoading }) {
         })
             .then((res) => res.json())
             .then((data) => {
-                console.log({ data });
                 setActivity((prevActivity) =>
                     prevActivity.filter((item) => !selectedItems.includes(item._id))
                 );
@@ -131,7 +130,7 @@ export function ActivityTable({ setIsLoading }) {
     };
 
     const deleteItemsByDate = (date) => {
-        const itemsToDelete = activity.filter(item => new Date(item.date).toLocaleDateString() === date).map(item => item._id);
+        const itemsToDelete = activity.filter(item => getDateString(item.date) === getDateString(date)).map(item => item._id);
         setIsLoading(true);
         fetch('/api/activity/deleteActivity', {
             method: 'POST',
@@ -169,7 +168,6 @@ export function ActivityTable({ setIsLoading }) {
         })
             .then((res) => res.json())
             .then((data) => {
-                console.log({ data });
                 setActivity((prevActivity) =>
                     prevActivity.map((item) =>
                         item._id === selectedItem._id ? { ...item, date: newDate } : item
@@ -246,7 +244,7 @@ export function ActivityTable({ setIsLoading }) {
                                 <ListItemText primary={toDateHeaderString(groupedActivities[date].date, groupedActivities[date].totalSets)} />
                                 {selectEnabled && (
                                     <ListItemSecondaryAction>
-                                        <IconButton onClick={() => deleteItemsByDate(date)}>
+                                        <IconButton onClick={() => deleteItemsByDate(groupedActivities[date].date)}>
                                             <Delete />
                                         </IconButton>
                                     </ListItemSecondaryAction>
