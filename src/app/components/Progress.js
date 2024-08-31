@@ -88,56 +88,58 @@ export function Progress({ setIsLoading }) {
 
     return (
         <Box>
-            <BarChart
-                data={graphData}
-                width={500}
-                height={500}
-            >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="day" />
-                <YAxis ticks={[5, 10, 15, 20, 25, 30]} />
-                <Tooltip
-                    labelFormatter={(value, name, props) => value}
-                    formatter={(value) => [`${value} sets`, 'Sets']}
-                />
-                <Legend />
-                {showByType ? (
-                    <>
-                        <Bar
-                            dataKey="upperBody"
-                            name="Upper Body"
-                            stackId="a"
-                            fill="#ADD8E6"
-                            onClick={handleBarClick}
-                            isAnimationActive={false} // Disable animation
-                        />
-                        <Bar
-                            dataKey="lowerBody"
-                            name="Lower Body"
-                            stackId="a"
-                            fill="#008080"
-                            onClick={handleBarClick}
-                            isAnimationActive={false} // Disable animation
-                        />
-                        <Bar
-                            dataKey="abs"
-                            name="Core"
-                            stackId="a"
-                            fill="#dfd3a4"
-                            onClick={handleBarClick}
-                            isAnimationActive={false} // Disable animation
-                        />
-                    </>
-                ) : (
-                    <Bar
-                        dataKey="total"
-                        name="Total Sets"
-                        fill="#673AB7"
-                        onClick={handleBarClick}
-                        isAnimationActive={false} // Disable animation
+            <ResponsiveContainer width="100%" height={500}>
+                <BarChart
+                    data={graphData}
+                    width={500}
+                    height={500}
+                >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="day" />
+                    <YAxis ticks={[5, 10, 15, 20, 25, 30]} />
+                    <Tooltip
+                        labelFormatter={(value, name, props) => value}
+                        formatter={(value) => [`${value} sets`, 'Sets']}
                     />
-                )}
-            </BarChart>
+                    <Legend />
+                    {showByType ? (
+                        <>
+                            <Bar
+                                dataKey="upperBody"
+                                name="Upper Body"
+                                stackId="a"
+                                fill="#ADD8E6"
+                                onClick={handleBarClick}
+                                isAnimationActive={false} // Disable animation
+                            />
+                            <Bar
+                                dataKey="lowerBody"
+                                name="Lower Body"
+                                stackId="a"
+                                fill="#008080"
+                                onClick={handleBarClick}
+                                isAnimationActive={false} // Disable animation
+                            />
+                            <Bar
+                                dataKey="abs"
+                                name="Core"
+                                stackId="a"
+                                fill="#dfd3a4"
+                                onClick={handleBarClick}
+                                isAnimationActive={false} // Disable animation
+                            />
+                        </>
+                    ) : (
+                        <Bar
+                            dataKey="total"
+                            name="Total Sets"
+                            fill="#673AB7"
+                            onClick={handleBarClick}
+                            isAnimationActive={false} // Disable animation
+                        />
+                    )}
+                </BarChart>
+            </ResponsiveContainer>
             <FormControlLabel
                 control={<Switch checked={showByType} onChange={() => setShowByType(!showByType)} />}
                 label="Show by Exercise Type"
