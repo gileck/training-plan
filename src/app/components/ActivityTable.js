@@ -185,14 +185,18 @@ export function ActivityTable({ setIsLoading }) {
     const toDateHeaderString = (dateString, totalSets) => {
         const date = new Date(dateString);
         const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
-        return `${dayName}, ${dateString} (Total Sets: ${totalSets})`;
+        return `${dayName}, ${date.toLocaleDateString()} (Total Sets: ${totalSets})`;
     };
+
+    const getDateString = (date) => {
+        return new Date(date).getDate() + "_" + new Date(date).getMonth() + "_" + new Date(date).getFullYear()
+    }
 
     const groupByDateAndExercise = (activities) => {
         return activities.reduce((acc, item) => {
-            const date = new Date(item.date).toLocaleDateString();
+            const date = getDateString(item.date)
             if (!acc[date]) {
-                acc[date] = { exercises: {}, totalSets: 0 };
+                acc[date] = { exercises: {}, totalSets: 0, date: item.date };
             }
             const exerciseName = item.exercise.name;
             if (!acc[date].exercises[exerciseName]) {
@@ -239,7 +243,7 @@ export function ActivityTable({ setIsLoading }) {
                     {Object.keys(groupedActivities).map((date) => (
                         <React.Fragment key={date}>
                             <ListItem sx={{ backgroundColor: '#f0f0f0' }}>
-                                <ListItemText primary={toDateHeaderString(date, groupedActivities[date].totalSets)} />
+                                <ListItemText primary={toDateHeaderString(groupedActivities[date].date, groupedActivities[date].totalSets)} />
                                 {selectEnabled && (
                                     <ListItemSecondaryAction>
                                         <IconButton onClick={() => deleteItemsByDate(date)}>
