@@ -1,6 +1,6 @@
-import React from 'react';
-import { ListItem, Box, ListItemText, IconButton, Typography, Chip, ListItemAvatar } from "@mui/material";
-import { CheckCircle, AddCircle as AddCircleIcon, RemoveCircle, ArrowUpward, ArrowDownward, Assistant } from '@mui/icons-material';
+import React, { useState } from 'react';
+import { ListItem, Box, ListItemText, IconButton, Typography, Chip, ListItemAvatar, Dialog } from "@mui/material";
+import { CheckCircle, AddCircle as AddCircleIcon, RemoveCircle, ArrowUpward, ArrowDownward, Assistant, Close } from '@mui/icons-material';
 import { getPrimaryMuscle, getSecondaryMuscles } from "../exercisesAPI";
 import { colors } from './colors';
 import { getImageUrl } from '../exercisesList';
@@ -23,6 +23,16 @@ export function Exercise({
     }
 
     const weeklyTargetReached = exercise.sets.done >= exercise.sets.target;
+    const [open, setOpen] = useState(false);
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
     return (
         <ListItem
             sx={{
@@ -46,7 +56,7 @@ export function Exercise({
                         margin: "auto",
                         marginRight: '15px',
                     }}
-
+                    onClick={handleClickOpen}
                 >
                     <img
                         width={60}
@@ -169,6 +179,25 @@ export function Exercise({
                     />
                 </div>
             </Box>
+            <Dialog
+                fullWidth
+                open={open}
+                onClose={handleClose}
+            >
+                <Box sx={{ padding: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="h6">
+                        {exercise.name}
+                    </Typography>
+                    <IconButton onClick={handleClose}>
+                        <Close />
+                    </IconButton>
+                </Box>
+                <img
+                    width="100%"
+                    src={getImageUrl(exercise.name)}
+                    alt={exercise.name}
+                />
+            </Dialog>
         </ListItem >
     );
 }
