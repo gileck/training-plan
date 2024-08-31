@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Box, Button, TextField, Typography, Container, Alert } from '@mui/material';
+import { Box, Button, TextField, Typography, Container, Alert, IconButton } from '@mui/material';
+import HomeIcon from '@mui/icons-material/Home';
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -37,6 +38,12 @@ const Login = () => {
                     alignItems: 'center',
                 }}
             >
+                <IconButton
+                    sx={{ alignSelf: 'center' }}
+                    onClick={() => window.location.href = '/'}
+                >
+                    <HomeIcon />
+                </IconButton>
                 <Typography component="h1" variant="h5">
                     Login
                 </Typography>
