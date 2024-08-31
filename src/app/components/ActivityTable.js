@@ -1,10 +1,49 @@
 import React, { useState } from "react";
-import { DialogActions, DialogTitle, Box, Button, Checkbox, Dialog, Divider, IconButton, List, ListItemSecondaryAction, TextField, DialogContent, LinearProgress, Tabs, Tab, Collapse } from "@mui/material";
+import { Box, Button, Checkbox, Dialog, Divider, IconButton, List, ListItemSecondaryAction, TextField, DialogContent, LinearProgress, Tabs, Tab, Collapse } from "@mui/material";
 import { ListItem, ListItemText } from "@mui/material";
 import { Delete, Edit, ExpandLess, ExpandMore } from "@mui/icons-material";
-import { Progress } from "./Progress";
+import { useFetch } from "@/useFetch";
+function EditDateDialog({ open, onClose, onDateChange, item }) {
 
-export function ActivityTable({ activity, setIsLoading, setActivity }) {
+    const [newDate, setNewDate] = useState(item.date);
+
+    const updatgeDate = (newDate) => {
+        if (!newDate) {
+            return;
+        }
+        if (new Date(newDate).toString() === 'Invalid Date') {
+            return;
+        }
+
+        setNewDate(newDate)
+    }
+
+    return (
+        <Dialog
+            open={open}
+            onClose={onClose}
+        >
+            <DialogTitle>Edit Date</DialogTitle>
+            <DialogContent>
+                <TextField
+                    type="datetime-local"
+                    value={new Date(newDate).toISOString().slice(0, 16)}
+                    onChange={(e) => updatgeDate(e.target.value)}
+                    fullWidth
+                />
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={onClose}>Cancel</Button>
+                <Button onClick={() => onDateChange(new Date(newDate), item._id)}>Save</Button>
+            </DialogActions>
+        </Dialog>
+    );
+}
+
+export function ActivityTable({ setIsLoading }) {
+    const { data, loading, error } = useFetch('/api/activity/activity')
+    const [activity, setActivity] = useState(data?.activity || [])
+    setIsLoading(loading)
     const [selectedItem, setSelectedItem] = useState(null);
     const [editDateDialogOpen, setEditDateDialogOpen] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
@@ -56,7 +95,6 @@ export function ActivityTable({ activity, setIsLoading, setActivity }) {
         })
             .then((res) => res.json())
             .then((data) => {
-                console.log({ data });
                 setActivity((prevActivity) =>
                     prevActivity.filter((item) => item._id !== id)
                 );
@@ -207,6 +245,7 @@ export function ActivityTable({ activity, setIsLoading, setActivity }) {
                                             ))}
                                         </List>
                                     </Collapse>
+                                    <Divider /> {/* Added Divider between exercise groups */}
                                 </React.Fragment>
                             ))}
                         </React.Fragment>

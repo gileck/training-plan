@@ -1,6 +1,6 @@
 import React from 'react';
 import { ListItem, Button, Alert, Drawer, IconButton, List, Paper, Snackbar, ListItemButton, ListItemIcon, ListItemText, Box, Divider } from "@mui/material";
-import { Assistant, Home, People } from '@mui/icons-material';
+import { Assistant, Home, People, Timeline, TrendingUp } from '@mui/icons-material'; // Add TrendingUp import
 
 export const Menu = ({ menuOpen, toggleDrawer, onRouteChanged }) => {
     const menuItems = [{
@@ -17,6 +17,16 @@ export const Menu = ({ menuOpen, toggleDrawer, onRouteChanged }) => {
         text: 'Ask AI',
         Icon: <Assistant />,
         route: 'askAI',
+    },
+    {
+        text: 'Activity',
+        Icon: <Timeline />, // Update Icon to Timeline
+        route: 'activity',
+    },
+    {
+        text: 'Progress',
+        Icon: <TrendingUp />, // Update Icon to TrendingUp
+        route: 'progress',
     }]
 
     return (

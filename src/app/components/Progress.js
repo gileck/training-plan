@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Box, Dialog, DialogTitle, DialogContent, List, ListItem, ListItemText, Divider } from "@mui/material";
+import { Box, Dialog, DialogTitle, DialogContent, List, ListItem, ListItemText, Divider, Switch, FormControlLabel } from "@mui/material";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { getCategory } from '../exercisesAPI'; // Import the getCategory function
+import { useFetch } from "@/useFetch";
 
-export function Progress({ activity }) {
+export function Progress({ setIsLoading }) {
+    const { data, loading, error } = useFetch('/api/activity/activity')
+    const activity = data?.activity || []
+    setIsLoading(loading)
     const [graphData, setGraphData] = useState([]);
     const [selectedDay, setSelectedDay] = useState(null);
     const [dialogOpen, setDialogOpen] = useState(false);
-
-    console.log({ activity, graphData });
+    const [showByType, setShowByType] = useState(true); // State to track the switch value
 
     useEffect(() => {
         const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -24,17 +28,28 @@ export function Progress({ activity }) {
             const date = new Date(item.date);
             date.setHours(0, 0, 0, 0);
             const key = date.toISOString();
+            const exerciseType = getCategory(item.exercise.name); // Get the exercise type using getCategory
             if (!acc[key]) {
-                acc[key] = 0;
+                acc[key] = { upperBody: 0, lowerBody: 0, abs: 0, total: 0 };
             }
-            acc[key] += item.numberOfSetsDone;
+            if (exerciseType === 'Upper body') {
+                acc[key].upperBody += item.numberOfSetsDone;
+            } else if (exerciseType === 'Legs') {
+                acc[key].lowerBody += item.numberOfSetsDone;
+            } else if (exerciseType === 'Core') {
+                acc[key].abs += item.numberOfSetsDone;
+            }
+            acc[key].total += item.numberOfSetsDone;
             return acc;
         }, {});
 
         const sortedData = last7Days.map(date => ({
             day: daysOfWeek[date.getDay()],
             date: date.toLocaleDateString(),
-            sets: dataByDay[date.toISOString()] || 0
+            upperBody: dataByDay[date.toISOString()]?.upperBody || 0,
+            lowerBody: dataByDay[date.toISOString()]?.lowerBody || 0,
+            abs: dataByDay[date.toISOString()]?.abs || 0,
+            total: dataByDay[date.toISOString()]?.total || 0
         }));
 
         setGraphData(sortedData);
@@ -80,15 +95,53 @@ export function Progress({ activity }) {
             >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="day" />
-                <YAxis />
+                <YAxis ticks={[5, 10, 15, 20, 25, 30]} />
                 <Tooltip
                     labelFormatter={(value, name, props) => value}
                     formatter={(value) => [`${value} sets`, 'Sets']}
                 />
                 <Legend />
-                <Bar dataKey="sets" fill="#8884d8" name="Number of Sets" onClick={handleBarClick} />
+                {showByType ? (
+                    <>
+                        <Bar
+                            dataKey="upperBody"
+                            name="Upper Body"
+                            stackId="a"
+                            fill="#ADD8E6"
+                            onClick={handleBarClick}
+                            isAnimationActive={false} // Disable animation
+                        />
+                        <Bar
+                            dataKey="lowerBody"
+                            name="Lower Body"
+                            stackId="a"
+                            fill="#008080"
+                            onClick={handleBarClick}
+                            isAnimationActive={false} // Disable animation
+                        />
+                        <Bar
+                            dataKey="abs"
+                            name="Core"
+                            stackId="a"
+                            fill="#dfd3a4"
+                            onClick={handleBarClick}
+                            isAnimationActive={false} // Disable animation
+                        />
+                    </>
+                ) : (
+                    <Bar
+                        dataKey="total"
+                        name="Total Sets"
+                        fill="#673AB7"
+                        onClick={handleBarClick}
+                        isAnimationActive={false} // Disable animation
+                    />
+                )}
             </BarChart>
-
+            <FormControlLabel
+                control={<Switch checked={showByType} onChange={() => setShowByType(!showByType)} />}
+                label="Show by Exercise Type"
+            />
             <Dialog open={dialogOpen} onClose={handleCloseDialog}>
                 <DialogTitle>Exercises on {selectedDay?.date}</DialogTitle>
                 <DialogContent>

@@ -51,7 +51,7 @@ function AppProvider({ children, setRoute, params, user }) {
   const trainingPlansFromLocal = localStorageAPI().getData('trainingPlans')
   const [trainingPlansState, setTrainingPlans] = useState(trainingPlansFromLocal || []);
 
-  
+
 
 
   useEffect(() => {
@@ -65,7 +65,7 @@ function AppProvider({ children, setRoute, params, user }) {
         console.error('Error fetching data', e.message)
       })
 
-      
+
   }, [])
 
 
@@ -138,6 +138,7 @@ export function Home({ user }) {
     'askAI': AskAI,
     'profile': Profile,
     'activity': Activity,
+    'progress': Activity,
   }
 
   const getComponent = (route) => {
