@@ -3,6 +3,7 @@ import { useEffect, useState, useContext } from "react";
 import _ from 'lodash'
 import { AppContext } from "../AppContext";
 import { useFetch } from "@/useFetch";
+import Link from 'next/link';
 
 function calculateRecoveryScore(volumes) {
     // Normalize volumes to a 0-1 scale
@@ -195,17 +196,31 @@ export function RecoveryStatus() {
                     <DialogContentText>
                         <b>Your recovery score is: {isLoading ? '' : Math.round(recoveryScore)}</b>
                     </DialogContentText>
-                    <DialogContentText>
+                    <DialogContentText
+                        sx={{
+                            fontSize: '14px'
+                        }}
+                    >
                         The recovery score is a measure of your recent activity levels, normalized and weighted to give an indication of your recovery status. A higher score indicates better recovery.
                     </DialogContentText>
-                    <DialogContentText>
-
+                    <DialogContentText
+                        sx={{
+                            fontSize: '14px'
+                        }}
+                    >
                         <ul>
                             <li>Below 25: Take a rest day or engage in light activity.</li>
                             <li>Between 25 and 50: Engage in moderate activity.</li>
                             <li>Between 50 and 75: You can perform regular workouts.</li>
                             <li>Above 75: You are well-recovered and can engage in intense workouts.</li>
+                            <li>100: You are fully recovered.</li>
                         </ul>
+
+                        To see your recent activity, click on the <a href="#" onClick={() => setRoute('activity')}>Activity</a> Page.
+                        To see your progress, click on the <a href="#" onClick={() => setRoute('progress')}>Progress</a> Page.
+
+
+
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
