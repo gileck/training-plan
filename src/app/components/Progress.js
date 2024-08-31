@@ -72,7 +72,7 @@ export function Progress({ activity }) {
     }
 
     return (
-        <Box >
+        <Box>
             <BarChart
                 data={graphData}
                 width={500}
