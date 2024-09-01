@@ -160,7 +160,8 @@ export async function getResponseFromGpt({ system, inputText, isJSON, model }) {
     try {
         result = isJSON ? JSON.parse(content) : content
     } catch (e) {
-        console.log(e)
+        console.log(e.message)
+        console.log({content})
         return {
             result: null,
             apiPrice: 0,

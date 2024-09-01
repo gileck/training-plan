@@ -83,7 +83,7 @@ export function Chat({
         setLoading(true);
         try {
             const response = await getResponse({ input })
-            setMessages(prevMessages => [...prevMessages, { user: 'AI', text: response.result, apiPrice: response.apiPrice, id: Date.now() }]);
+            setMessages(prevMessages => [...prevMessages, { user: 'AI', text: response.result, apiPrice: response.apiPrice, id: Date.now(), Comp: response.Comp }]);
         } catch (e) {
             console.error(e)
             setError(e.message);
@@ -106,7 +106,6 @@ export function Chat({
                                     variant="body1"
                                     sx={{
                                         mb: 1,
-
                                         paddingRight: 1,
                                         paddingLeft: 1,
                                         border: '1px solid gray',
@@ -116,11 +115,13 @@ export function Chat({
                                     <ReactMarkdown>{`**${message.user}**: ${message.text}`}</ReactMarkdown>
                                 </Typography> : <Typography key={index}
                                     variant="body1"
-                                    sx={{ mb: 1, p: 1 }}
+                                    sx={{ }}
                                     align={message.user === 'You' ? 'right' : 'left'}>
                                     <ReactMarkdown>{`**${message.user}**: ${message.text}`}</ReactMarkdown>
                                 </Typography>
                             }
+                            {message.Comp && <message.Comp />}
+
 
                             {message.apiPrice && <Typography
                                 sx={{
@@ -128,6 +129,7 @@ export function Chat({
                                     p: 1
                                 }}
                                 variant="caption" color="textSecondary">Price: {message.apiPrice}</Typography>}
+
                         </>
                     ))}
                     {loading && (

@@ -106,7 +106,7 @@ export function Workout() {
     function onUpdateExercise(workoutId, exerciseId, selectedWeek, updateData, options) {
         updateExercise(workoutId, exerciseId, selectedWeek, updateData, options)
         if (WorkoutFinished(workoutId, exerciseId, selectedWeek, updateData)) {
-            showWorkoutFinishedAnimation()
+            // showWorkoutFinishedAnimation()
         }
     }
 
@@ -135,7 +135,7 @@ export function Workout() {
     return (<div>
 
         {/* {shouldShowWorkoutFinishedAnimation && <WorkoutFinishedAnimation />} */}
-        {shouldShowWorkoutFinishedAnimation && <FireWorksAnimation />}
+        {/*{shouldShowWorkoutFinishedAnimation && <FireWorksAnimation />}*/}
 
         <WorkoutList
             exercises={exercises}
