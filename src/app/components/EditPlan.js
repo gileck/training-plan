@@ -22,6 +22,7 @@ import { BodyPartsPlan } from "./BodyPartsPlan";
 import { BuildTrainingPlanDialog } from "./BuildTrainingPlanDialog";
 import { WorkoutList } from "./WorkoutList";
 import { AppContext } from "../AppContext";
+import {EditPlanChat} from "@/app/components/EditPlanChat";
 
 const { getData, saveData, cleanData } = localStorageAPI();
 
@@ -93,14 +94,13 @@ function PlanSettings({ trainingPlan, setNumberOfWeeks, updateName }) {
 export function EditPlan({ }) {
     const { createTrainingPlanActions, findTrainingPlanById, currentTrainingPlan } = useExercisesAPI()
     const { params: { trainingPlan: planId } } = useContext(AppContext);
-    console.log({ planId });
     const trainingPlan = planId ? findTrainingPlanById(planId) : currentTrainingPlan
-    console.log({ trainingPlan });
     if (!trainingPlan) return null;
     const actions = createTrainingPlanActions(trainingPlan)
 
 
     return <AppTabs noCard={true} Comps={[
+        // { label: 'Chat', Comp: <EditPlanChat trainingPlan={trainingPlan} {...actions} /> },
         { label: 'Exercises', Comp: <EditTrainingPlan trainingPlan={trainingPlan} {...actions} /> },
         { label: 'Workouts', Comp: <WorkoutPlan trainingPlan={trainingPlan} {...actions} /> },
         // { label: 'Body Parts', Comp: <BodyPartsPlan trainingPlan={trainingPlan} {...actions} /> },
@@ -114,10 +114,6 @@ function TrainingPlanPreviewDialog({
     onClose,
     trainingPlan,
 }) {
-
-    console.log({
-        trainingPlan
-    });
 
     if (!trainingPlan) return null;
     return <Dialog

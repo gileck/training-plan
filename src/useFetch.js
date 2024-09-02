@@ -54,21 +54,15 @@ function shouldFetchInBackground(url) {
 }
 
 export function useFetch(url) {
-
-    const dataFromCache = getDataFromCache(url)
-    if (dataFromCache) {
-        if (shouldFetchInBackground(url)) {
-            updateCacheInBackground(url)
-        }
-        return { data: dataFromCache, loading: false, error: null }
-    }
-
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
+    const dataFromCache = getDataFromCache(url)
 
     useEffect(() => {
+        if (dataFromCache) {
+            return;
+        }
         fetch(url)
             .then((res) => res.json())
             .then((data) => {
@@ -81,6 +75,13 @@ export function useFetch(url) {
             });
 
     }, [url]);
+
+    if (dataFromCache) {
+        if (shouldFetchInBackground(url)) {
+            updateCacheInBackground(url)
+        }
+        return { data: dataFromCache, loading: false, error: null }
+    }
 
     return { data, loading, error };
 }
