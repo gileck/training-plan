@@ -22,7 +22,7 @@ import { BodyPartsPlan } from "./BodyPartsPlan";
 import { BuildTrainingPlanDialog } from "./BuildTrainingPlanDialog";
 import { WorkoutList } from "./WorkoutList";
 import { AppContext } from "../AppContext";
-import {EditPlanChat} from "@/app/components/EditPlanChat";
+import { EditPlanChat } from "@/app/components/EditPlanChat";
 
 const { getData, saveData, cleanData } = localStorageAPI();
 
@@ -100,7 +100,7 @@ export function EditPlan({ }) {
 
 
     return <AppTabs noCard={true} Comps={[
-        // { label: 'Chat', Comp: <EditPlanChat trainingPlan={trainingPlan} {...actions} /> },
+        { label: 'Chat', Comp: <EditPlanChat trainingPlan={trainingPlan} {...actions} /> },
         { label: 'Exercises', Comp: <EditTrainingPlan trainingPlan={trainingPlan} {...actions} /> },
         { label: 'Workouts', Comp: <WorkoutPlan trainingPlan={trainingPlan} {...actions} /> },
         // { label: 'Body Parts', Comp: <BodyPartsPlan trainingPlan={trainingPlan} {...actions} /> },

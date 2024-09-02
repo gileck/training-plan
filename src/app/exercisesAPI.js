@@ -53,7 +53,7 @@ export function isStaticExercise(name) {
 export function useExercisesAPI() {
     const context = useContext(AppContext)
 
-    const { trainingPlans, setTrainingPlans } = context
+    const { trainingPlans, setTrainingPlans, questionBox } = context
 
     const { getData, saveData, cleanData } = localStorageAPI();
     // console.log("useExercisesAPI: trainingPlans", trainingPlans)
@@ -64,8 +64,15 @@ export function useExercisesAPI() {
 
     useEffect(() => {
         window.addEventListener('online', () => {
-            updateTrainingPlan(currentTrainingPlan, { online: true });
+            questionBox.openQuestionBox('Back Online! Do you want to save the training plan?', (answer) => {
+                if (answer) {
+                    updateTrainingPlan(currentTrainingPlan, { online: true });
+                }
+            })
         });
+        // questionBox.openQuestionBox('Back Online! Do you want to save the training plan?', () => {
+        // updateTrainingPlan(currentTrainingPlan, { online: true });
+        // })
     })
 
     function selectTrainingPlan(planId) {
@@ -366,8 +373,15 @@ export function useExercisesAPI() {
         }
         const { exercises, workouts, numberOfWeeks } = trainingPlan;
 
+
         function addExercise(exercise) {
             trainingPlan.exercises.push(buildExerciseObject(trainingPlan, exercise))
+            saveTrainingPlan(trainingPlan);
+        }
+        function addMultipleExercises(exercises) {
+            for (const exercise of exercises) {
+                trainingPlan.exercises.push(buildExerciseObject(trainingPlan, exercise))
+            }
             saveTrainingPlan(trainingPlan);
         }
         function editExercise(exercise) {
@@ -386,6 +400,14 @@ export function useExercisesAPI() {
         }
         function deleteExercise(exercise) {
             trainingPlan.exercises = trainingPlan.exercises.filter(e => e.id !== exercise.id);
+            saveTrainingPlan(trainingPlan);
+        }
+        function addEmptyWorkout(workoutName) {
+            trainingPlan.workouts.push({
+                id: uniqueId('workout-'),
+                name: workoutName,
+                exercises: []
+            })
             saveTrainingPlan(trainingPlan);
         }
         function addWorkout(workout) {
@@ -414,8 +436,14 @@ export function useExercisesAPI() {
             return sum;
 
         }
-        function addExerciseToWorkoutForTrainingPlan({ workoutId, exerciseName, sets }) {
+        function deleteExerciseFromWorkoutForTrainingPlan(workoutId, exerciseName) {
             const workout = trainingPlan.workouts.find(w => w.id === workoutId)
+            const exercise = workout.exercises.find(e => e.name === exerciseName)
+            workout.exercises = workout.exercises.filter(e => e.name !== exerciseName)
+            editWorkout(workout)
+        }
+        function addExerciseToWorkoutForTrainingPlan({ workoutName, workoutId, exerciseName, sets }) {
+            const workout = workoutName ? trainingPlan.workouts.find(w => w.name === workoutName) : trainingPlan.workouts.find(w => w.id === workoutId)
             const exercise = trainingPlan.exercises.find(e => e.name === exerciseName)
             const exerciseWorkoutObject = createExerciseObject(
                 trainingPlan, { ...exercise, weeklySets: sets }, workout.name
@@ -423,6 +451,13 @@ export function useExercisesAPI() {
             workout.exercises.push(exerciseWorkoutObject)
             editWorkout(workout)
         }
+        function changeExerciseSetsInWorkout(workoutId, exerciseName, sets) {
+            const workout = trainingPlan.workouts.find(w => w.id === workoutId)
+            const exercise = workout.exercises.find(e => e.name === exerciseName)
+            exercise.sets = sets
+            editWorkout(workout)
+        }
+
         function changeExerciseOrderInWorkoutForTrainingPlan(wid, eid, value) {
             const workout = trainingPlan.workouts.find(w => w.id === wid)
             const index = workout.exercises.findIndex(e => e.id === eid)
@@ -595,6 +630,8 @@ export function useExercisesAPI() {
             workouts: trainingPlan.workouts,
             numberOfWeeks: trainingPlan.numberOfWeeks,
             addWorkout,
+            addEmptyWorkout,
+            addMultipleExercises,
             editExercise,
             addExercise,
             updateExercise,
@@ -603,7 +640,9 @@ export function useExercisesAPI() {
             editWorkout,
             calculateExerciseDone: calculateExerciseDoneForTrainingPlan,
             addExerciseToWorkout: addExerciseToWorkoutForTrainingPlan,
+            deleteExerciseFromWorkout: deleteExerciseFromWorkoutForTrainingPlan,
             changeExerciseOrderInWorkout: changeExerciseOrderInWorkoutForTrainingPlan,
+            changeExerciseSetsInWorkout: changeExerciseSetsInWorkout,
             setNumberOfWeeks,
             getExercisesByWeeks,
             calculateTotalSetsDoneWeek,
@@ -612,7 +651,7 @@ export function useExercisesAPI() {
             getWeeksDone,
             updateName,
             isEmptyPlan,
-            updateWorkoutIndex
+            updateWorkoutIndex,
         }
     }
 

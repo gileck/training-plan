@@ -5,6 +5,7 @@ const { getData, saveData } = localStorageAPI()
 const STALE_TIME = 1000 * 60 * 60; // 1 hour
 const UPDATE_TIME = 1000 * 60 // 1 minute
 
+const fetchCache = {}
 const cache = getData('fetchCache') || {};
 const getFromCache = (url) => cache[url];
 const saveToCache = (url, data) => {
@@ -33,13 +34,19 @@ function updateCache(url) {
 }
 
 function updateCacheInBackground(url) {
-    return fetch(url)
+    if (fetchCache[url]) {
+        return fetchCache[url]
+    }
+    fetchCache[url] = fetch(url)
         .then((res) => res.json())
         .then((data) => {
             saveDataToCache(url, data);
         }).catch((e) => {
             console.error('Error fetching data', e.message);
-        });
+        }).finally(() => {
+            delete fetchCache[url]
+        })
+    return fetchCache[url]
 }
 
 function shouldFetchInBackground(url) {

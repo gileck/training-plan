@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Delete, Send } from "@mui/icons-material";
+import { Delete, Repeat, Replay, Send } from "@mui/icons-material";
 import { Box, Container, Divider, IconButton, Paper, TextField, Typography } from "@mui/material";
 import { localStorageAPI } from "../localStorageAPI";
 import PendingIcon from '@mui/icons-material/Pending';
@@ -74,13 +74,10 @@ export function Chat({
         }
     }, [messages]);
 
-    async function handleSendMessage() {
-        if (!input) {
-            return
-        }
-        setInput('');
-        setMessages([...messages, { user: 'You', text: input, id: Date.now() }]);
+    async function sendMessage(message) {
+        setMessages([...messages, message]);
         setLoading(true);
+        setInput('');
         try {
             const response = await getResponse({ input })
             setMessages(prevMessages => [...prevMessages, { user: 'AI', text: response.result, apiPrice: response.apiPrice, id: Date.now(), Comp: response.Comp }]);
@@ -91,7 +88,20 @@ export function Chat({
             setLoading(false);
         }
     }
+    async function handleSendMessage() {
+        if (!input) {
+            return
+        }
+        const message = { user: 'You', text: input, id: Date.now() }
+        await sendMessage(message)
+    }
 
+    async function resendMessage(message) {
+        sendMessage({
+            ...message,
+            id: Date.now()
+        })
+    }
 
     return <div id="chat_container">
         <Container maxWidth="sm" sx={{ marginTop: '10px' }}>
@@ -99,7 +109,7 @@ export function Chat({
 
                 <Box sx={{ flex: 1, overflowY: 'auto', padding: 2 }}>
                     {messages.map((message, index) => (
-                        <>
+                        <Box key={index} sx={{ position: 'relative', '&:hover .resend-button': { display: 'block' } }}>
                             <div id={message.id}></div>
                             {
                                 message.user === 'You' ? <Typography key={index}
@@ -115,7 +125,7 @@ export function Chat({
                                     <ReactMarkdown>{`**${message.user}**: ${message.text}`}</ReactMarkdown>
                                 </Typography> : <Typography key={index}
                                     variant="body1"
-                                    sx={{ }}
+                                    sx={{}}
                                     align={message.user === 'You' ? 'right' : 'left'}>
                                     <ReactMarkdown>{`**${message.user}**: ${message.text}`}</ReactMarkdown>
                                 </Typography>
@@ -130,7 +140,14 @@ export function Chat({
                                 }}
                                 variant="caption" color="textSecondary">Price: {message.apiPrice}</Typography>}
 
-                        </>
+                            {message.user === 'You' ? <IconButton
+                                className="resend-button"
+                                sx={{ display: 'none', position: 'absolute', top: 0, right: 0 }}
+                                onClick={() => resendMessage(message)}
+                            >
+                                <Replay />
+                            </IconButton> : null}
+                        </Box>
                     ))}
                     {loading && (
                         <TypingIndicator>

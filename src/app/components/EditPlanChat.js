@@ -1,50 +1,67 @@
-import {Chat} from "@/app/components/chat";
-import {useState} from "react";
+import { Chat } from "@/app/components/chat";
+import { useContext, useState } from "react";
 import Box from "@mui/material/Box";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
-import {Button, Dialog, DialogContent} from "@mui/material";
+import { Button, Card, CardContent, CardHeader, Dialog, DialogActions, DialogContent, Typography } from "@mui/material";
 import Divider from "@mui/material/Divider";
+import { Cancel, Check, Info } from "@mui/icons-material";
+import { AppContext } from "../AppContext";
 
-function VerifyChange({changes}) {
+function VerifyChange({ onAccept, onReject, showDetails, changes }) {
+    const [showDetailsDialog, setShowDetailsDialog] = useState(false);
+    const [isRejected, setIsRejected] = useState(false);
+    function onAcceptInternal() {
+        onAccept()
+        setShowDetailsDialog(false)
+    }
+    function onRejectInternal() {
+        onReject()
+        setIsRejected(true)
+        setShowDetailsDialog(false)
+    }
     return <Box>
-        <List>
-            {
-                changes.map(({type, value}) => {
-                    return <ListItem>
-                        <List>
-                            <ListItem>{type}</ListItem>
-                            <Divider/>
-                            {
+        <Dialog open={showDetailsDialog} onClose={() => setShowDetailsDialog(false)}>
+            <DialogContent>
+                <Typography>
+                    {changes.map(({ action, params }) => {
+                        return <Card sx={{
+                            p: 1
+                        }}>
 
-                                Object.entries(value).map(([key, val]) => {
-                                    return <>
-                                    <ListItem>
-                                        <div>{key}: {val}</div>
-                                    </ListItem>
-                                        <Divider/>
-                                    </>
-                                })
-                            }
-                        </List>
-                    </ListItem>
-                })
-            }
-        </List>
+                            <Typography>{action}</Typography>
+                            <Typography>{Object.entries(params).map(([key, value]) => {
+                                return <pre>{key}: {JSON.stringify(value, '/n', 2)}</pre>
+                            })}</Typography>
+                            <Divider />
+                        </Card>
+                    })}
+                </Typography>
+            </DialogContent>
+            <DialogActions>
+                <Button variant={'contained'} startIcon={<Check />} onClick={onAcceptInternal}>Accept</Button>
+
+                <Button onClick={onRejectInternal}>Reject</Button>
+                <Button onClick={() => setShowDetailsDialog(false)}>Close</Button>
+            </DialogActions>
+        </Dialog>
         <Box>
-            <Button variant={'contained'}>Accept</Button>
-            <Button>Reject</Button>
+            <Button disabled={isRejected} variant={'contained'} startIcon={<Check />} onClick={onAccept}>Accept</Button>
+            <Button disabled={isRejected} startIcon={<Info />} onClick={() => setShowDetailsDialog(true)}>Details</Button>
+            <Button disabled={isRejected} startIcon={<Cancel />} onClick={onRejectInternal}>Reject</Button>
         </Box>
     </Box>
 
 }
 
-export function EditPlanChat({trainingPlan}) {
+export function EditPlanChat({ trainingPlan, ...actions }) {
 
-    console.log({trainingPlan})
+    console.log({ trainingPlan })
 
-    async function getResponse({input}) {
-        const {result, apiPrice} = await fetch('/api/ai/editPlanAI', {
+    const { openAlert } = useContext(AppContext)
+
+    async function getResponse({ input }) {
+        const { result, apiPrice } = await fetch('/api/ai/editPlanAI', {
             method: 'POST',
             body: JSON.stringify({
                 text: input,
@@ -55,14 +72,23 @@ export function EditPlanChat({trainingPlan}) {
             }
         }).then(res => res.json())
 
-        const {message, changes} = result;
-
+        const { message, changes } = result;
 
         return {
             result: message,
             apiPrice,
             Comp: () => <VerifyChange
                 changes={changes}
+                onAccept={() => {
+                    changes.forEach(({ action, params }) => {
+                        actions[action](...Object.values(params))
+                    })
+                    openAlert('Done! The changes have been applied to the training plan')
+
+                }}
+                onReject={() => {
+                    console.log('reject')
+                }}
             />
         }
 

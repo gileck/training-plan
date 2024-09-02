@@ -10,8 +10,8 @@ import { Workout } from "./components/Workout.js";
 import Box from '@mui/material/Box';
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
-import { Alert, Paper, Snackbar, ThemeProvider } from "@mui/material";
-import { People, Settings as SettingsIcon } from '@mui/icons-material';
+import { Alert, Button, IconButton, Paper, Snackbar, ThemeProvider } from "@mui/material";
+import { Cancel, CheckCircle, People, Settings as SettingsIcon } from '@mui/icons-material';
 import { FormatListBulleted as FormatListBulletedIcon } from '@mui/icons-material';
 import { FitnessCenter as FitnessCenterIcon } from '@mui/icons-material';
 import { NoteAdd as NoteAddIcon } from '@mui/icons-material';
@@ -28,6 +28,29 @@ import { Profile } from "./profile";
 import theme from "./theme";
 import { Activity } from "./components/Activity";
 
+function useQuestionBox() {
+  const [isQuestionBoxOpen, setIsQuestionBoxOpen] = useState(false)
+  const [questionBoxMessage, setQuestionBoxMessage] = useState('')
+  const [questionBoxCallback, setQuestionBoxCallback] = useState(null)
+
+  return {
+    isQuestionBoxOpen,
+    questionBoxMessage,
+    setIsQuestionBoxOpen,
+    openQuestionBox: (message, cb) => {
+
+      setQuestionBoxMessage(message)
+      setIsQuestionBoxOpen(true)
+      setQuestionBoxCallback({ cb })
+    },
+    onQuestionBoxAnswer: (answer) => {
+      if (questionBoxCallback?.cb) {
+        questionBoxCallback.cb(answer)
+      }
+      setIsQuestionBoxOpen(false)
+    }
+  }
+}
 function useAlert() {
   const [isAlertOpen, setIsAlertOpen] = React.useState(false)
   const [isErrorAlertOpen, setIsErrorAlertOpen] = React.useState(false)
@@ -70,7 +93,9 @@ function AppProvider({ children, setRoute, params, user }) {
 
 
   const alert = useAlert()
+  const questionBox = useQuestionBox()
   const contextValue = {
+    questionBox: questionBox,
     user,
     trainingPlans: trainingPlansState,
     setTrainingPlans,
@@ -98,7 +123,32 @@ function AppProvider({ children, setRoute, params, user }) {
   </AppContext.Provider>
 }
 
+function QuestionBox() {
+  const { questionBox: { setIsQuestionBoxOpen, isQuestionBoxOpen, questionBoxMessage, onQuestionBoxAnswer } } = React.useContext(AppContext)
+  return <Snackbar
+    open={isQuestionBoxOpen}
+    onClose={() => setIsQuestionBoxOpen(false)}
+  >
+    <Alert
+      onClose={() => setIsQuestionBoxOpen(false)}
+      severity="info"
+      sx={{ width: '100%' }}
+      action={
+        <>
+          <IconButton onClick={() => onQuestionBoxAnswer(true)}>
+            <CheckCircle />
+          </IconButton>
+          <IconButton onClick={() => onQuestionBoxAnswer(false)}>
+            <Cancel />
+          </IconButton>
 
+        </>
+      }
+    >
+      {questionBoxMessage}
+    </Alert>
+  </Snackbar >
+}
 function FloaingAlert() {
   const { isErrorAlertOpen, isAlertOpen, closeAlert, alertMessage } = React.useContext(AppContext)
 
@@ -268,6 +318,7 @@ export function Home({ user }) {
             </BottomNavigation>
           </Box>
         </Paper>
+        <QuestionBox />
         <FloaingAlert />
         <Menu onRouteChanged={setInernalRoute} menuOpen={menuOpen} toggleDrawer={toggleDrawer} />
       </AppProvider>
