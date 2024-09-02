@@ -50,11 +50,9 @@ export function RecoveryStatus() {
     }
 
     const currentDate = new Date().getDate()
-    const range = _.range(currentDate - 7, currentDate + 1)
+    const range = _.range(currentDate - 7, currentDate + 1).map(day => new Date(new Date().setDate(day)).getDate())
 
     const activityPerDay = _.groupBy(activity, item => new Date(item.date).getDate())
-    // console.log({ activityPerDay });
-
     const totalVolumePerDay = _(range)
         .map((day) => {
             const items = activityPerDay[day] || []
