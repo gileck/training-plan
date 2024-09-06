@@ -82,7 +82,7 @@ export function User() {
 
     async function importTrainingPlanClicked(id) {
         const trainingPlan = data.trainingPlans.find(plan => plan.id === id);
-        console.log({ trainingPlan });
+        
         await importTrainingPlan({ plan: trainingPlan, name: `${trainingPlan.name} (${data.user.name})` });
         setRoute('training_plans');
 

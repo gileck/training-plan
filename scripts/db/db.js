@@ -1,107 +1,12 @@
-import { localStorageAPI } from "./localStorageAPI";
+const dotenv = require('dotenv');
+dotenv.config();
+const { MongoClient } = require('mongodb');
 
-const images = {
-    "Wide Push-ups": "wide_hand_push_up.jpg",
-    "Push-ups": "clap_push_up.jpg",
-    "Squats": "kettlebell_goblet_squat_mobility.jpg",
-    "Lunges": "dumbbell_lunge.jpg",
-    "Deadlifts": "barbell_clean_deadlift.jpg",
-    "Bench Press": "bench_press.jpg",
-    "Pull-ups": "archer_pull_up.jpg",
-    "Sit-ups": "janda_sit_up.jpg",
-    "Mountain Climbers": "mountain_climber.jpg",
-    "Bicep Curls": "dumbbell_drag_bicep_curl.jpg",
-    "Shoulder Press": "dumbbell_alternate_shoulder_press.jpg",
-    "Shoulder Side raise": "dumbbell_lateral_raise.jpg",
-    "Shoulder Front raise": "dumbbell_standing_front_raise_above_head.jpg",
-    "Tricep Dips": "chest_dip.jpg",
-    "Jump Squats": "double_jump_squat.jpg",
-    "Kettlebell Swings": "kettlebell_swing.jpg",
-    "Box Jumps": "jump_on_fit-box.jpg",
-    "Wall Sit": "dumbbell_wall_squat.jpg",
-    "ATG Split Squats": "split_squats.jpg",
-    "Hip Extention": "cable_standing_hip_extension.jpg",
-    "Muscle Up": "archer_pull_up.jpg",
-    "Dips": "elbow_dips.jpg",
-    "Plank": "plank_jack.jpg",
-    "Side Plank": "side_plank_leg_lift.jpg",
-    "Lat Pull-downs": "cable_wide-grip_lat_pulldown.jpg",
-    "Chin-ups": "chin-up.jpg",
-    "Leg Press": "lever_seated_leg_press.jpg",
-    "Single Leg Press": "lever_horizontal_one_leg_press.jpg",
-    "Cable Chest Fly": "cable_standing_fly.jpg",
-    "Seated Row": "cable_low_seated_row.jpg",
-    "Leg Curls": "lever_seated_leg_curl.jpg",
-    "Leg Extensions": "lever_one_leg_extension.jpg",
-    "Face Pulls": "cable_standing_supinated_face_pull_(with_rope).jpg",
-    "Calf Raises": "standing_calf_raise.jpg",
-    "Diamond Push-ups": "diamond_push_up.jpg",
-    "Pistol Squats": "kettlebell_pistol_squat.jpg",
-    "Handstand Push-ups": "handstand_push-up.jpg",
-    "Glute Bridge": "glute_bridge_two_legs_on_floor.jpg",
-    "Inverted Row": "inverted_row_with_bed_sheet.jpg",
-    "L-Sit": "l-sit_on_floor.jpg",
-    "Archer Push-ups": "incline_close-grip_push-up.jpg",
-    "Single-leg Deadlift": "kettlebell_kickstand_one_leg_deadlift.jpg",
-    "Nordic Hamstring Curl": "bodyweight_lying_legs_curl_(male).jpg",
-    "Bulgarian split squats": "smith_split_squat.jpg",
-    "Bulgarian split squat": "smith_split_squat.jpg",
-    "Single leg Squats": "single_leg_squat.jpg",
-    "Thrusters": "dumbbell_swing.jpg",
-    "Hip Thrust": "barbell_staggered_stance_hip_thrust.jpg",
-    "Romanian Deadlift": "barbell_romanian_deadlift.jpg",
-    "Incline Bench Press": "incline_bench_press.jpg",
-    "Farmer Carry": "kettlebell_farmers_carry.jpg",
-    "Dragon Flies": "weighted_muscle_up.jpg",
-    "Cable biceps curls": "cable_curl.jpg",
-    "Bicep curls": "biceps_curl.jpg",
-    "Russian Twists": "russian_twist.jpg",
-    "Hammer Curls": "dumbbell_seated_alternate_shoulder.jpg",
-    "Step-ups": "jump_step-up.jpg",
-    "Reverse Lunges": "warming-up_in_lunge.jpg",
-    "Flutter Kicks": "prisoner_half_sit-up.jpg",
-    "Chest Press Machine": "lever_incline_chest_press.jpg",
-    "Lat Pulldown Machine": "cable_reverse_grip_pulldown.jpg",
-    "Side Crunch": "bottle_weighted_side_bend_(female).jpg",
-    "Running": "stationary_bike_run.jpg",
-    "Crunches": "crunch_floor.jpg",
-    "Rowing Machine": "cable_seated_row_with_v_bar.jpg",
-    "Inner Thigh Extensions": "lever_seated_hip_adduction.jpg",
-    "Cable Kickbacks": "cable_kneeling_glute_kickback_(female).jpg",
-    "Goblet Squats": "dumbbell_goblet_squat.jpg",
-    "Front Squats": "smith_front_squat.jpg",
-    "Sumo Squats": "sitting_sumo_right_twist_stretch.jpg",
-    "Cossack Squats": "smith_split_squat.jpg",
-    "Dumbbell Bench Press": "dumbbell_one_arm_bench_fly.jpg",
-    "Lateral Raises": "dumbbell_partials_lateral_raise.jpg",
-    "Snatch": "dumbbell_one_arm_snatch.jpg",
-    "Bulgarian Split Squats": "dumbbell_bulgarian_split_squat.jpg",
-    "Abs": "elbow_to_knee_side_plank_crunch.jpg",
-    "Walking": "walking_on_treadmill.jpg",
-    "Side kicks": "squat_side_kick.jpg",
-    "Bent over & reverse fly": "suspension_reverse_fly.jpg",
-    "Squat in smith": "smith_squat_to_bench.jpg",
-    "Hip extensions with machine": "cable_standing_hip_extension.jpg",
-    "Inner Thigh extensions in machine": "lever_seated_hip_adduction.jpg",
-    "Cable kickbacks": "cable_kickback.jpg",
-    "Cossack squat": "cossack_squats.jpg",
-    "Single leg Hip-Thrust": "single_leg_hip_thrust_(version_2)_(female).jpg",
-    "Head stand": "handstand_hold_on_wall_(female).jpg",
-    "Half Burpee": "burpee.jpg",
-    "Jump lunges": "bodyweight_forward_lunge_(hinge_at_hips).jpg",
-    "Scapular pull ups": "rocky_pull_up_pulldown.jpg",
-    "Cable Triceps Pushdowns": "cable_triceps_pushdown.jpg",
-    "Back Extension": "lever_back_extension.jpg",
-    "Back Extension (Roman Chair)": "lever_back_extension.jpg",
-}
+client = new MongoClient(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+});
 
-export const getImageUrl = (name) => {
-    const item = images[name]
-    if (!item) {
-        return null
-    }
-    return `/images/${item}`
-}
 
 const staticExercisesList = [{
     "name": "Wide Push-ups",
@@ -947,19 +852,10 @@ const staticExercisesList = [{
     "category": "Upper body"
 }
 ]
-
-const { getData } = localStorageAPI()
-export const getLocalExercises = () => getData("exercisesList") || []
-
-export const exercisesList = [
-    ...staticExercisesList,
-    ...getLocalExercises()
-]
-
-export const getExercisesList = () => {
-    const exercisesListFromLocalStorage = getLocalExercises()
-    return [
-        ...staticExercisesList,
-        ...exercisesListFromLocalStorage
-    ]
+async function start() {
+    const mongoClient = await client.connect();
+    const db = await mongoClient.db()
+    // const response = await db.collection('exercises').insertMany(staticExercisesList)
+    console.log({ response })
 }
+start()

@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     const db = await getDB();
 
     const trainingPlan = await db.collection('trainingPlans').findOne({ id: trainingPlanId });
-    console.log({ trainingPlan })
+
     const planWithoutWeeks = {
         ...trainingPlan,
         plan: {
@@ -64,7 +64,8 @@ export default async function handler(req, res) {
     { name: string, exercises: Array<Exercise & {sets: number}> }
     
     return a JSON object with 2 keys:
-    - message: a message to the client explaining the change you are about to make and prompting them to confirm.
+    - message: a message to the client explaining the change you are about to make and prompting them to confirm. list each change you are about to make in a seperate bullet point. be specific about the changes you are about to make. if you are adding a new exercise, specify it, and its details (name, sets, reps, weight, etc) and specify the workout it is added to.
+
     - changes: an array of changes you made to the training plan. Each change should be an object with the following keys:
         * action: the action of change you made. This can be one of the following (only the function name, the params are in the params field): 
             
@@ -73,15 +74,14 @@ export default async function handler(req, res) {
             addExercise({exercise: Exercise}): add a new single exercise to the training plan.
             addMultipleExercises({exercises: Array<Exercise>}): add multiple exercises to the training plan. 
             deleteWorkout({workoutId: string}): delete an existing workout from the training plan.
-            deleteExercise({exerciseId: string}): delete an existing exercise from the training plan.
+            deleteExercise({exerciseId: string}): delete an existing exercise from the training plan. take the exerciseId from the id field of the exercise object.
             editWorkout({workout: Workout}): edit an existing workout in the training plan.
-            addExerciseToWorkout({ details: Object<{ workoutName: string, exerciseName: string, sets: number }>}): add an exercise to an existing workout. use it only when there is already a workout in the plan.
+            addExerciseToWorkout({ workoutName: string, exerciseName: string, sets: number }): add an exercise to an existing workout. use it only when there is already a workout in the plan.
             deleteExerciseFromWorkout({workoutId: string, exerciseName: string}): delete an exercise from an existing workout.
             changeExerciseSetsInWorkout({workoutId: string, exerciseName: string, sets: number}): change the sets of an exercise in an existing workout.
 
 
-        * params: an object of params that the action needs to work. The params will be the parameter of the action function. it should be a valid object for the action function.
-
+        * params: an object of key-value pairs that the action needs to work. The params object will be the parameter of the action function. it should be a valid object for the action function.
             For example:
             action: addExercise
             params:  {exercise: { "id": "shoulder_exercise_1", "overloadValue": 5, "overloadType": "weight", "name": "Front Raise", "numberOfReps": 10, "weight": 12, "weeklySets": 5 }}

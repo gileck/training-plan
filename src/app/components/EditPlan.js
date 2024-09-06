@@ -186,7 +186,8 @@ function EditTrainingPlan({
     updateExercise,
     exercises,
     deleteExercise,
-    cleanAllData
+    cleanAllData,
+    isExerciseExists
 }) {
 
 
@@ -195,6 +196,9 @@ function EditTrainingPlan({
     const [addExerciseDialogOpen, setOpen] = React.useState(false);
     const [createNewExerciseDialogOpen, setCreateNewExerciseDialogOpen] = React.useState(false);
     const [editExerciseOpened, setEditExercise] = React.useState({});
+    const getExerciseFromTrainingPlan = (exerciseName) => {
+        return exercises.find(e => e.name === exerciseName)
+    }
 
     function createNewExercise() {
         setOpen(false);
@@ -265,6 +269,8 @@ function EditTrainingPlan({
                 onClose={() => setOpen(false)}
                 createNewExercise={createNewExercise}
                 exerciseList={exercisesList}
+                isExerciseExists={isExerciseExists}
+                getExerciseFromTrainingPlan={getExerciseFromTrainingPlan}
 
             />
 
@@ -344,11 +350,10 @@ function EditExerciseDialog({ exerciseList, exercises, exerciseToEdit, onAddExer
     >
         <DialogTitle>Edit Exercise</DialogTitle>
         <EditExerciseForm
-            exerciseList={exerciseList}
             onCancel={onClose}
-            exerciseToEdit={exerciseToEdit}
-            exercises={exercises}
+            exercise={exerciseToEdit}
             onAddExercise={onAddExercise}
+            isEdit={true}
         />
 
     </Dialog>

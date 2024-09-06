@@ -3,10 +3,11 @@ import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Avatar from '@mui/material/Avatar';
-import exercisesJSON from '../../scripts/exercises/output.json'
+// import exercisesJSON from '../api'
 import _ from 'lodash'
 import Image from 'next/image';
 import { CopyAll } from '@mui/icons-material';
+const exercisesJSON = {}
 
 const ExercisesAutocomplete = () => {
     const exercises = Object.values(exercisesJSON);

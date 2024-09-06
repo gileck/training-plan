@@ -19,7 +19,6 @@ export default async function handler(req, res) {
 
     const trainingPlan = await db.collection('trainingPlans').findOne({ id: currentTrainingPlan });
 
-    console.log({ trainingPlan });
 
     const prompt = `
 

@@ -373,9 +373,17 @@ export function useExercisesAPI() {
         }
         const { exercises, workouts, numberOfWeeks } = trainingPlan;
 
+        function isExerciseExists(exerciseName) {
+            return exercises.some(e => e.name === exerciseName);
+        }
 
         function addExercise(exercise) {
-            trainingPlan.exercises.push(buildExerciseObject(trainingPlan, exercise))
+            const newExercise = buildExerciseObject(trainingPlan, exercise)
+            if (isExerciseExists(newExercise.name)) {
+                context.openErrorAlert(`Exercise ${newExercise.name} already exists`);
+                return;
+            }
+            trainingPlan.exercises.push(newExercise)
             saveTrainingPlan(trainingPlan);
         }
         function addMultipleExercises(exercises) {
@@ -652,6 +660,19 @@ export function useExercisesAPI() {
             updateName,
             isEmptyPlan,
             updateWorkoutIndex,
+            isExerciseExists,
+            aiActions: {
+                addEmptyWorkout: ({ workoutName }) => addEmptyWorkout(workoutName),
+                editExercise: ({ exercise }) => editExercise(exercise),
+                addExercise: ({ exercise }) => addExercise(exercise),
+                addMultipleExercises: ({ exercises }) => addMultipleExercises(exercises),
+                deleteWorkout: ({ workoutId }) => deleteWorkout(workoutId),
+                deleteExercise: ({ exerciseId }) => deleteExercise(exerciseId),
+                editWorkout: ({ workout }) => editWorkout(workout),
+                addExerciseToWorkout: ({ workoutName, exerciseName, sets }) => addExerciseToWorkoutForTrainingPlan({ workoutName, exerciseName, sets }),
+                deleteExerciseFromWorkout: ({ workoutId, exerciseName }) => deleteExerciseFromWorkoutForTrainingPlan(workoutId, exerciseName),
+                changeExerciseSetsInWorkout: ({ workoutId, exerciseName, sets }) => changeExerciseSetsInWorkout(workoutId, exerciseName, sets)
+            }
         }
     }
 

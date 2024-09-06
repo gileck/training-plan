@@ -9,13 +9,15 @@ import Divider from '@mui/material/Divider';
 import Collapse from '@mui/material/Collapse';
 import AddIcon from '@mui/icons-material/Add';
 import IconButton from '@mui/material/IconButton';
-import {AddCircle as AddCircleIcon} from '@mui/icons-material';
+import { AddCircle as AddCircleIcon } from '@mui/icons-material';
 import { Delete, ExpandCircleDown, ExpandCircleUp, ExpandMore, ExpandLess, Label, } from "@mui/icons-material";
 import {
     Autocomplete,
     Button,
     Chip,
     Dialog,
+    DialogActions,
+    DialogContent,
     DialogTitle,
     FormControl,
     FormControlLabel,
@@ -25,11 +27,13 @@ import {
     MenuItem,
     Select,
     Switch,
-    TextField
+    TextField,
+    Typography
 } from '@mui/material';
 import { localStorageAPI } from '../localStorageAPI';
 import { getExercisesList } from '../exercisesList';
 import { getAllBodyParts, getPrimaryMuscle, isBodyWeightExercise, isStaticExercise } from "../exercisesAPI";
+import { AddExercise, SelectExercise } from './SelectExercise';
 
 // import { exercisesList } from '../exercisesList';
 export function CreateNewExerciseDialog({
@@ -166,14 +170,12 @@ export function CreateNewExerciseDialog({
 }
 
 export function AddExerciseDialog({
-    exerciseList,
-    createNewExercise,
-    onAddExercise,
-    exercises,
     addExerciseDialogOpen,
-    onClose
+    onClose,
+    onAddExercise,
+    isExerciseExists,
+    getExerciseFromTrainingPlan
 }) {
-
 
     return (
         <Dialog
@@ -181,39 +183,40 @@ export function AddExerciseDialog({
             open={addExerciseDialogOpen}
             onClose={() => onClose()}
             fullWidth={true}
+            fullScreen={true}
         >
             <DialogTitle>
                 Add Exercise
             </DialogTitle>
-            <EditExerciseForm
-                exerciseList={exerciseList}
-                onCancel={() => onClose()}
-                exercises={exercises}
-                onAddExercise={onAddExercise}
-                createNewExercise={createNewExercise}
-            />
+            <DialogContent>
+                <SelectExercise
+                    isExerciseExists={isExerciseExists}
+                    getExerciseFromTrainingPlan={getExerciseFromTrainingPlan}
+                    onAddExercise={onAddExercise}
+                />
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={onClose}>Close</Button>
+            </DialogActions>
         </Dialog>
     );
 }
 
 export function EditExerciseForm({
-    exerciseList,
     onAddExercise,
-    exerciseToEdit,
-    exercises,
+    exercise: exerciseToEdit,
     onCancel,
-    createNewExercise
+    isEdit
 }) {
 
-    const exerciseOptions = getExercisesList().filter(e => !exercises.find(ex => ex.name === e.name))
-    const [exercise, setExercise] = useState(exerciseToEdit || exerciseOptions[0]);
+    const exercise = exerciseToEdit
     const [totalWeeklySets, setTotalWeeklySets] = useState(exerciseToEdit?.weeklySets || 5);
     const [reps, setReps] = useState(exerciseToEdit?.numberOfReps || 8);
-    const [weight, setWeight] = useState(exerciseToEdit?.weight);
+    const [weight, setWeight] = useState(exerciseToEdit?.weight || 0);
     const [overloadType, setOverloadType] = useState(exerciseToEdit?.overloadType || 'sets');
     const [overloadValue, setOverloadValue] = useState(exerciseToEdit?.overloadValue || 5);
 
-    console.log({ exercise });
+    // console.log({ exercise });
     const onAddButtonClicked = () => {
         onAddExercise(Object.assign(exerciseToEdit || {}, {
             ...exercise,
@@ -257,7 +260,7 @@ export function EditExerciseForm({
 
             }} component="div" disablePadding>
             <ListItem>
-                <Autocomplete
+                {/* <Autocomplete
                     size='small'
                     blurOnSelect
                     disableClearable
@@ -278,11 +281,13 @@ export function EditExerciseForm({
                             setExercise(newValue.value)
                         }
                     }}
-                />
+                /> */}
 
-                {createNewExercise ? <IconButton onClick={createNewExercise}>
-                    <AddCircleIcon />
-                </IconButton> : ''}
+                <Typography>
+                    {exercise.name}
+                </Typography>
+
+
 
             </ListItem>
             <ListItem>
@@ -355,7 +360,7 @@ export function EditExerciseForm({
                     variant="contained"
                     color="primary"
                 >
-                    {exerciseToEdit ? 'Update' : 'Add'}
+                    {isEdit ? 'Update' : 'Add'}
                 </Button>
                 <Button
                     onClick={onCancel}

@@ -1,4 +1,4 @@
-{
+export default {
   "11": {
     "id": 11,
     "name": "Wrist Ulnar Deviator And Flexor Stretch",

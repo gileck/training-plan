@@ -56,7 +56,6 @@ function VerifyChange({ onAccept, onReject, showDetails, changes }) {
 
 export function EditPlanChat({ trainingPlan, ...actions }) {
 
-    console.log({ trainingPlan })
 
     const { openAlert } = useContext(AppContext)
 
@@ -81,7 +80,7 @@ export function EditPlanChat({ trainingPlan, ...actions }) {
                 changes={changes}
                 onAccept={() => {
                     changes.forEach(({ action, params }) => {
-                        actions[action](...Object.values(params))
+                        actions.aiActions[action](params)
                     })
                     openAlert('Done! The changes have been applied to the training plan')
 

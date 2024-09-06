@@ -12,7 +12,7 @@ import { getPrimaryMuscle, getSecondaryMuscles, getAllBodyParts, getBodyParts, g
 import { RemoveCircle, AddCircle, AddCircleOutline, Delete, Edit, ExpandLess, ExpandMore, Label, CheckCircleOutline } from "@mui/icons-material";
 
 function WorkoutExercise({ totalWeeklySetsInAllWorkouts, totalWeeklySets, exercise, onRemoveSetComplete, onAddSetComplete, onDeleteExercise }) {
-    console.log({ exercise });
+    // console.log({ exercise });
     return (
         <ListItem
 
@@ -88,10 +88,6 @@ function WorkoutExercise({ totalWeeklySetsInAllWorkouts, totalWeeklySets, exerci
 
 function AddExerciseToWorkoutDialog({ workouts, open, handleClose, onAddExercise, exercises, workoutId }) {
 
-    console.log({
-        workouts, open, handleClose, onAddExercise, exercises, workoutId
-    });
-
     if (!workoutId) {
         return null
     }
@@ -106,11 +102,6 @@ function AddExerciseToWorkoutDialog({ workouts, open, handleClose, onAddExercise
     const maxSetsInExercise = ex?.weeklySets
 
 
-    console.log({
-        workoutId,
-        workouts,
-        ex
-    });
 
     const totalSetsCountInExercise = workouts.map(w => w.exercises.find(e => e.name === selectedExercise)).filter(e => e).reduce((acc, e) => acc + e.sets, 0)
     const setsLeft = maxSetsInExercise - totalSetsCountInExercise
@@ -388,7 +379,6 @@ export function WorkoutPlan({
     updateWorkoutIndex
 }) {
 
-    console.log({ workouts, exercises });
 
     const [open, setOpen] = useState(false);
     const [openAddExercise, setOpenAddExercise] = useState(false)
@@ -502,7 +492,6 @@ export function WorkoutPlan({
             .map(e => ({ ...e, sets: 0 }))
     }
     const exercisesNotInsideWorkouts = getExercisesNotInsideWorkouts()
-    console.log({ exercisesNotInsideWorkouts, exercises });
 
     function getExercisesLeft() {
         return exercises.map(e => {
