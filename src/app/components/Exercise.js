@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { ListItem, Box, ListItemText, IconButton, Typography, Chip, ListItemAvatar, Dialog } from "@mui/material";
 import { CheckCircle, AddCircle as AddCircleIcon, RemoveCircle, ArrowUpward, ArrowDownward, Assistant, Close } from '@mui/icons-material';
 import { getPrimaryMuscle, getSecondaryMuscles } from "../exercisesAPI";
 import { colors } from './colors';
 import { getImageUrl } from '../exercisesList';
+import { AppContext } from '../AppContext';
 
 export function Exercise({
     shouldShowArrows,
@@ -21,6 +22,9 @@ export function Exercise({
     if (!exercise) {
         return null;
     }
+
+    const { getImageUrl } = useContext(AppContext);
+
 
     const weeklyTargetReached = exercise.sets.done >= exercise.sets.target;
     const [open, setOpen] = useState(false);

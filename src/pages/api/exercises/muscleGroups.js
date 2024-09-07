@@ -10,12 +10,7 @@ export default async function handler(req, res) {
     }
 
     const db = await getDB()
-    const exercises = await db.collection('exercises').find({}, {
-        projection: {
-            _id: 0,
-        }
-    }).toArray()
-    res.status(200).json({
-        exercises
-    })
+    const exercises = await db.collection('exercises').find({}).toArray()
+    const muscleGroups = [...new Set(exercises.map(exercise => [exercise.primaryMuscle, ...(exercise.secondaryMuscle || [])]).flat())]
+    res.status(200).json(muscleGroups)
 }

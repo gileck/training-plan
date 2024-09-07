@@ -15,6 +15,7 @@
     "@mui/icons-material": "^5.15.13",
     "@mui/material": "^5.15.13",
     "@prisma/client": "^5.16.2",
+    "@vercel/blob": "^0.23.4",
     "axios": "^1.7.2",
     "dotenv": "^16.4.5",
     "image-downloader": "^4.3.0",

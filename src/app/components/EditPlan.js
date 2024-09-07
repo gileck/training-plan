@@ -1,13 +1,13 @@
 "use client"
 import React, { useContext, useState } from "react";
-import { Button, Card, Collapse, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControl, FormGroup, InputLabel, MenuItem, Select, TextField, } from "@mui/material";
+import { Avatar, Button, Card, Collapse, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControl, FormGroup, InputLabel, ListItemAvatar, MenuItem, Select, TextField, } from "@mui/material";
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
-import { AddCircle, Delete, EditLocationAlt, EditNotifications, EditOutlined, Label, RemoveCircle } from "@mui/icons-material";
+import { Add, AddCircle, Delete, EditLocationAlt, EditNotifications, EditOutlined, Label, RemoveCircle } from "@mui/icons-material";
 import { AddExerciseDialog, EditExerciseForm, CreateNewExerciseDialog } from "./AddExerciseListItem";
 import _ from 'lodash'
 import { useExercisesAPI } from "../exercisesAPI";
@@ -16,7 +16,7 @@ import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 import { isBodyWeightExercise } from "../exercisesAPI";
 import { AppTabs } from "../tabs";
 import { WorkoutPlan } from "./WorkoutPlan";
-import { exercisesList, getLocalExercises } from "../exercisesList";
+import { exercisesList, getImageUrl, getLocalExercises } from "../exercisesList";
 import { localStorageAPI } from "../localStorageAPI";
 import { BodyPartsPlan } from "./BodyPartsPlan";
 import { BuildTrainingPlanDialog } from "./BuildTrainingPlanDialog";
@@ -190,6 +190,8 @@ function EditTrainingPlan({
     isExerciseExists
 }) {
 
+    const { getImageUrl } = useContext(AppContext);
+
 
     const exerciseToShow = exercises.map(e => ({ ...e, ...e.weeks[0] }))
 
@@ -284,15 +286,15 @@ function EditTrainingPlan({
             />
             <div style={{
                 display: 'flex',
-                justifyContent: 'space-between',
+                justifyContent: 'center',
             }}>
 
 
                 <Button
-                    sx={{ fontSize: '13px', marginRight: '10px' }}
-                    startIcon={<AddCircle />}
-                    variant="contained"
+                    sx={{ fontSize: '15px', marginTop: '10px', }}
+                    startIcon={<Add />}
                     onClick={() => setOpen(!addExerciseDialogOpen)}>
+
                     Add Exercise
 
                 </Button>
@@ -312,6 +314,17 @@ function EditTrainingPlan({
                         <React.Fragment key={exercise.id}>
                             <ListItem disablePadding>
                                 <ListItemButton>
+                                    <ListItemAvatar>
+                                        <Box
+                                            sx={{
+                                                height: '100px',
+                                                width: '100px',
+                                                backgroundImage: `url(${getImageUrl(exercise.name)})`,
+                                                backgroundSize: 'contain',
+                                                backgroundRepeat: 'no-repeat',
+                                            }}
+                                        ></Box>
+                                    </ListItemAvatar>
                                     <ListItemText primary={exercise.name}
                                         secondary={printSets(exercise)} />
                                     <IconButton onClick={() => handleEditExerciseClicked(exercise.id)}>

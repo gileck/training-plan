@@ -1,12 +1,16 @@
 const dotenv = require('dotenv');
-dotenv.config();
+dotenv.config({
+    path: '.env.development.local'
+});
 const { MongoClient } = require('mongodb');
-
+const fs = require('fs');
+const path = require('path');
 client = new MongoClient(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 });
 
+const { put, head } = require('@vercel/blob');
 
 const staticExercisesList = [{
     "name": "Wide Push-ups",
@@ -856,6 +860,50 @@ async function start() {
     const mongoClient = await client.connect();
     const db = await mongoClient.db()
     // const response = await db.collection('exercises').insertMany(staticExercisesList)
-    console.log({ response })
+    // console.log({ response })
+    for (const exercise of staticExercisesList) {
+        const { name } = exercise
+        console.log({ name })
+        // const imageUrl = `https://storage.googleapis.com/workout-plan-generator/${image}`
+
+
+        // const exists = await head(imageUrl)
+        // console.log({ exists })
+        // if (exists) {
+        //     console.log('exists')
+        //     continue
+        // }
+
+        const item = await db.collection('exercises').findOne({ name })
+        if (item.image.includes("https")) {
+            console.log('exists', item.name, item.image)
+            continue
+        }
+        const imageUrl = `${name.toLowerCase().replace(/ /g, '_')}.jpg`
+        const toPath = path.resolve(__dirname, `../../public/images/${imageUrl}`)
+        const data = fs.readFileSync(toPath)
+        const blob = await put(imageUrl, data, {
+            access: 'public',
+        });
+
+        const response = await db.collection('exercises').updateOne({ name }, { $set: { image: blob.url } })
+        console.log(name, response.modifiedCount, blob.url)
+        // try {
+        //     if (fs.existsSync(toPath)) {
+
+        //         continue
+        //     }
+        //     if (!fs.existsSync(fromPath)) {
+        //         console.log({ fromPath })
+        //         continue
+        //     }
+        //     if (!fs.existsSync(toPath)) {
+        //         fs.renameSync(fromPath, toPath)
+        //     }
+        // } catch (error) {
+        //     console.log({ error })
+        // }
+
+    }
 }
 start()

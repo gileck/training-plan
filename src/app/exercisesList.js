@@ -96,11 +96,11 @@ const images = {
 }
 
 export const getImageUrl = (name) => {
-    const item = images[name]
-    if (!item) {
-        return null
-    }
-    return `/images/${item}`
+    // const item = images[name]
+    // if (!item) {
+    //     return null
+    // }
+    return `images/${name.toLowerCase().replace(/ /g, '_')}.jpg`
 }
 
 const staticExercisesList = [{

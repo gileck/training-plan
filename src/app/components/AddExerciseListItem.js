@@ -9,7 +9,7 @@ import Divider from '@mui/material/Divider';
 import Collapse from '@mui/material/Collapse';
 import AddIcon from '@mui/icons-material/Add';
 import IconButton from '@mui/material/IconButton';
-import { AddCircle as AddCircleIcon } from '@mui/icons-material';
+import { AddCircle as AddCircleIcon, ArrowBack, ArrowBackIos, Close } from '@mui/icons-material';
 import { Delete, ExpandCircleDown, ExpandCircleUp, ExpandMore, ExpandLess, Label, } from "@mui/icons-material";
 import {
     Autocomplete,
@@ -33,7 +33,7 @@ import {
 import { localStorageAPI } from '../localStorageAPI';
 import { getExercisesList } from '../exercisesList';
 import { getAllBodyParts, getPrimaryMuscle, isBodyWeightExercise, isStaticExercise } from "../exercisesAPI";
-import { AddExercise, SelectExercise } from './SelectExercise';
+import { AddCustomExercise, AddExercise, SelectExercise } from './SelectExercise';
 
 // import { exercisesList } from '../exercisesList';
 export function CreateNewExerciseDialog({
@@ -177,6 +177,20 @@ export function AddExerciseDialog({
     getExerciseFromTrainingPlan
 }) {
 
+    const [isCustomExercise, setIsCustomExercise] = useState(false);
+
+    const addCustomExerciseClicked = () => {
+        setIsCustomExercise(true);
+    }
+
+    const onAddCustonExercise = (exercise) => {
+        console.log({ exercise });
+        // onAddExercise(exercise);
+        setIsCustomExercise(false);
+    }
+
+
+
     return (
         <Dialog
             disableEscapeKeyDown
@@ -185,19 +199,45 @@ export function AddExerciseDialog({
             fullWidth={true}
             fullScreen={true}
         >
-            <DialogTitle>
-                Add Exercise
+            <DialogTitle
+            >
+                <Box sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    height: "20px"
+
+                }}>
+                    <IconButton onClick={onClose} sx={{
+                        fontSize: "14px"
+                    }}>
+                        <ArrowBackIos sx={{
+                            fontSize: "14px"
+                        }} />Cancel
+                    </IconButton>
+                    <Typography sx={{
+                        fontSize: "14px"
+                    }}>Add Exercise</Typography>
+                    <IconButton onClick={onClose} sx={{
+                        fontSize: "16px"
+                    }}>
+                        <Close />
+                    </IconButton>
+
+                </Box>
+
             </DialogTitle>
             <DialogContent>
-                <SelectExercise
+                {!isCustomExercise ? <SelectExercise
                     isExerciseExists={isExerciseExists}
                     getExerciseFromTrainingPlan={getExerciseFromTrainingPlan}
                     onAddExercise={onAddExercise}
-                />
+                    addCustomExerciseClicked={addCustomExerciseClicked}
+                /> : <AddCustomExercise
+                    onAddCustonExercise={onAddCustonExercise}
+                />}
             </DialogContent>
-            <DialogActions>
-                <Button onClick={onClose}>Close</Button>
-            </DialogActions>
+
         </Dialog>
     );
 }

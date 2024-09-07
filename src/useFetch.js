@@ -61,7 +61,7 @@ function shouldFetchInBackground(url) {
 }
 
 export function useFetch(url) {
-    const [data, setData] = useState(null);
+    const [data, setData] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const dataFromCache = getDataFromCache(url)
