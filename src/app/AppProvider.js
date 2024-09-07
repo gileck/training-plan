@@ -2,6 +2,7 @@ import React, { useState, useEffect, createContext } from 'react';
 import { localStorageAPI } from './localStorageAPI';
 import { AppContext } from './AppContext';
 import { useFetch } from '../useFetch';
+import { getStaticImageUrl } from './exercisesList';
 
 
 function useQuestionBox() {
@@ -57,11 +58,15 @@ export function AppProvider({ children, setRoute, params, user }) {
     const { data: { exercises: exercisesList } } = useFetch('/api/exercises/getExercises')
     console.log({ exercisesList });
     const getImageUrl = (name) => {
-        const e = exercisesList.find(e => e.name === name)
-        if (e) {
+        const e = exercisesList.find(e => e.name.toLowerCase() === name.toLowerCase())
+        if (e && e.image) {
             return e.image
         }
-        return `/images/${name}.png`
+        const staticImageUrl = getStaticImageUrl(name)
+        if (staticImageUrl) {
+            return staticImageUrl
+        }
+        return `/images/${name}.jpg`
     }
 
 

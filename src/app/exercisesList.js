@@ -87,7 +87,8 @@ const images = {
     "Cossack squat": "cossack_squats.jpg",
     "Single leg Hip-Thrust": "single_leg_hip_thrust_(version_2)_(female).jpg",
     "Head stand": "handstand_hold_on_wall_(female).jpg",
-    "Half Burpee": "burpee.jpg",
+    "Half Burpees": "burpee.jpg",
+    "Half Burpees ": "burpee.jpg",
     "Jump lunges": "bodyweight_forward_lunge_(hinge_at_hips).jpg",
     "Scapular pull ups": "rocky_pull_up_pulldown.jpg",
     "Cable Triceps Pushdowns": "cable_triceps_pushdown.jpg",
@@ -95,11 +96,11 @@ const images = {
     "Back Extension (Roman Chair)": "lever_back_extension.jpg",
 }
 
-export const getImageUrl = (name) => {
-    // const item = images[name]
-    // if (!item) {
-    //     return null
-    // }
+export const getStaticImageUrl = (name) => {
+    const item = images[name]
+    if (item) {
+        return `/images/${item}`
+    }
     return `images/${name.toLowerCase().replace(/ /g, '_')}.jpg`
 }
 

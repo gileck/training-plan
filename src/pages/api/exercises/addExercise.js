@@ -1,6 +1,7 @@
 import { getDB } from "../db"
 import { getUser } from "../userApi"
 import fs from 'fs'
+import path from 'path'
 import { put, head } from '@vercel/blob';
 
 export default async function handler(req, res) {
@@ -26,11 +27,14 @@ export default async function handler(req, res) {
         exercise.image = uploadedImage.url
     }
     if (!exercise.image.includes('https')) {
-        // const imageData = fs.readFileSync(exercise.image)
-        // const uploadedImage = await put(exercise.name, imageData, {
-        //     access: 'public'
-        // })
-        // exercise.image = uploadedImage.url
+        const imagesFolder = path.join(process.cwd(), 'public', 'images')
+        console.log({ imagesFolder })
+        const imageData = fs.readFileSync(path.join(imagesFolder, exercise.image))
+        const uploadedImage = await put(exercise.name, imageData, {
+            access: 'public'
+        })
+        console.log({ uploadedImage })
+        exercise.image = uploadedImage.url
     }
     if (!exercise.name) {
         return res.status(400).json({
