@@ -58,6 +58,12 @@ export function AppProvider({ children, setRoute, params, user }) {
     const { data: { exercises: exercisesList } } = useFetch('/api/exercises/getExercises')
     console.log({ exercisesList });
     const getImageUrl = (name) => {
+        if (!name) {
+            return ''
+        }
+        if (!exercisesList) {
+            return getStaticImageUrl(name)
+        }
         const e = exercisesList.find(e => e.name.toLowerCase() === name.toLowerCase())
         if (e && e.image) {
             return e.image

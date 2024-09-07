@@ -633,6 +633,32 @@ export function useExercisesAPI() {
             saveTrainingPlan(trainingPlan);
         }
 
+        function replaceExerciseByName(oldName, newName) {
+            console.log('replaceExerciseByName', oldName, newName)
+            trainingPlan.workouts = trainingPlan.workouts.map(w => {
+                w.exercises = w.exercises.map(e => {
+                    if (e.name === oldName) {
+                        return {
+                            ...e,
+                            name: newName
+                        }
+                    }
+                    return e;
+                })
+                return w;
+            })
+            trainingPlan.exercises = trainingPlan.exercises.map(e => {
+                if (e.name === oldName) {
+                    return {
+                        ...e,
+                        name: newName
+                    }
+                }
+                return e;
+            })
+            saveTrainingPlan(trainingPlan);
+        }
+
         return {
             exercises: trainingPlan.exercises,
             workouts: trainingPlan.workouts,
@@ -661,6 +687,7 @@ export function useExercisesAPI() {
             isEmptyPlan,
             updateWorkoutIndex,
             isExerciseExists,
+            replaceExerciseByName,
             aiActions: {
                 addEmptyWorkout: ({ workoutName }) => addEmptyWorkout(workoutName),
                 editExercise: ({ exercise }) => editExercise(exercise),

@@ -7,8 +7,8 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
-import { Add, AddCircle, Delete, EditLocationAlt, EditNotifications, EditOutlined, Label, RemoveCircle } from "@mui/icons-material";
-import { AddExerciseDialog, EditExerciseForm, CreateNewExerciseDialog } from "./AddExerciseListItem";
+import { Add, AddCircle, Delete, EditLocationAlt, EditNotifications, EditOutlined, FindReplace, FindReplaceSharp, FindReplaceTwoTone, Label, RemoveCircle, Replay, ReplayCircleFilled } from "@mui/icons-material";
+import { AddExerciseDialog, EditExerciseForm, CreateNewExerciseDialog, ReplaceExerciseDialog } from "./AddExerciseListItem";
 import _ from 'lodash'
 import { useExercisesAPI } from "../exercisesAPI";
 import EditIcon from '@mui/icons-material/Edit';
@@ -23,6 +23,7 @@ import { BuildTrainingPlanDialog } from "./BuildTrainingPlanDialog";
 import { WorkoutList } from "./WorkoutList";
 import { AppContext } from "../AppContext";
 import { EditPlanChat } from "@/app/components/EditPlanChat";
+import { AddCustomExercise } from "./SelectExercise";
 
 const { getData, saveData, cleanData } = localStorageAPI();
 
@@ -187,7 +188,8 @@ function EditTrainingPlan({
     exercises,
     deleteExercise,
     cleanAllData,
-    isExerciseExists
+    isExerciseExists,
+    replaceExerciseByName
 }) {
 
     const { getImageUrl } = useContext(AppContext);
@@ -198,6 +200,20 @@ function EditTrainingPlan({
     const [addExerciseDialogOpen, setOpen] = React.useState(false);
     const [createNewExerciseDialogOpen, setCreateNewExerciseDialogOpen] = React.useState(false);
     const [editExerciseOpened, setEditExercise] = React.useState({});
+    const [selectedExercise, setSelectedExercise] = React.useState(null);
+
+    console.log('selectedExercise', selectedExercise)
+
+    function onExerciseSelected(exercise) {
+        console.log('selected', exercise)
+        setSelectedExercise(null);
+
+        replaceExerciseByName(selectedExercise, exercise.name);
+
+        // setSelectedExercise(exercise);
+        // setAddCustomExerciseOpen(true);
+    }
+
     const getExerciseFromTrainingPlan = (exerciseName) => {
         return exercises.find(e => e.name === exerciseName)
     }
@@ -205,6 +221,11 @@ function EditTrainingPlan({
     function createNewExercise() {
         setOpen(false);
         setCreateNewExerciseDialogOpen(true);
+    }
+
+    function handleReplaceExercise(exerciseName) {
+        // setOpen(true);
+        setSelectedExercise(exerciseName);
     }
 
     function handleEditExerciseClicked(id) {
@@ -262,7 +283,15 @@ function EditTrainingPlan({
     return (
         <div>
 
+            {selectedExercise && <ReplaceExerciseDialog
+                exercises={exercises}
+                addExerciseDialogOpen={!!selectedExercise}
+                onClose={() => setSelectedExercise(null)}
+                isExerciseExists={isExerciseExists}
+                getExerciseFromTrainingPlan={getExerciseFromTrainingPlan}
+                onExerciseSelected={onExerciseSelected}
 
+            />}
 
             <AddExerciseDialog
                 exercises={exercises}
@@ -327,6 +356,9 @@ function EditTrainingPlan({
                                     </ListItemAvatar>
                                     <ListItemText primary={exercise.name}
                                         secondary={printSets(exercise)} />
+                                    <IconButton>
+                                        <Replay onClick={() => handleReplaceExercise(exercise.name)} />
+                                    </IconButton>
                                     <IconButton onClick={() => handleEditExerciseClicked(exercise.id)}>
                                         <EditOutlined />
                                     </IconButton>

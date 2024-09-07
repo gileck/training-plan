@@ -13,6 +13,12 @@ export default async function handler(req, res) {
 
 
     const plansToReturn = plans.map(({ id, name, plan, user, dateCreated }) => {
+        if (!plan.exercises) {
+            plan.exercises = [];
+        }
+        if (!plan.workouts || plan.workouts[0] === null) {
+            plan.workouts = [];
+        }
         return {
             id,
             name,

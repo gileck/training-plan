@@ -63,8 +63,9 @@ export function Exercise({
                     onClick={handleClickOpen}
                 >
                     <img
-                        width={60}
-                        height={60}
+                        style={{ objectFit: 'contain' }}
+                        width={80}
+                        height={80}
                         src={getImageUrl(exercise.name)} />
                 </ListItemAvatar> : ''}
 

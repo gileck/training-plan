@@ -33,7 +33,7 @@ import {
 import { localStorageAPI } from '../localStorageAPI';
 import { getExercisesList } from '../exercisesList';
 import { getAllBodyParts, getPrimaryMuscle, isBodyWeightExercise, isStaticExercise } from "../exercisesAPI";
-import { AddCustomExercise, AddExercise, SelectExercise } from './SelectExercise';
+import { AddCustomExercise, AddExercise, SelectExercise, SelectExerciseInternal } from './SelectExercise';
 
 // import { exercisesList } from '../exercisesList';
 export function CreateNewExerciseDialog({
@@ -168,7 +168,70 @@ export function CreateNewExerciseDialog({
         </Dialog>
     );
 }
+export function ReplaceExerciseDialog({
+    addExerciseDialogOpen,
+    onClose,
+    onExerciseSelected,
+    isExerciseExists,
+    getExerciseFromTrainingPlan,
 
+}) {
+
+    return (
+        <Dialog
+            disableEscapeKeyDown
+            open={addExerciseDialogOpen}
+            onClose={() => onClose()}
+            fullWidth={true}
+            fullScreen={true}
+        >
+            <DialogTitle
+            >
+                <DialogHeader
+                    onClose={onClose}
+                    title="Add Exercise"
+                />
+
+
+            </DialogTitle>
+            <DialogContent>
+                <SelectExerciseInternal
+                    isExerciseExists={isExerciseExists}
+                    getExerciseFromTrainingPlan={getExerciseFromTrainingPlan}
+                    onExerciseSelected={onExerciseSelected}
+                />
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+
+function DialogHeader({ onClose, title }) {
+    return <Box sx={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        height: "20px"
+
+    }}>
+        <IconButton onClick={onClose} sx={{
+            fontSize: "14px"
+        }}>
+            <ArrowBackIos sx={{
+                fontSize: "14px"
+            }} />Cancel
+        </IconButton>
+        <Typography sx={{
+            fontSize: "14px"
+        }}>{title}</Typography>
+        <IconButton onClick={onClose} sx={{
+            fontSize: "16px"
+        }}>
+            <Close />
+        </IconButton>
+
+    </Box>
+}
 export function AddExerciseDialog({
     addExerciseDialogOpen,
     onClose,
@@ -201,30 +264,11 @@ export function AddExerciseDialog({
         >
             <DialogTitle
             >
-                <Box sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    height: "20px"
+                <DialogHeader
+                    onClose={onClose}
+                    title="Add Exercise"
+                />
 
-                }}>
-                    <IconButton onClick={onClose} sx={{
-                        fontSize: "14px"
-                    }}>
-                        <ArrowBackIos sx={{
-                            fontSize: "14px"
-                        }} />Cancel
-                    </IconButton>
-                    <Typography sx={{
-                        fontSize: "14px"
-                    }}>Add Exercise</Typography>
-                    <IconButton onClick={onClose} sx={{
-                        fontSize: "16px"
-                    }}>
-                        <Close />
-                    </IconButton>
-
-                </Box>
 
             </DialogTitle>
             <DialogContent>

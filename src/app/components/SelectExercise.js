@@ -175,12 +175,13 @@ function ExerciseCard({
     )
 }
 
-export function AddCustomExercise({ onExerciseSelected }) {
+export function AddCustomExercise({ onExerciseSelected, onClose }) {
     return <Box>
         <SelectExerciseInternal
             isExerciseExists={() => false}
             getExerciseFromTrainingPlan={() => { }}
             onExerciseSelected={onExerciseSelected}
+            onClose={onClose}
         />
     </Box>
 }
@@ -211,7 +212,7 @@ export function SelectExercise({ onAddExercise, isExerciseExists, getExerciseFro
     </>
 
 }
-export function SelectExerciseInternal({ onExerciseSelected, isExerciseExists, getExerciseFromTrainingPlan, addCustomExerciseClicked }) {
+export function SelectExerciseInternal({ onCLose, onExerciseSelected, isExerciseExists, getExerciseFromTrainingPlan, addCustomExerciseClicked }) {
     const [shouldUseRawExercises, setShouldUseRawExercises] = useState(false);
 
     const { data } = useFetch(shouldUseRawExercises ? '/api/exercises/getAllExercisesRaw' : '/api/exercises/getExercises');
