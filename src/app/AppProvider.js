@@ -56,7 +56,7 @@ export function AppProvider({ children, setRoute, params, user }) {
     const [trainingPlansState, setTrainingPlans] = useState(trainingPlansFromLocal || []);
 
     const { data: { exercises: exercisesList } } = useFetch('/api/exercises/getExercises')
-    // console.log({ exercisesList });
+    console.log({ exercisesList });
     const getImageUrl = (name) => {
         if (!name) {
             return ''

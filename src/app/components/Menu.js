@@ -9,6 +9,7 @@ export const Menu = ({ menuOpen, toggleDrawer, onRouteChanged }) => {
         route: '',
     },
     {
+
         text: 'Users',
         Icon: <People />,
         route: 'users',
@@ -26,11 +27,6 @@ export const Menu = ({ menuOpen, toggleDrawer, onRouteChanged }) => {
         text: 'Progress',
         Icon: <TrendingUp />, // Update Icon to TrendingUp
         route: 'progress',
-    },
-    {
-        text: 'Personal Coach AI',
-        Icon: <Assistant />,
-        route: 'coachAI'
     }]
 
     return (

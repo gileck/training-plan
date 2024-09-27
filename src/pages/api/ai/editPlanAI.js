@@ -114,7 +114,7 @@ export default async function handler(req, res) {
     res.status(200).json({ result, apiPrice });
 
     await sendLog(`
-        AI: EditPlanAI
+        AI: AskAI
         User: ${user.username}
         Question: ${text}
         Result: ${JSON.stringify(result || '').length} characters
@@ -126,7 +126,6 @@ export default async function handler(req, res) {
     `);
 
     await db.collection('ai-api-logs').insertOne({
-        type: 'EditPlanAI',
         user: user.username,
         input: text,
         result,

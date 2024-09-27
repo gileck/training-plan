@@ -6,7 +6,6 @@ const STALE_TIME = 1000 * 60 * 60; // 1 hour
 const UPDATE_TIME = 1000 * 60 // 1 minute
 
 const fetchCache = {}
-const fetchPromiseCache = {}
 const cache = getData('fetchCache') || {};
 const getFromCache = (url) => cache[url];
 const saveToCache = (url, data) => {
@@ -61,42 +60,26 @@ function shouldFetchInBackground(url) {
     return true;
 }
 
-export function useFetch(_url, options = {}) {
-    const query = options.query ? '?' + new URLSearchParams(options.query).toString() : '';
-    const url = _url + query;
-    const shouldUsecache = options.shouldUsecache !== false;
-
+export function useFetch(url) {
     const [data, setData] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
-    const dataFromCache = shouldUsecache ? getDataFromCache(url) : null;
+    const dataFromCache = getDataFromCache(url)
 
     useEffect(() => {
         if (dataFromCache) {
-            setData(dataFromCache);
-            setLoading(false);
-            return
+            return;
         }
-        setLoading(true);
-        fetchPromiseCache[url] = fetchPromiseCache[url] || fetch(url, options)
-            .then((res) => {
-                if (!res.ok) {
-                    throw new Error('Error fetching data');
-                } else {
-                    return res.json()
-                }
-            })
+        fetch(url)
+            .then((res) => res.json())
             .then((data) => {
                 setData(data);
+                setLoading(false);
                 saveDataToCache(url, data);
             }).catch((e) => {
                 console.error('Error fetching data', e.message);
                 setError(e);
-            }).finally(() => {
-                delete fetchPromiseCache[url]
-                setLoading(false);
-            })
+            });
 
     }, [url]);
 
@@ -104,7 +87,7 @@ export function useFetch(_url, options = {}) {
         if (shouldFetchInBackground(url)) {
             updateCacheInBackground(url)
         }
-        // return { data: dataFromCache, loading: false, error: null }
+        return { data: dataFromCache, loading: false, error: null }
     }
 
     return { data, loading, error };
