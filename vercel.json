@@ -1,7 +1,10 @@
 {
     "functions": {
         "pages/api/**/*.js": {
-            "excludeFiles": "public/**/*"
+            "excludeFiles": "node_modules/**"
+        },
+        "pages/api/*.js": {
+            "excludeFiles": "node_modules/**"
         },
         "pages/api/exercises/addExercise.js": {
             "excludeFiles": "node_modules/**"
