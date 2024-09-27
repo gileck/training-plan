@@ -1,6 +1,6 @@
 import { getDB } from "../db"
 import { getUser } from "../userApi"
-import output from "./raw.js"
+// import output from "./raw.js"
 
 export default async function handler(req, res) {
     const { username } = await getUser(req)
@@ -9,6 +9,8 @@ export default async function handler(req, res) {
             message: 'Unauthorized'
         })
     }
+
+    const output = {}
 
 
     res.status(200).json({
