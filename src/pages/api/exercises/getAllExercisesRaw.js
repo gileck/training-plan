@@ -1,6 +1,6 @@
 import { getDB } from "../db"
 import { getUser } from "../userApi"
-// import output from "./raw.js"
+import output from "./raw.js"
 
 export default async function handler(req, res) {
     const { username } = await getUser(req)
