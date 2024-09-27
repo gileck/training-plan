@@ -1,13 +1,19 @@
 'use client'
-import { Home } from './home';
 import { Client } from './client';
 import { useState, useEffect } from 'react';
 import { LinearProgress } from '@mui/material';
+<<<<<<< Updated upstream
 import { localStorageAPI } from './localStorageAPI';
 import { useFetch } from '@/useFetch';
+=======
+import dynamic from 'next/dynamic'
+>>>>>>> Stashed changes
 
-const baseUrl = process.env.NODE_ENV === 'production' ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : 'http://localhost:3000';
+
+// const baseUrl = process.env.NODE_ENV === 'production' ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : 'http://localhost:3000';
 // console.log({ baseUrl });
+
+const HomeLazy = dynamic(() => import('./home'), { ssr: false })
 
 export default function () {
     // const cookieStore = cookies()
@@ -37,7 +43,7 @@ export default function () {
     if (loading) return <LinearProgress color="secondary" />
 
     if (user) {
-        return <Home user={user} />
+        return <HomeLazy user={user} />
     } else {
         return <Client />
     }
