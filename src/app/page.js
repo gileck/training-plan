@@ -8,7 +8,7 @@ import dynamic from 'next/dynamic'
 // const baseUrl = process.env.NODE_ENV === 'production' ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : 'http://localhost:3000';
 // console.log({ baseUrl });
 
-const HomeLazy = dynamic(() => import('./home'), { ssr: false })
+const HomeLazy = dynamic(() => import('./home').then(m => m.Home), { ssr: false })
 
 export default function () {
     // const cookieStore = cookies()
