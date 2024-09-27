@@ -10,8 +10,6 @@ export default async function handler(req, res) {
         })
     }
 
-    const output = {}
-
 
     res.status(200).json({
         exercises: Object.values(output)
