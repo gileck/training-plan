@@ -1,13 +1,8 @@
 'use client'
 import { Client } from './client';
-import { useState, useEffect } from 'react';
 import { LinearProgress } from '@mui/material';
-<<<<<<< Updated upstream
-import { localStorageAPI } from './localStorageAPI';
 import { useFetch } from '@/useFetch';
-=======
 import dynamic from 'next/dynamic'
->>>>>>> Stashed changes
 
 
 // const baseUrl = process.env.NODE_ENV === 'production' ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : 'http://localhost:3000';
