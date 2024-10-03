@@ -11,6 +11,7 @@ const withBundleAnalyzerFunc = WithBundleAnalyzer({
 
 
 const nextConfig = withBundleAnalyzerFunc({
+    productionBrowserSourceMaps: true,
     webpack: (config, { isServer, dev }) => {
         // Only add the service worker plugin when building the client-side bundle
         if (!isServer && !dev) {
