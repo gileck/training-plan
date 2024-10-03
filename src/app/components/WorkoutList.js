@@ -124,7 +124,7 @@ export function WorkoutList({
                         // color: colors.listHeaderText,
                     }}
                     primary={<div style={{ fontSize: '25px' }}>
-                        Workouts
+                        Workouts (Test)
                     </div>}
 
                     secondary={<React.Fragment>
