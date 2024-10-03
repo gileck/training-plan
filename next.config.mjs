@@ -11,13 +11,13 @@ const withBundleAnalyzerFunc = WithBundleAnalyzer({
 
 
 const nextConfig = withBundleAnalyzerFunc({
-    productionBrowserSourceMaps: true,
-    webpack: (config, { isServer, dev }) => {
+    webpack: (config, { isServer, dev, config: { distDir } }) => {
         // Only add the service worker plugin when building the client-side bundle
         if (!isServer && !dev) {
             config.plugins.push(
                 new GenerateSW({
-                    disableDevLogs: true,
+                    swDest: `static/service-worker.js`,
+                    disableDevLogs: false,
                     clientsClaim: true,
                     skipWaiting: true,
                     maximumFileSizeToCacheInBytes: 100 * 1024 * 1024, // 5 MB limit
