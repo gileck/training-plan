@@ -13,7 +13,7 @@ const withBundleAnalyzerFunc = WithBundleAnalyzer({
 const nextConfig = withBundleAnalyzerFunc({
     webpack: (config, { isServer, dev, config: { distDir } }) => {
         // Only add the service worker plugin when building the client-side bundle
-        if (!isServer && !dev) {
+        if (!isServer) {
             config.plugins.push(
                 new GenerateSW({
                     swDest: `static/service-worker.js`,
