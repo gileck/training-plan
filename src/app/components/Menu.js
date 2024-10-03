@@ -27,11 +27,12 @@ export const Menu = ({ menuOpen, toggleDrawer, onRouteChanged }) => {
         Icon: <TrendingUp />, // Update Icon to TrendingUp
         route: 'progress',
     },
-    {
-        text: 'Personal Coach AI',
-        Icon: <Assistant />,
-        route: 'coachAI'
-    }]
+        // {
+        //     text: 'Personal Coach AI',
+        //     Icon: <Assistant />,
+        //     route: 'coachAI'
+        // }
+    ]
 
     return (
         <div>

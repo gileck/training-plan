@@ -147,6 +147,16 @@ export function Home({ user }) {
     return params;
   }
 
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(reg => console.log('Service Worker registered:', reg))
+          .catch(err => console.error('Service Worker registration failed:', err));
+      });
+    }
+  }, []);
+
 
   useEffect(() => {
     window.addEventListener('popstate', function (event) {
