@@ -1,4 +1,4 @@
-const CACHE_NAME = 'training-plans-cache-v2';
+const CACHE_NAME = 'training-plans-cache-v3';
 
 // Utility function to check for disableCache=true
 function hasDisableCache(url) {
@@ -35,86 +35,67 @@ function hasDisableCache(url) {
 //     );
 // });
 
-// Fetch event: Handle requests
-self.addEventListener('fetch', (event) => {
-    const requestURL = event.request.url;
-    if (requestURL.includes('localhost')) {
-        return;
-    }
-    if (requestURL.endsWith('.js')) {
-        if (event.request.url.startsWith(self.location.origin)) {
-            event.respondWith(
-                caches.match(event.request).then((cachedResponse) => {
-                    // Serve from cache if available, otherwise fetch from network
-                    return cachedResponse || fetch(event.request).then((networkResponse) => {
-                        return caches.open(CACHE_NAME).then((cache) => {
-                            // Cache the new resource dynamically
-                            cache.put(event.request, networkResponse.clone());
-                            return networkResponse;
-                        });
-                    }).catch(() => {
-                        // Optionally provide fallback for offline scenarios
-                        // Example: return caches.match('/offline.html');
-                    });
-                })
-            );
-        }
-        return
-    }
-    // Determine if cache should be bypassed
-    const shouldBypassCache = hasDisableCache(requestURL);
+function cacheFile(event) {
+    return caches.match(event.request).then((cachedResponse) => {
+        // Serve from cache if available, otherwise fetch from network
+        return cachedResponse || fetch(event.request).then((networkResponse) => {
+            return caches.open(CACHE_NAME).then((cache) => {
+                // Cache the new resource dynamically
+                cache.put(event.request, networkResponse.clone());
+                return networkResponse;
+            });
+        }).catch(() => {
+            // Optionally provide fallback for offline scenarios
+            // Example: return caches.match('/offline.html');
+        });
+    })
+}
 
-    if (shouldBypassCache) {
-        console.log("Bypassing cache for", requestURL);
-        // Bypass cache: Fetch directly from the network
-        event.respondWith(
-            fetch(event.request)
+function cacheWhileRevalidate(event) {
+    return caches.open(CACHE_NAME).then((cache) => {
+        return cache.match(event.request).then((cachedResponse) => {
+            const fetchPromise = fetch(event.request)
                 .then((networkResponse) => {
-                    // Optionally update the cache with the fresh response
-                    // Uncomment the following lines if you want to update the cache
-                    /*
-                    return caches.open(CACHE_NAME).then((cache) => {
-                      cache.put(event.request, networkResponse.clone());
-                      return networkResponse;
-                    });
-                    */
+                    if (networkResponse && networkResponse.status === 200) {
+                        cache.put(event.request, networkResponse.clone());
+                    }
                     return networkResponse;
                 })
                 .catch((error) => {
-                    // Handle network errors
-                    console.error('Network request failed:', error);
-                    // Optionally, serve from cache if available
-                    return caches.match(event.request).then((cachedResponse) => {
-                        return cachedResponse || new Response('Network error occurred.', {
-                            status: 408,
-                            statusText: 'Network error',
-                        });
-                    });
-                })
-        );
-    } else {
-        // Use Stale-While-Revalidate strategy
+                    console.error('Fetch failed:', error);
+                    // Optionally, return cachedResponse if network fails
+                    return cachedResponse;
+                });
+
+            // Return cached response immediately if available, else wait for network
+            return cachedResponse || fetchPromise;
+        });
+    })
+}
+
+// Fetch event: Handle requests
+self.addEventListener('fetch', (event) => {
+    const requestURL = event.request.url;
+    const isSameOrigin = event.request.url.startsWith(self.location.origin)
+    const fileExtention = requestURL.split('.').pop();
+    const isNavigation = event.request.mode === 'navigate';
+    const shouldBypassCache = hasDisableCache(requestURL);
+    const isLocalhost = requestURL.includes('localhost');
+
+
+    if (shouldBypassCache && !isSameOrigin || isLocalhost) {
+        return
+    }
+
+    const shouldCacheFile = ['js', 'css', 'html'].includes(fileExtention) && !isNavigation
+    if (shouldCacheFile) {
+        return event.respondWith(cacheFile(event));
+    }
+
+    if (isNavigation) {
 
         event.respondWith(
-            caches.open(CACHE_NAME).then((cache) => {
-                return cache.match(event.request).then((cachedResponse) => {
-                    const fetchPromise = fetch(event.request)
-                        .then((networkResponse) => {
-                            if (networkResponse && networkResponse.status === 200) {
-                                cache.put(event.request, networkResponse.clone());
-                            }
-                            return networkResponse;
-                        })
-                        .catch((error) => {
-                            console.error('Fetch failed:', error);
-                            // Optionally, return cachedResponse if network fails
-                            return cachedResponse;
-                        });
-
-                    // Return cached response immediately if available, else wait for network
-                    return cachedResponse || fetchPromise;
-                });
-            })
+            cacheWhileRevalidate(event)
         );
     }
 });
