@@ -41,7 +41,7 @@ self.addEventListener('fetch', (event) => {
     if (requestURL.includes('localhost')) {
         return;
     }
-    if (event.request.mode !== 'navigate') {
+    if (requestURL.endsWith('.js')) {
         if (event.request.url.startsWith(self.location.origin)) {
             event.respondWith(
                 caches.match(event.request).then((cachedResponse) => {
