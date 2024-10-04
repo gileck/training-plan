@@ -1,6 +1,7 @@
 const CACHE_NAME = 'training-plans-cache';
-'/*.js'
 const urlsToCache = [
+    '/*'
+
 ];
 
 // Utility function to check for disableCache=true
@@ -23,20 +24,20 @@ self.addEventListener('install', (event) => {
 });
 
 // Activate event: Clean up old caches
-self.addEventListener('activate', (event) => {
-    const cacheWhitelist = [CACHE_NAME];
-    event.waitUntil(
-        caches.keys().then((cacheNames) => {
-            return Promise.all(
-                cacheNames.map((cacheName) => {
-                    if (!cacheWhitelist.includes(cacheName)) {
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        })
-    );
-});
+// self.addEventListener('activate', (event) => {
+//     const cacheWhitelist = [CACHE_NAME];
+//     event.waitUntil(
+//         caches.keys().then((cacheNames) => {
+//             return Promise.all(
+//                 cacheNames.map((cacheName) => {
+//                     if (!cacheWhitelist.includes(cacheName)) {
+//                         return caches.delete(cacheName);
+//                     }
+//                 })
+//             );
+//         })
+//     );
+// });
 
 // Fetch event: Handle requests
 self.addEventListener('fetch', (event) => {
@@ -45,7 +46,23 @@ self.addEventListener('fetch', (event) => {
         return;
     }
     if (event.request.mode !== 'navigate') {
-        return;
+        if (event.request.url.startsWith(self.location.origin)) {
+            event.respondWith(
+                caches.match(event.request).then((cachedResponse) => {
+                    // Serve from cache if available, otherwise fetch from network
+                    return cachedResponse || fetch(event.request).then((networkResponse) => {
+                        return caches.open(CACHE_NAME).then((cache) => {
+                            // Cache the new resource dynamically
+                            cache.put(event.request, networkResponse.clone());
+                            return networkResponse;
+                        });
+                    }).catch(() => {
+                        // Optionally provide fallback for offline scenarios
+                        // Example: return caches.match('/offline.html');
+                    });
+                })
+            );
+        }
     }
     // Determine if cache should be bypassed
     const shouldBypassCache = hasDisableCache(requestURL);
