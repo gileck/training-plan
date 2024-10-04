@@ -150,8 +150,8 @@ export function Home({ user }) {
   useEffect(() => {
     if (navigator.serviceWorker) {
       navigator.serviceWorker.register('/service-worker.js')
-      // .then(reg => console.log('Service Worker registered:', reg))
-      // .catch(err => console.error('Service Worker registration failed:', err));
+        .then(reg => console.log('Service Worker registered:', reg))
+        .catch(err => console.error('Service Worker registration failed:', err));
     }
   }, []);
 
