@@ -1,4 +1,4 @@
-const CACHE_NAME = 'training-plans-cache';
+const CACHE_NAME = 'training-plans-cache-v2';
 
 // Utility function to check for disableCache=true
 function hasDisableCache(url) {
