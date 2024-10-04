@@ -15,13 +15,13 @@ function hasDisableCache(url) {
     }
 }
 
-self.addEventListener('install', (event) => {
-    event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(urlsToCache);
-        })
-    );
-});
+// self.addEventListener('install', (event) => {
+//     event.waitUntil(
+//         caches.open(CACHE_NAME).then((cache) => {
+//             return cache.addAll(urlsToCache);
+//         })
+//     );
+// });
 
 // Activate event: Clean up old caches
 // self.addEventListener('activate', (event) => {
@@ -63,6 +63,7 @@ self.addEventListener('fetch', (event) => {
                 })
             );
         }
+        return
     }
     // Determine if cache should be bypassed
     const shouldBypassCache = hasDisableCache(requestURL);
