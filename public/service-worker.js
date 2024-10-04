@@ -81,9 +81,11 @@ self.addEventListener('fetch', (event) => {
     const isNavigation = event.request.mode === 'navigate';
     const shouldBypassCache = hasDisableCache(requestURL);
     const isLocalhost = requestURL.includes('localhost');
+    const isChromeExtension = requestURL.includes('chrome-extension://');
 
 
-    if (shouldBypassCache && !isSameOrigin || isLocalhost) {
+
+    if (shouldBypassCache && !isSameOrigin || isLocalhost || isChromeExtension) {
         return
     }
 
