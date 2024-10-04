@@ -1,8 +1,4 @@
 const CACHE_NAME = 'training-plans-cache';
-const urlsToCache = [
-    '/*'
-
-];
 
 // Utility function to check for disableCache=true
 function hasDisableCache(url) {
