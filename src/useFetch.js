@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { localStorageAPI } from "./app/localStorageAPI";
 
 const { getData, saveData } = localStorageAPI()
-const STALE_TIME = 1000 * 60 * 60; // 1 hour
-const UPDATE_TIME = 1000 * 60 // 1 minute
+const STALE_TIME = 24 * 1000 * 60 * 60; // 1 hour
+const UPDATE_TIME = 1 * 1000 * 60 // 1 minute
 
 const fetchCache = {}
 const fetchPromiseCache = {}

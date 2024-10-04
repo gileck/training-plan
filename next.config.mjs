@@ -12,32 +12,7 @@ const withBundleAnalyzerFunc = WithBundleAnalyzer({
 
 const nextConfig = withBundleAnalyzerFunc({
     webpack: (config, { isServer, dev, config: { distDir } }) => {
-        // Only add the service worker plugin when building the client-side bundle
-        if (!isServer) {
-            config.plugins.push(
-                new GenerateSW({
-                    swDest: `static/service-worker.js`,
-                    disableDevLogs: false,
-                    clientsClaim: true,
-                    skipWaiting: true,
-                    maximumFileSizeToCacheInBytes: 100 * 1024 * 1024, // 5 MB limit
-                    runtimeCaching: [
-                        {
-                            urlPattern: ({ request }) => request.destination === 'script',
-                            handler: 'StaleWhileRevalidate',
-                            options: {
-                                cacheName: 'js-files',
-                                expiration: {
-                                    maxEntries: 50,
-                                    maxAgeSeconds: 30 * 24 * 60 * 60, // Cache for 30 days
-                                },
-                            },
-                        },
-                    ],
-                })
-            );
-        }
-
+        // addServiceWorker({ config, distDir, dev, isServer });
         return config;
     },
 });
@@ -51,3 +26,31 @@ export default nextConfig;
 //         return config;
 //     },
 // });
+
+
+function addServiceWorker({ config, distDir, dev, isServer }) {
+    if (!isServer) {
+        config.plugins.push(
+            new GenerateSW({
+                swDest: `static/service-worker.js`,
+                disableDevLogs: false,
+                clientsClaim: true,
+                skipWaiting: true,
+                maximumFileSizeToCacheInBytes: 100 * 1024 * 1024, // 5 MB limit
+                runtimeCaching: [
+                    {
+                        urlPattern: ({ request }) => request.destination === 'script',
+                        handler: 'StaleWhileRevalidate',
+                        options: {
+                            cacheName: 'js-files',
+                            expiration: {
+                                maxEntries: 50,
+                                maxAgeSeconds: 30 * 24 * 60 * 60, // Cache for 30 days
+                            },
+                        },
+                    },
+                ],
+            })
+        );
+    }
+}
