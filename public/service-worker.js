@@ -93,8 +93,7 @@ self.addEventListener('fetch', (event) => {
     }
 
     if (isNavigation) {
-
-        event.respondWith(
+        return event.respondWith(
             cacheWhileRevalidate(event)
         );
     }
