@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { List, ListItem, ListItemText, IconButton, Fab, Box, LinearProgress, Divider, Collapse, ListItemSecondaryAction } from "@mui/material";
-import { ArrowLeft, ArrowRight, ExpandLess, ExpandMore, Assistant, NavigationOutlined } from '@mui/icons-material';
+import { ArrowLeft, ArrowRight, ExpandLess, ExpandMore, Assistant, NavigationOutlined, Close } from '@mui/icons-material';
 import { Exercise } from "./Exercise";
 import { ExerciseAskAIDialog } from "./ExerciseAskAIDialog";
 import { RecoveryStatus } from "./RecoveryStatus";
@@ -12,6 +12,7 @@ export function WorkoutList({
     selectedExercises,
     onWorkoutArrowClicked,
     selectExercise,
+    setSelectedExercises,
     onSetComplete,
     onExerciseDone,
     numberOfWeeks,
@@ -88,22 +89,75 @@ export function WorkoutList({
             exercise={AskAIExerciseDialogOpen}
         />
         {
-            selectedExercises.length > 0 ? <Fab
-                onClick={() => setRoute('runExercise', {
-                    week: selectedWeek
-                })
-                }
+            selectedExercises.length > 0 ? <><Fab
+
                 variant="extended"
                 color="primary"
                 sx={{
                     position: 'fixed',
                     bottom: '70px',
                     right: "130px",
+                    "width": "200px",
                 }}>
 
                 {/* <NavigationOutlined sx={{ mr: 1 }} /> */}
-                Super Set ({selectedExercises.length})
-            </Fab> : ''}
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        width: '100%'
+
+                    }}
+                >
+
+                    <Box>
+
+                    </Box>
+
+
+                    <Box
+                        onClick={() => setRoute('runExercise', { week: selectedWeek })}
+                    >
+                        <Box>
+                            Super Set ({selectedExercises.length})
+                        </Box>
+                    </Box>
+                    <IconButton
+                        sx={{
+                            p: 0,
+                            ml: 1
+                        }}
+                        onClick={() => setSelectedExercises([])}
+                    >
+                        <Close
+                            sx={{
+                                color: "lightgray",
+                            }}
+                            size="small"
+                        />
+                    </IconButton>
+                </Box>
+
+
+            </Fab>
+                {/* <Fab
+                    size="small"
+
+                    color="secondary"
+                    sx={{
+                        position: 'fixed',
+                        bottom: '70px',
+                        right: '20px',
+
+                    }}>
+
+                </Fab> */}
+
+
+
+
+            </> : ''}
         < List
             sx={{
                 paddingTop: '0px',

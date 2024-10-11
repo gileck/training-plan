@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Button, Checkbox, Dialog, Divider, IconButton, List, ListItemSecondaryAction, TextField, DialogContent, LinearProgress, Tabs, Tab, Collapse } from "@mui/material";
+import { Box, Button, Checkbox, Dialog, Divider, IconButton, List, ListItemSecondaryAction, TextField, DialogContent, LinearProgress, Tabs, Tab, Collapse, DialogTitle, DialogActions } from "@mui/material";
 import { ListItem, ListItemText } from "@mui/material";
 import { Delete, Edit, ExpandLess, ExpandMore } from "@mui/icons-material";
 import { useFetch } from "@/useFetch";
@@ -41,8 +41,9 @@ function EditDateDialog({ open, onClose, onDateChange, item }) {
 }
 
 export function ActivityTable({ setIsLoading }) {
-    const { data, loading, error } = useFetch('/api/activity/activity')
-    const [activity, setActivity] = useState(data?.activity || [])
+    const { data, loading, error, setData } = useFetch('/api/activity/activity')
+    const setActivity = (cb) => setData(prevData => ({ activity: cb(prevData.activity) }))
+    const activity = data.activity || [];
     setIsLoading(loading)
     const [selectedItem, setSelectedItem] = useState(null);
     const [editDateDialogOpen, setEditDateDialogOpen] = useState(false);
@@ -208,6 +209,7 @@ export function ActivityTable({ setIsLoading }) {
     };
 
     const groupedActivities = groupByDateAndExercise(activity);
+
 
     const handleToggleGroup = (date, exerciseName) => {
         setExpandedGroups((prevExpandedGroups) => ({

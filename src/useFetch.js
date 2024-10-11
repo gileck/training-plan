@@ -107,5 +107,5 @@ export function useFetch(_url, options = {}) {
         // return { data: dataFromCache, loading: false, error: null }
     }
 
-    return { data, loading, error };
+    return { data, loading, error, setData };
 }

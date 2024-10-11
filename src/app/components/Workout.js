@@ -80,6 +80,7 @@ export function Workout() {
         console.log({ value, wid, eid });
         changeExerciseOrderInWorkout(wid, eid, value)
     }
+
     function selectExercise(exerciseId) {
 
         let newSelectedExercises = [];
