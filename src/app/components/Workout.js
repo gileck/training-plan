@@ -81,6 +81,11 @@ export function Workout() {
         changeExerciseOrderInWorkout(wid, eid, value)
     }
 
+    function clearSelectedExercises() {
+        setSelectedExercises([])
+        saveData('selectedExercises', [])
+    }
+
     function selectExercise(exerciseId) {
 
         let newSelectedExercises = [];
@@ -142,7 +147,7 @@ export function Workout() {
             exercises={exercises}
             workouts={workouts}
             selectedExercises={selectedExercises}
-            setSelectedExercises={setSelectedExercises}
+            clearSelectedExercises={clearSelectedExercises}
             onWorkoutArrowClicked={onWorkoutArrowClicked}
             selectExercise={selectExercise}
             onSetComplete={onSetComplete}

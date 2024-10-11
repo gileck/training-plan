@@ -12,7 +12,7 @@ export function WorkoutList({
     selectedExercises,
     onWorkoutArrowClicked,
     selectExercise,
-    setSelectedExercises,
+    clearSelectedExercises,
     onSetComplete,
     onExerciseDone,
     numberOfWeeks,
@@ -128,7 +128,7 @@ export function WorkoutList({
                             p: 0,
                             ml: 1
                         }}
-                        onClick={() => setSelectedExercises([])}
+                        onClick={() => clearSelectedExercises()}
                     >
                         <Close
                             sx={{
