@@ -92,7 +92,8 @@ export default function SelectExercise() {
                             <img
                                 height={150}
                                 width={150}
-                                src={selectedExercise.imageData || selectedExercise.image} alt={selectedExercise.name} />
+                                src={!selectedExercise.image.includes("https") ? `/images/${selectedExercise.image}` : selectedExercise.image} />
+                            {/*  src={selectedExercise.imageData || selectedExercise.image} alt={selectedExercise.name} /> */}
                         </Box>
 
                         <FormGroup
