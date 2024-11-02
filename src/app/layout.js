@@ -12,7 +12,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <link rel="icon" sizes="180x180" href="/favicon.png" />
       <meta name="apple-mobile-web-app-capable" content="yes" />
-      <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+      <meta name="apple-mobile-web-app-status-bar-style" content="blue" />
       <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png" />
       <link rel="manifest" href="/manifest.json" />
       <body className={inter.className}>{children}</body>
