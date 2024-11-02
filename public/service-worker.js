@@ -85,8 +85,6 @@ self.addEventListener('fetch', (event) => {
     const isLocalhost = requestURL.includes('localhost');
     const isChromeExtension = requestURL.includes('chrome-extension://');
 
-
-
     if (shouldBypassCache && !isSameOrigin || isLocalhost || isChromeExtension) {
         return
     }

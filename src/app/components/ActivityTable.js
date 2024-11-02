@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Box, Button, Checkbox, Dialog, Divider, IconButton, List, ListItemSecondaryAction, TextField, DialogContent, LinearProgress, Tabs, Tab, Collapse, DialogTitle, DialogActions } from "@mui/material";
 import { ListItem, ListItemText } from "@mui/material";
-import { Delete, Edit, ExpandLess, ExpandMore } from "@mui/icons-material";
-import { useFetch } from "@/useFetch";
+import { Delete, Edit, ExpandLess, ExpandMore, Refresh } from "@mui/icons-material";
+import { fetchWithCache, useFetch } from "@/useFetch";
 function EditDateDialog({ open, onClose, onDateChange, item }) {
 
     const [newDate, setNewDate] = useState(item.date);
@@ -105,6 +105,23 @@ export function ActivityTable({ setIsLoading }) {
                 console.error('Error deleting data', e.message);
             });
     };
+
+    const refreshItems = () => {
+        setIsLoading(true);
+        fetchWithCache('/api/activity/activity', {
+            shouldUsecache: false,
+        })
+            .then((data) => {
+                console.log(data.activity);
+                setActivity(() => data.activity);
+                setIsLoading(false);
+            })
+            .catch((e) => {
+                console.error('Error fetching data', e.message);
+            });
+    };
+
+
 
     const deleteItems = () => {
         setIsLoading(true);
@@ -235,7 +252,8 @@ export function ActivityTable({ setIsLoading }) {
                     <Button sx={{ color: "#0063fe", fontSize: '11px' }} onClick={() => toggleEnableSelect()}>{selectEnabled ? 'Cancel' : 'Edit'}</Button>
                     <Button sx={{ color: "#0063fe", fontSize: '11px' }} disabled={!selectEnabled} onClick={() => handleSelectAll()}>Select All</Button>
                     <Button sx={{ color: "#0063fe", fontSize: '11px' }} disabled={selectedItems.length === 0} onClick={() => handleDeselectAll()}>Deselect All</Button>
-                    <Button startIcon={<Delete />} disabled={selectedItems.length === 0} sx={{ color: "#0063fe", fontSize: '11px' }} onClick={() => deleteItems()}>Delete</Button>
+                    <Button startIcon={<Delete />} disabled={selectedItems.length === 0} sx={{ color: "#0063fe", fontSize: '11px' }} onClick={() => deleteItems()}></Button>
+                    <Button startIcon={<Refresh />} sx={{ color: "#0063fe", fontSize: '11px' }} onClick={() => refreshItems()}></Button>
                 </Box>
                 <Divider />
 

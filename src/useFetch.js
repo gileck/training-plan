@@ -2,25 +2,29 @@ import { useEffect, useState } from "react";
 import { localStorageAPI } from "./app/localStorageAPI";
 
 const { getData, saveData } = localStorageAPI()
-const STALE_TIME = 24 * 1000 * 60 * 60; // 1 hour
-const UPDATE_TIME = 1 * 1000 * 60 // 1 minute
+const STALE_TIME = 1000 * 60 * 60; // 1 hour
+const UPDATE_TIME = 1000 * 60 // 1 minute
 
 const fetchCache = {}
 const fetchPromiseCache = {}
 const cache = getData('fetchCache') || {};
 const getFromCache = (url) => cache[url];
 const saveToCache = (url, data) => {
-    cache[url] = data;
+    const dataClone = JSON.parse(JSON.stringify(data));
+    if (dataClone?.data?.apiPrice) {
+        dataClone.data.apiPrice = null
+    }
+    cache[url] = dataClone;
     saveData('fetchCache', cache);
 }
 
-function getDataFromCache(url) {
+function getDataFromCache(url, overrideStaleTime) {
     const data = getFromCache(url);
     if (data) {
         const { timestamp, data: dataFromCache } = data;
         const now = new Date().getTime();
         const diff = now - timestamp;
-        if (diff < STALE_TIME) {
+        if (diff < overrideStaleTime || STALE_TIME) {
             return dataFromCache;
         }
     }
@@ -62,50 +66,84 @@ function shouldFetchInBackground(url) {
 }
 
 export function useFetch(_url, options = {}) {
-    const query = options.query ? '?' + new URLSearchParams(options.query).toString() : '';
-    const url = _url + query;
-    const shouldUsecache = options.shouldUsecache !== false;
-
+    // console.log('useFetch', _url, options);
     const [data, setData] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
-    const dataFromCache = shouldUsecache ? getDataFromCache(url) : null;
-
+    const { url, body, query } = getCacheParams(_url, options);
     useEffect(() => {
-        if (dataFromCache) {
-            setData(dataFromCache);
-            setLoading(false);
-            return
-        }
+        // console.log('useEffect', _url);
         setLoading(true);
-        fetchPromiseCache[url] = fetchPromiseCache[url] || fetch(url, options)
-            .then((res) => {
-                if (!res.ok) {
-                    throw new Error('Error fetching data');
-                } else {
-                    return res.json()
-                }
-            })
+        fetchWithCache(_url, options)
             .then((data) => {
                 setData(data);
-                saveDataToCache(url, data);
             }).catch((e) => {
                 console.error('Error fetching data', e.message);
                 setError(e);
             }).finally(() => {
-                delete fetchPromiseCache[url]
                 setLoading(false);
             })
+    }, [url, body, query]);
+    return { data, loading, error, setData };
+}
 
-    }, [url]);
+async function hashString(str) {
+    // Convert the string to an ArrayBuffer
+    const encoder = new TextEncoder();
+    const data = encoder.encode(str);
+    // Hash the data using SHA-256
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    // Convert ArrayBuffer to Array of bytes
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    // Convert bytes to hexadecimal string
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+}
 
+function getCacheParams(url, options) {
+    const body = options.body ? "_" + JSON.stringify(options.body) : '';
+    const query = options.query ? '?' + new URLSearchParams(options.query).toString() : '';
+    return { url, body, query }
+}
+
+function getCacheKey(url, options) {
+    const { body, query } = getCacheParams(url, options);
+    return hashString(url + body + query);
+}
+
+export async function fetchWithCache(_url, options = {}) {
+    // console.log('fetchWithCache', _url, options);
+    const cacheKey = await getCacheKey(_url, options);
+    // console.log({ cacheKey });
+    const query = options.query ? '?' + new URLSearchParams(options.query).toString() : '';
+    const url = _url + query;
+    const shouldUsecache = options.shouldUsecache !== false;
+    const overrideStaleTime = options.overrideStaleTime;
+    const disableFetchInBackground = options.disableFetchInBackground === true;
+    const dataFromCache = shouldUsecache ? getDataFromCache(cacheKey, overrideStaleTime) : null;
     if (dataFromCache) {
-        if (shouldFetchInBackground(url)) {
+        if (!disableFetchInBackground && shouldFetchInBackground(url)) {
             updateCacheInBackground(url)
         }
-        // return { data: dataFromCache, loading: false, error: null }
+        return Promise.resolve(dataFromCache)
     }
 
-    return { data, loading, error, setData };
+    fetchPromiseCache[cacheKey] = fetchPromiseCache[cacheKey] || fetch(url, options)
+        .then((res) => {
+            if (!res.ok) {
+                throw new Error('Error fetching data');
+            } else {
+                return res.json()
+            }
+        })
+        .then((data) => {
+            saveDataToCache(cacheKey, data);
+            if (options.onSuccess) {
+                options.onSuccess(data);
+            }
+            return data;
+        }).finally(() => {
+            delete fetchPromiseCache[cacheKey]
+        })
+    return fetchPromiseCache[cacheKey]
 }
