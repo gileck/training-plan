@@ -89,7 +89,7 @@ self.addEventListener('fetch', (event) => {
         return
     }
 
-    const shouldCacheFile = ['js', 'css', 'html'].includes(fileExtention) && !isNavigation
+    const shouldCacheFile = ['js', 'css', 'html', 'jpg'].includes(fileExtention) && !isNavigation
     if (shouldCacheFile) {
         return event.respondWith(cacheFile(event));
     }
