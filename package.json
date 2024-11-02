@@ -17,6 +17,7 @@
     "@next/bundle-analyzer": "^14.2.13",
     "@vercel/blob": "^0.23.4",
     "axios": "^1.7.2",
+    "cookie": "^1.0.1",
     "dotenv": "^16.4.5",
     "lodash": "^4.17.21",
     "mongodb": "^6.8.0",
