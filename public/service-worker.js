@@ -78,6 +78,8 @@ self.addEventListener('fetch', (event) => {
     const requestURL = event.request.url;
     const isSameOrigin = event.request.url.startsWith(self.location.origin)
     const fileExtention = requestURL.split('.').pop();
+    const type = event.request.destination;
+    const isImage = type === 'image';
     const isNavigation = event.request.mode === 'navigate';
     const shouldBypassCache = hasDisableCache(requestURL);
     const isLocalhost = requestURL.includes('localhost');
@@ -89,7 +91,7 @@ self.addEventListener('fetch', (event) => {
         return
     }
 
-    const shouldCacheFile = ['js', 'css', 'html', 'jpg'].includes(fileExtention) && !isNavigation
+    const shouldCacheFile = (['js', 'css', 'html', 'jpg'].includes(fileExtention) && !isNavigation) || isImage
     if (shouldCacheFile) {
         return event.respondWith(cacheFile(event));
     }
