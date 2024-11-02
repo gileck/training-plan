@@ -15,6 +15,7 @@ export default function RootLayout({ children }) {
       <meta name="apple-mobile-web-app-status-bar-style" content="blue" />
       <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png" />
       <link rel="manifest" href="/manifest.json" />
+      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
       <body className={inter.className}>{children}</body>
     </html>
   );

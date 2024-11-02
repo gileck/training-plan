@@ -213,7 +213,10 @@ export function Home({ user }) {
           </div>
         </div>
         <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
-          <Box sx={{ minWidth: 380 }}>
+          <Box sx={{
+            minWidth: 380,
+            marginBottom: '10px',
+          }}>
             <BottomNavigation
               showLabels
               value={Comps.findIndex(({ route: r }) => r === route)}
