@@ -112,7 +112,6 @@ export function ActivityTable({ setIsLoading }) {
             shouldUsecache: false,
         })
             .then((data) => {
-                console.log(data.activity);
                 setActivity(() => data.activity);
                 setIsLoading(false);
             })
@@ -252,8 +251,12 @@ export function ActivityTable({ setIsLoading }) {
                     <Button sx={{ color: "#0063fe", fontSize: '11px' }} onClick={() => toggleEnableSelect()}>{selectEnabled ? 'Cancel' : 'Edit'}</Button>
                     <Button sx={{ color: "#0063fe", fontSize: '11px' }} disabled={!selectEnabled} onClick={() => handleSelectAll()}>Select All</Button>
                     <Button sx={{ color: "#0063fe", fontSize: '11px' }} disabled={selectedItems.length === 0} onClick={() => handleDeselectAll()}>Deselect All</Button>
-                    <Button startIcon={<Delete />} disabled={selectedItems.length === 0} sx={{ color: "#0063fe", fontSize: '11px' }} onClick={() => deleteItems()}></Button>
-                    <Button startIcon={<Refresh />} sx={{ color: "#0063fe", fontSize: '11px' }} onClick={() => refreshItems()}></Button>
+                    <IconButton disabled={selectedItems.length === 0} sx={{ color: "#0063fe", fontSize: '11px' }} onClick={() => deleteItems()}>
+                        <Delete />
+                    </IconButton>
+                    <IconButton sx={{ color: "#0063fe", fontSize: '11px' }} onClick={() => refreshItems()} >
+                        <Refresh />
+                    </IconButton>
                 </Box>
                 <Divider />
 
@@ -304,7 +307,7 @@ export function ActivityTable({ setIsLoading }) {
                         </React.Fragment>
                     ))}
                 </List>
-            </Box>
+            </Box >
 
         </>
     );
