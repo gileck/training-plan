@@ -120,8 +120,13 @@ export function Workout() {
         onUpdateExercise(workoutId, exercise.id, selectedWeek, {
             totalWeeklySets: Number(exercise.weeks[selectedWeek].totalWeeklySets || 0) + Number(sets)
         }, {
-            action: sets > 0 ? 'SetComplete' : null,
-            numberOfSetsDone: sets
+            operations: [sets > 0 ? {
+                action: sets > 0 ? 'SetComplete' : null,
+                numberOfSetsDone: sets,
+                exerciseId: exercise.id,
+                workoutId,
+                weekIndex: selectedWeek
+            } : {}]
         });
     }
 
@@ -129,8 +134,13 @@ export function Workout() {
         onUpdateExercise(workoutId, exercise.id, selectedWeek, {
             totalWeeklySets: Number(exercise.weeks[selectedWeek].weeklyTarget || 0)
         }, {
-            action: 'ExerciseDone',
-            numberOfSetsDone: exercise.weeks[selectedWeek].weeklyTarget - exercise.weeks[selectedWeek].totalWeeklySets
+            operations: [{
+                action: 'ExerciseDone',
+                numberOfSetsDone: exercise.weeks[selectedWeek].weeklyTarget - exercise.weeks[selectedWeek].totalWeeklySets,
+                exerciseId: exercise.id,
+                workoutId,
+                weekIndex: selectedWeek
+            }]
         })
     }
 
@@ -158,6 +168,7 @@ export function Workout() {
             currentWeekOpened={currentWeekOpened}
             saveConfig={saveConfig}
             shouldShowRecoveryStatus={true}
+            getConfig={getConfig}
 
         />
 

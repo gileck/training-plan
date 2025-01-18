@@ -12,7 +12,7 @@ export default async function handler(req, res) {
 
 
 
-    const plansToReturn = plans.map(({ id, name, plan, user, dateCreated }) => {
+    const plansToReturn = plans.map(({ id, name, plan, user, dateCreated, dateUpdated }) => {
         if (!plan.exercises) {
             plan.exercises = [];
         }
@@ -24,6 +24,7 @@ export default async function handler(req, res) {
             name,
             user,
             dateCreated,
+            dateUpdated,
             ...plan,
         }
     });

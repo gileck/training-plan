@@ -3,8 +3,8 @@ import _ from 'lodash';
 import { localStorageAPI } from "./localStorageAPI";
 import { getExercisesList } from "./exercisesList";
 import { AppContext } from './AppContext';
-import { toBase64 } from 'openai/core';
 const debouncedFetch = _.debounce((url, options, onSuccess, onError) => fetch(url, options).then(res => res.json()).then(onSuccess).catch(onError), 1000);
+let operationsQueue = [];
 
 function randomNum(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
@@ -64,15 +64,18 @@ export function useExercisesAPI() {
 
     useEffect(() => {
         window.addEventListener('online', () => {
+            console.log('online', { operationsQueue });
             questionBox.openQuestionBox('Back Online! Do you want to save the training plan?', (answer) => {
                 if (answer) {
-                    updateTrainingPlan(currentTrainingPlan, { online: true });
+                    updateTrainingPlan(currentTrainingPlan, {
+                        operations: operationsQueue,
+                        online: true
+                    }).then(() => {
+                        operationsQueue = []
+                    })
                 }
             })
         });
-        // questionBox.openQuestionBox('Back Online! Do you want to save the training plan?', () => {
-        // updateTrainingPlan(currentTrainingPlan, { online: true });
-        // })
     })
 
     function selectTrainingPlan(planId) {
@@ -81,7 +84,7 @@ export function useExercisesAPI() {
     }
 
     function updateTrainingPlan(trainingPlan, options) {
-        debouncedFetch('/api/saveTrainingPlan', {
+        return debouncedFetch('/api/saveTrainingPlan', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -99,6 +102,8 @@ export function useExercisesAPI() {
         }, err => {
             context.openErrorAlert('Error saving Training Plan')
             console.error("ERROR:", err);
+            operationsQueue.push(...options.operations);
+            console.log('operationsQueue', { operationsQueue });
         })
     }
 
@@ -547,7 +552,7 @@ export function useExercisesAPI() {
             })
 
             trainingPlan.workouts = newWorkouts;
-            saveTrainingPlan(trainingPlan, { exerciseId, workoutId, weekIndex, ...options });
+            saveTrainingPlan(trainingPlan, options);
 
         }
 

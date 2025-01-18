@@ -41,7 +41,9 @@ function EditDateDialog({ open, onClose, onDateChange, item }) {
 }
 
 export function ActivityTable({ setIsLoading }) {
-    const { data, loading, error, setData } = useFetch('/api/activity/activity')
+    const { data, loading, error, setData } = useFetch('/api/activity/activity', {
+        shouldUsecache: false
+    })
     const setActivity = (cb) => setData(prevData => ({ activity: cb(prevData.activity) }))
     const activity = data.activity || [];
     setIsLoading(loading)

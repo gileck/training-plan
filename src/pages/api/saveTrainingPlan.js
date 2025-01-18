@@ -26,51 +26,53 @@ export default async function handler(req, res) {
 
 
 
-    if (options && options.action) {
-        const { exerciseId, workoutId, weekIndex } = options;
-        // const exercise = trainingPlan.exercises.find(e => e.id === options.exerciseId);
-        const exercise = trainingPlan.workouts.find(w => w.id === workoutId).exercises.find(e => e.id === exerciseId)
-        const currentWeek = exercise.weeks[weekIndex];
+    if (options && options.operations) {
+        for (const operation of options.operations) {
+            if (!operation.action) continue;
+            const { exerciseId, workoutId, weekIndex } = operation;
+            const exercise = trainingPlan.workouts.find(w => w.id === workoutId).exercises.find(e => e.id === exerciseId)
+            const currentWeek = exercise.weeks[weekIndex];
 
-        // console.log({
-        //     username,
-        //     date: new Date(),
-        //     trainingPlanId: trainingPlan.id,
-        //     action: options.action,
-        //     numberOfSetsDone: options.numberOfSetsDone,
-        //     exercise: {
-        //         id: exercise.id,
-        //         name: exercise.name,
-        //         weekIndex,
-        //         totalWeeklySets: currentWeek.totalWeeklySets,
-        //         weeklyTarget: currentWeek.weeklyTarget,
-        //         numberOfReps: currentWeek.numberOfReps,
-        //         weight: currentWeek.weight,
-        //     }
-        // });
+            // console.log({
+            //     username,
+            //     date: new Date(),
+            //     trainingPlanId: trainingPlan.id,
+            //     action: options.action,
+            //     numberOfSetsDone: options.numberOfSetsDone,
+            //     exercise: {
+            //         id: exercise.id,
+            //         name: exercise.name,
+            //         weekIndex,
+            //         totalWeeklySets: currentWeek.totalWeeklySets,
+            //         weeklyTarget: currentWeek.weeklyTarget,
+            //         numberOfReps: currentWeek.numberOfReps,
+            //         weight: currentWeek.weight,
+            //     }
+            // });
 
-        await db.collection('activity').insertOne({
-            username,
-            date: new Date().getTime(),
-            trainingPlanId: trainingPlan.id,
-            action: options.action,
-            numberOfSetsDone: options.numberOfSetsDone,
-            exercise: {
-                id: exercise.id,
-                name: exercise.name,
-                weekIndex,
-                totalWeeklySets: currentWeek.totalWeeklySets,
-                weeklyTarget: currentWeek.weeklyTarget,
-                numberOfReps: currentWeek.numberOfReps,
-                weight: currentWeek.weight,
+            await db.collection('activity').insertOne({
+                username,
+                date: new Date().getTime(),
+                trainingPlanId: trainingPlan.id,
+                action: operation.action,
+                numberOfSetsDone: operation.numberOfSetsDone,
+                exercise: {
+                    id: exercise.id,
+                    name: exercise.name,
+                    weekIndex,
+                    totalWeeklySets: currentWeek.totalWeeklySets,
+                    weeklyTarget: currentWeek.weeklyTarget,
+                    numberOfReps: currentWeek.numberOfReps,
+                    weight: currentWeek.weight,
+                }
+            })
+
+
+            // await sendMessage(`Training plan updated for ${username} with action ${action}`);
+            await sendLog(`${name} finisied ${exercise?.name} (${currentWeek.totalWeeklySets}/${currentWeek.weeklyTarget})`);
+            if (currentWeek.totalWeeklySets >= currentWeek.weeklyTarget) {
+                await sendMessage(`${name} just completed the weekly target of ${currentWeek.weeklyTarget} sets for ${exercise?.name}`);
             }
-        })
-
-
-        // await sendMessage(`Training plan updated for ${username} with action ${action}`);
-        await sendLog(`${name} finisied ${exercise?.name} (${currentWeek.totalWeeklySets}/${currentWeek.weeklyTarget})`);
-        if (currentWeek.totalWeeklySets >= currentWeek.weeklyTarget) {
-            await sendMessage(`${name} just completed the weekly target of ${currentWeek.weeklyTarget} sets for ${exercise?.name}`);
         }
     }
 

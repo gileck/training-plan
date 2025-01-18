@@ -55,8 +55,9 @@ export function AppProvider({ children, setRoute, params, user }) {
     const trainingPlansFromLocal = localStorageAPI().getData('trainingPlans')
     const [trainingPlansState, setTrainingPlans] = useState(trainingPlansFromLocal || []);
 
-    const { data: { exercises: exercisesList } } = useFetch('/api/exercises/getExercises')
-    // console.log({ exercisesList });
+    const { data: { exercises: exercisesList } } = useFetch('/api/exercises/getExercises', {
+        shouldUsecache: false
+    })
     const getImageUrl = (name) => {
         if (!name) {
             return ''

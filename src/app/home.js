@@ -29,6 +29,7 @@ import theme from "./theme";
 import { Activity } from "./components/Activity";
 import { AppProvider } from "./AppProvider";
 import { PersonalCoachAI } from "./components/PersonalCoachAI";
+import { ExerciseList } from "./components/ExerciseList";
 
 
 
@@ -98,7 +99,7 @@ export function Home({ user }) {
     'profile': Profile,
     'activity': Activity,
     'progress': Activity,
-    'coachAI': PersonalCoachAI
+    'coachAI': PersonalCoachAI,
   }
 
   const getComponent = (route) => {

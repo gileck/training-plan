@@ -5,7 +5,9 @@ import { getCategory } from '../exercisesAPI'; // Import the getCategory functio
 import { useFetch } from "@/useFetch";
 
 export function Progress({ setIsLoading }) {
-    const { data, loading, error } = useFetch('/api/activity/activity')
+    const { data, loading, error } = useFetch('/api/activity/activity', {
+        shouldUsecache: false
+    })
     const activity = data?.activity || []
     setIsLoading(loading)
     const [graphData, setGraphData] = useState([]);

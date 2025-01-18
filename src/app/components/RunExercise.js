@@ -139,13 +139,21 @@ export function RunExercise(props) {
                 return Object.assign(exercise, exercise.weeks[Number(week)])
             })
 
+
     function updateSet(exercise, sets) {
         updateExercise(exercise.workoutId, exercise.id, Number(week), {
             totalWeeklySets: Number(exercise.totalWeeklySets || 0) + Number(sets)
-        }, {
-            action: sets > 0 ? 'SetComplete' : null,
-            numberOfSetsDone: sets
-        });
+        },
+            {
+                operations: [{
+                    action: sets > 0 ? 'SetComplete' : null,
+                    numberOfSetsDone: sets,
+                    exerciseId: exercise.id,
+                    workoutId: exercise.workoutId,
+                    weekIndex: week
+                }]
+            }
+        );
     }
 
     return (
