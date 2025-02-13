@@ -7,6 +7,7 @@ import { getImageUrl } from '../exercisesList';
 import { AppContext } from '../AppContext';
 
 export function Exercise({
+    shouldShowWeek,
     shouldShowArrows,
     onWorkoutArrowClicked,
     isSelected,
@@ -92,6 +93,14 @@ export function Exercise({
                     }
                     secondary={
                         <React.Fragment>
+                            { shouldShowWeek ? <Typography
+                                sx={{ ml: '0px' }}
+                                component="div"
+                                variant="body2"
+                                color="text.secondary"
+                            >
+                                week: {exercise.week + 1}
+                            </Typography> : '' }
                             <Typography
                                 component="span"
                                 variant="body2"
@@ -113,6 +122,8 @@ export function Exercise({
                                 {exercise.weight > 0 ? `${exercise.numberOfReps}x${exercise.weight}kg` : `${exercise.numberOfReps} reps`}
                                 {exercise.weight === 0 ? " (body weight)" : ""}
                             </Typography>
+                            
+
                         </React.Fragment>
                     } />
                 <IconButton
