@@ -59,21 +59,23 @@ export function ExerciseList({
 
     useEffect(() => {
         const exercises = workouts.flatMap(workout => workout.exercises)
-        console.log({exercises});
-        
         setExerciseOrder(exercises);
     }, [workouts]);
 
     const exercises = exerciseOrder
     .flatMap(e => e.weeks.map(ew => ({...e, ...ew})))
-    .sort((a, b) => a.week - b.week)
+    
     .filter(e => e.week <= selectedWeek || e.week === selectedWeek + 1);
 
 
-    const unfinishedExercises = exercises.filter(e => !getExercise(e).sets.isFinished);
-    const finishedExercises = exercises.filter(e => getExercise(e).sets.isFinished);
+    const unfinishedExercises = exercises.filter(e => !getExercise(e).sets.isFinished).sort((a, b) => a.week - b.week)
+
 
     console.log({unfinishedExercises});
+    
+
+    const finishedExercises = exercises.filter(e => getExercise(e).sets.isFinished).sort((a, b) => b.week - a.week)
+
     
 
     return (
@@ -81,17 +83,17 @@ export function ExerciseList({
             {unfinishedExercises.map((exercise, index) => (
                 <div key={exercise.id} style={{ marginBottom: '16px', display: 'flex', gap: '8px' }}>
                     <Exercise
-                        openAskAIDialog={() => openAskAIDialog(exercise, selectedWeek)}
+                        openAskAIDialog={() => openAskAIDialog(exercise, exercise.week)}
                         shouldShowArrows={true}
                         onWorkoutArrowClicked={(e, v) => onWorkoutArrowClicked(exercise.workoutId, e.id, v)}
                         isSelected={selectedExercises.includes(exercise.id)}
                         selectExercise={selectExercise}
-                        selectedWeek={selectedWeek}
+                        selectedWeek={exercise.week}
                         shouldShowWeek={true}
                         exercise={getExercise(exercise)}
-                        onRemoveSetComplete={() => onSetComplete(exercise.workoutId, exercise, -1, selectedWeek)}
-                        onAddSetComplete={() => onSetComplete(exercise.workoutId, exercise, 1, selectedWeek)}
-                        onSetDone={() => onExerciseDone(exercise.workoutId, exercise, selectedWeek)}
+                        onRemoveSetComplete={() => onSetComplete(exercise.workoutId, exercise, -1, exercise.week)}
+                        onAddSetComplete={() => onSetComplete(exercise.workoutId, exercise, 1, exercise.week)}
+                        onSetDone={() => onExerciseDone(exercise.workoutId, exercise, exercise.week)}
                         disableEdit={disableEdit}
                     />
                 </div>
@@ -115,6 +117,7 @@ export function ExerciseList({
                     {showFinished && finishedExercises.map((exercise, index) => (
                         <div key={exercise.id} style={{ marginBottom: '16px', display: 'flex', gap: '8px' }}>
                             <Exercise
+                                shouldShowWeek={true}
                                 openAskAIDialog={() => openAskAIDialog(exercise, exercise.week)}
                                 shouldShowArrows={true}
                                 onWorkoutArrowClicked={(e, v) => onWorkoutArrowClicked(exercise.workoutId, e.id, v)}
