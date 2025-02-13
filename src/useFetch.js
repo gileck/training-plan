@@ -112,15 +112,15 @@ function getCacheKey(url, options) {
 }
 
 export async function fetchWithCache(_url, options = {}) {
-    // console.log('fetchWithCache', _url, options);
     const cacheKey = await getCacheKey(_url, options);
-    // console.log({ cacheKey });
     const query = options.query ? '?' + new URLSearchParams(options.query).toString() : '';
     const url = _url + query;
     const shouldUsecache = options.shouldUsecache !== false;
     const overrideStaleTime = options.overrideStaleTime;
     const disableFetchInBackground = options.disableFetchInBackground === true;
+    
     const dataFromCache = shouldUsecache ? getDataFromCache(cacheKey, overrideStaleTime) : null;
+    
     if (dataFromCache) {
         if (!disableFetchInBackground && shouldFetchInBackground(url)) {
             updateCacheInBackground(url)
