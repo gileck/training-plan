@@ -19,10 +19,6 @@ export function ExerciseList({
     disableEdit,
 }) {
 
-    console.log({workouts});
-    
-
-
     const [exerciseOrder, setExerciseOrder] = useState([]);
     const [showFinished, setShowFinished] = useState(false);
 
@@ -64,17 +60,11 @@ export function ExerciseList({
 
     const exercises = exerciseOrder
     .flatMap(e => e.weeks.map(ew => ({...e, ...ew})))
-    
-    .filter(e => e.week <= selectedWeek || e.week === selectedWeek + 1);
-
+    .filter(e => e.week <= selectedWeek || e.week === selectedWeek + 1)
 
     const unfinishedExercises = exercises.filter(e => !getExercise(e).sets.isFinished).sort((a, b) => a.week - b.week)
-
-
-    console.log({unfinishedExercises});
-    
-
     const finishedExercises = exercises.filter(e => getExercise(e).sets.isFinished).sort((a, b) => b.week - a.week)
+
 
     
 
