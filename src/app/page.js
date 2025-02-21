@@ -10,7 +10,10 @@ const HomeLazy = dynamic(() => import('./home').then(m => m.Home), { ssr: false 
 export default function () {
 
 
-    const { data, loading } = useFetch('/api/user', { shouldUsecache: true });
+    const { data, loading } = useFetch('/api/user', {
+        shouldUsecache: true,
+        saveToCachePredicate: (data) => data?.user,
+    });
     const user = data?.user
 
     if (loading) return <LinearProgress color="secondary" />
