@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Box, Button, Checkbox, Dialog, Divider, IconButton, List, ListItemSecondaryAction, TextField, DialogContent, LinearProgress, Tabs, Tab, Collapse, DialogTitle, DialogActions } from "@mui/material";
 import { ListItem, ListItemText } from "@mui/material";
-import { Delete, Edit, ExpandLess, ExpandMore, Refresh } from "@mui/icons-material";
+import { Delete, Edit, ExpandLess, ExpandMore, Refresh, ContentCopy } from "@mui/icons-material";
 import { fetchWithCache, useFetch } from "@/useFetch";
 function EditDateDialog({ open, onClose, onDateChange, item }) {
 
@@ -199,6 +199,27 @@ export function ActivityTable({ setIsLoading }) {
             });
     }
 
+    const duplicateItem = (item) => {
+        setIsLoading(true);
+        fetch('/api/activity/duplicateActivity', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                id: item._id,
+            }),
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                setActivity((prevActivity) => [...prevActivity, data.activity]);
+                setIsLoading(false);
+            })
+            .catch((e) => {
+                console.error('Error duplicating data', e.message);
+            });
+    };
+
     const toDateHeaderString = (dateString, totalSets) => {
         const date = new Date(dateString);
         const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
@@ -286,10 +307,17 @@ export function ActivityTable({ setIsLoading }) {
                                         <List component="div" disablePadding>
                                             {groupedActivities[date].exercises[exerciseName].items.map((item, index) => (
                                                 <React.Fragment key={index}>
-                                                    <ListItem sx={{ pl: 4 }}>
+                                                    <ListItem sx={{ pl: selectEnabled ? 0 : 5 }}>
                                                         {selectEnabled ? <Checkbox checked={selectedItems.includes(item._id)} onChange={() => handleSelect(item._id)} /> : ''}
-                                                        <ListItemText primary={item.exercise.name + ` x${item.numberOfSetsDone}`} secondary={toDateString(item.date)} />
+                                                        <ListItemText
+                                                            primary={item.exercise.name + ` x${item.numberOfSetsDone}`}
+                                                            secondary={toDateString(item.date)}
+
+                                                        />
                                                         <ListItemSecondaryAction sx={{ visibility: !selectEnabled ? 'hidden' : 'visible' }}>
+                                                            <IconButton onClick={() => duplicateItem(item)}>
+                                                                <ContentCopy />
+                                                            </IconButton>
                                                             <IconButton onClick={() => { setEditDateDialogOpen(true); setSelectedItem(item); }}>
                                                                 <Edit />
                                                             </IconButton>
