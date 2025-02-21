@@ -19,6 +19,9 @@ const Login = () => {
             body: JSON.stringify({ username, password, name }),
         });
 
+        console.log(res);
+        
+
         if (res.ok) {
             setSuccess('Logged in successfully!');
             window.location.href = '/';

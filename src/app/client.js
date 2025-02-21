@@ -5,12 +5,11 @@ export function Client() {
 
   useEffect(() => {
     const tryToLogin = async () => {
-      const user = await fetch(`/api/user`).then(res => res.json());
-      console.log({ user });
+      const { user } = await fetch(`/api/user`).then(res => res.json());
       if (!user.username) {
         window.location.href = '/login';
       } else {
-        window.location.href = '/home';
+        window.location.href = '/';
       }
     }
     tryToLogin();
